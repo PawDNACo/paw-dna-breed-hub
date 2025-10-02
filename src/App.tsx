@@ -23,6 +23,7 @@ import VerificationComplete from "./pages/VerificationComplete";
 import VerificationDashboard from "./pages/VerificationDashboard";
 import ConversationsDashboard from "./pages/ConversationsDashboard";
 import DeveloperDashboard from "./pages/DeveloperDashboard";
+import SecuritySettings from "./pages/SecuritySettings";
 import AuthCallback from "./pages/AuthCallback";
 import CompleteProfile from "./pages/CompleteProfile";
 import { AuthPage } from "./components/auth/AuthPage";
@@ -142,6 +143,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <DeveloperDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/security-settings" 
+            element={
+              <ProtectedRoute>
+                <SecuritySettings />
               </ProtectedRoute>
             } 
           />

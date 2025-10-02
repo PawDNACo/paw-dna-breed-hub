@@ -22,6 +22,9 @@ export const AuthPage = () => {
   const [username, setUsername] = useState("");
   const [showLocationInput, setShowLocationInput] = useState(false);
   const [signupData, setSignupData] = useState<any>(null);
+  const [show2FA, setShow2FA] = useState(false);
+  const [mfaCode, setMfaCode] = useState("");
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
 
   useEffect(() => {
     checkUser();
@@ -131,12 +134,56 @@ export const AuthPage = () => {
         });
 
         if (sessionError) throw sessionError;
+
+        // Check if user has MFA enabled
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        const hasMFA = factors?.totp?.some(f => f.status === 'verified');
+
+        if (hasMFA && factors?.totp?.[0]) {
+          // User has 2FA enabled, show 2FA prompt
+          setMfaFactorId(factors.totp[0].id);
+          setShow2FA(true);
+          toast.info("Please enter your 2FA code");
+          setLoading(false);
+          return;
+        }
       }
 
       toast.success("Welcome back!");
       navigate("/browse");
     } catch (error: any) {
       toast.error(error.message || "Failed to sign in");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMFAVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (!mfaFactorId) throw new Error("No MFA factor ID");
+
+      // Challenge and verify
+      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+        factorId: mfaFactorId,
+      });
+
+      if (challengeError) throw challengeError;
+
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId: mfaFactorId,
+        challengeId: challengeData.id,
+        code: mfaCode,
+      });
+
+      if (verifyError) throw verifyError;
+
+      toast.success("Welcome back!");
+      navigate("/browse");
+    } catch (error: any) {
+      toast.error(error.message || "Invalid 2FA code");
     } finally {
       setLoading(false);
     }
@@ -192,6 +239,52 @@ export const AuthPage = () => {
             </CardHeader>
             <CardContent>
               <LocationInput onLocationUpdate={handleLocationUpdate} />
+            </CardContent>
+          </Card>
+        ) : show2FA ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Two-Factor Authentication</CardTitle>
+              <CardDescription>
+                Enter the 6-digit code from your authenticator app
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleMFAVerify} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="mfa-code">Authentication Code</Label>
+                  <Input
+                    id="mfa-code"
+                    type="text"
+                    placeholder="123456"
+                    value={mfaCode}
+                    onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    maxLength={6}
+                    required
+                    autoFocus
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Open your authenticator app to get your code
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button type="submit" className="flex-1" disabled={loading || mfaCode.length !== 6}>
+                    {loading ? "Verifying..." : "Verify"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShow2FA(false);
+                      setMfaCode("");
+                      setIdentifier("");
+                      setPassword("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
             </CardContent>
           </Card>
         ) : (

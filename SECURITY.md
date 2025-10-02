@@ -1,8 +1,35 @@
-# Security Documentation
+# PawDNA Security Guide
+
+**Last Updated: 2025-10-02**  
+**Status: ✅ All Critical Security Issues Resolved**
 
 ## Overview
 
 PawDNA implements comprehensive security measures to protect user data, prevent fraud, and ensure safe transactions between breeders and buyers.
+
+## 🔒 Recent Security Fixes (2025-10-02)
+
+### Critical Issues Resolved:
+
+1. ✅ **Financial Transaction History Protection**
+   - Added explicit RLS denial for anonymous users on `sales` table
+   - Recreated `my_transactions` view with `security_invoker = true`
+   - Strengthened participant-only access validation
+
+2. ✅ **Sales Record Creation Security**
+   - Confirmed only `complete-purchase` edge function can create sales
+   - Service role key bypasses RLS for authorized creation
+   - All client-side INSERT attempts blocked: `WITH CHECK (false)`
+
+3. ✅ **Bot Scraping Prevention**
+   - Strengthened profile RLS with explicit anonymous denial
+   - Added system-managed field protection (is_verified, account_status, etc.)
+   - Enhanced audit logging for profile access
+
+4. ✅ **PII Exposure Prevention**
+   - Added database comments marking sensitive fields
+   - Implemented UPDATE policy preventing modification of system-managed fields
+   - Ensured all views use `security_invoker = true`
 
 ## Critical Data Protection
 
@@ -252,17 +279,119 @@ rateLimitMiddleware(clientIp, {
 ### Critical Protections
 
 #### Customer Personal Information (PII)
-- **Email addresses**: NEVER exposed to other users
+
+**Email Address Protection:**
+- **NEVER exposed**: Email addresses are completely isolated from other users
+- **Explicit denial**: Anonymous users cannot access profiles table at all
+- **Owner-only access**: Authenticated users can only view their own email
+- **Safe views**: `public_profiles` and `conversation_partner_profiles` exclude email field
+- **Audit logging**: Email access logged to `email_access_log` table
+
+**System-Managed Field Protection:**
+Users **cannot** modify these security-critical fields even on their own profile:
+```sql
+CREATE POLICY "Users can update their own profile"
+ON public.profiles FOR UPDATE TO authenticated
+USING (auth.uid() = id)
+WITH CHECK (
+  auth.uid() = id AND (
+    -- These fields MUST remain unchanged
+    OLD.is_verified = NEW.is_verified
+    AND OLD.verification_status = NEW.verification_status
+    AND OLD.account_status = NEW.account_status
+    AND OLD.frozen_at = NEW.frozen_at
+    AND OLD.frozen_reason = NEW.frozen_reason
+  )
+);
+```
+
+**Location Data Protection:**
 - **Full names**: Only visible in authorized transactions
-- **Location data**: GPS coordinates owner-only, city/state for active partners only
+- **GPS coordinates**: Owner-only, never exposed to other users
+- **Zip code**: Restricted to conversation/transaction partners only
+- **City/State**: Safe public access via secure views
 - **Identity verification tokens**: Completely isolated, owner-only access
 
 #### Transaction Data Protection
-- **Sales records**: Only visible to buyer and breeder participants
-- **No client-side inserts**: Sales creation restricted to authorized edge functions only
-- **Audit logging**: All sales access logged in `sales_access_log` table
-- **Anonymous users blocked**: Zero access to transaction data
-- **Secure view**: `my_transactions` view provides safe access to own transactions only
+
+**CRITICAL**: Transaction and financial data must ONLY be accessible to transaction participants.
+
+##### Multi-Layer Security Implementation:
+
+**1. Database RLS Policies:**
+```sql
+-- Anonymous users are EXPLICITLY DENIED all access
+CREATE POLICY "Anonymous users cannot access sales data"
+ON public.sales FOR ALL TO anon
+USING (false) WITH CHECK (false);
+
+-- Authenticated users can ONLY view their own transactions
+CREATE POLICY "Authenticated non-participants cannot access sales"
+ON public.sales FOR SELECT TO authenticated
+USING (auth.uid() = buyer_id OR auth.uid() = breeder_id);
+
+-- Direct INSERT blocked for ALL users (edge functions only)
+CREATE POLICY "Only service role can create sales"
+ON public.sales FOR INSERT TO authenticated
+WITH CHECK (false);
+```
+
+**2. Secure View with security_invoker:**
+```sql
+-- my_transactions view respects RLS policies
+CREATE VIEW public.my_transactions
+WITH (security_invoker = true)
+AS SELECT 
+  s.id, s.sale_date, s.sale_price, s.platform_fee,
+  s.breeder_earnings, s.payout_status, s.payout_date,
+  CASE 
+    WHEN s.buyer_id = auth.uid() THEN 'purchase'
+    WHEN s.breeder_id = auth.uid() THEN 'sale'
+  END as transaction_type,
+  p.name as pet_name, p.species, p.breed
+FROM public.sales s
+LEFT JOIN public.pets p ON s.pet_id = p.id
+WHERE auth.uid() = s.buyer_id OR auth.uid() = s.breeder_id;
+```
+
+**3. Edge Function Authorization:**
+Only the `complete-purchase` edge function can create sales using service role key:
+```typescript
+// Uses service role to bypass RLS for authorized creation
+const supabaseClient = createClient(
+  Deno.env.get('SUPABASE_URL'),
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'), // ← Bypasses RLS
+  { auth: { persistSession: false } }
+);
+
+await supabaseClient.from('sales').insert({
+  pet_id, breeder_id, buyer_id, sale_price,
+  platform_fee, breeder_earnings, payout_status: 'pending'
+});
+```
+
+**4. Frontend Security Utilities:**
+Use `src/lib/transactionSecurity.ts` helpers:
+```typescript
+import { getMyTransactions, canAccessTransaction } from '@/lib/transactionSecurity';
+
+// ✅ CORRECT: Use secure helper functions
+const myTransactions = await getMyTransactions(); // Only returns user's transactions
+
+// ✅ CORRECT: Verify access before showing details
+const hasAccess = await canAccessTransaction(saleId);
+if (!hasAccess) return <AccessDenied />;
+
+// ❌ NEVER: Query sales table directly
+// supabase.from('sales').select('*') // BLOCKED by RLS
+```
+
+**Protected Fields:**
+- Sales records: Only visible to buyer and breeder participants
+- No client-side inserts: Sales creation restricted to authorized edge functions only
+- Audit logging: All sales access logged in `sales_access_log` table
+- Anonymous users blocked: Zero access to transaction data
+- Secure view: `my_transactions` view provides safe access to own transactions only
 
 #### Financial Data Security
 - **No payment method storage**: Credit cards, bank accounts stored in Stripe only

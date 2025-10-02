@@ -322,6 +322,48 @@ export type Database = {
           },
         ]
       }
+      contact_submissions: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          email: string
+          id: string
+          ip_address: unknown | null
+          message: string
+          name: string
+          status: string | null
+          subject: string
+          updated_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          ip_address?: unknown | null
+          message: string
+          name: string
+          status?: string | null
+          subject: string
+          updated_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          ip_address?: unknown | null
+          message?: string
+          name?: string
+          status?: string | null
+          subject?: string
+          updated_at?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           approved_at: string | null

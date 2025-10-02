@@ -27,6 +27,7 @@ import DeveloperDashboard from "./pages/DeveloperDashboard";
 import SecuritySettings from "./pages/SecuritySettings";
 import AuthCallback from "./pages/AuthCallback";
 import CompleteProfile from "./pages/CompleteProfile";
+import Contact from "./pages/Contact";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -116,7 +117,8 @@ const App = () => (
           <Route path="/buyer-agreement" element={<BuyerAgreement />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/faq" element={<FAQ />} />
-          <Route 
+          <Route path="/contact" element={<Contact />} />
+          <Route
             path="/verification-complete" 
             element={
               <ProtectedRoute>

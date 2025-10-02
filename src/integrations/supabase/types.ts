@@ -902,6 +902,7 @@ export type Database = {
           city: string | null
           county: string | null
           created_at: string
+          email: string
           frozen_at: string | null
           frozen_reason: string | null
           full_name: string | null
@@ -925,6 +926,7 @@ export type Database = {
           city?: string | null
           county?: string | null
           created_at?: string
+          email: string
           frozen_at?: string | null
           frozen_reason?: string | null
           full_name?: string | null
@@ -948,6 +950,7 @@ export type Database = {
           city?: string | null
           county?: string | null
           created_at?: string
+          email?: string
           frozen_at?: string | null
           frozen_reason?: string | null
           full_name?: string | null

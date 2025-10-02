@@ -27,7 +27,7 @@ export const Hero = () => {
             <p className="text-lg sm:text-xl text-muted-foreground mb-8 leading-relaxed">
               Connect with verified breeders, hire quality breeding partners, and find your perfect 
               puppy or kitten. PawDNA is the trusted platform where responsible breeding meets 
-              exceptional pet ownership.
+              exceptional pet ownership. <strong className="text-primary">Sign up free - no payment required upfront.</strong>
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button variant="hero" size="xl" onClick={() => window.location.href = "/auth"}>
@@ -40,11 +40,15 @@ export const Hero = () => {
             </div>
             <div className="mt-8 flex flex-wrap gap-8 text-sm">
               <div>
+                <div className="text-2xl font-bold text-primary">Free</div>
+                <div className="text-muted-foreground">Sign Up - No Upfront Cost</div>
+              </div>
+              <div>
                 <div className="text-2xl font-bold text-primary">$1,500+</div>
                 <div className="text-muted-foreground">Average Breeding Value</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-primary">15%</div>
+                <div className="text-2xl font-bold text-primary">85%</div>
                 <div className="text-muted-foreground">Breeder Royalties</div>
               </div>
               <div>

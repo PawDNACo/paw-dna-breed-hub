@@ -839,6 +839,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_admin_by_email: {
+        Args: { _email: string }
+        Returns: undefined
+      }
       calculate_breeder_earnings_percentage: {
         Args: { sale_price: number }
         Returns: number

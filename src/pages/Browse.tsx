@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const DOG_BREEDS = [
   "Labrador Retriever", "German Shepherd", "Golden Retriever", "French Bulldog",
@@ -41,22 +41,18 @@ interface Pet {
   vaccinated: boolean;
   city?: string;
   state?: string;
-  zip_code?: string;
-  latitude?: number;
-  longitude?: number;
+  // Removed sensitive location fields for privacy protection
+  // zip_code, county, latitude, longitude are not displayed to public
 }
 
 const Browse = () => {
   const navigate = useNavigate();
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchZip, setSearchZip] = useState("");
-  const [searchRadius, setSearchRadius] = useState("250");
   const [searchSpecies, setSearchSpecies] = useState("all");
   const [searchCity, setSearchCity] = useState("");
   const [searchState, setSearchState] = useState("");
   const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
-  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   useEffect(() => {
     fetchPets();
@@ -66,7 +62,7 @@ const Browse = () => {
     try {
       let query = supabase
         .from("pets")
-        .select("*")
+        .select("id, name, species, breed, gender, size, age_months, price, listing_type, vaccinated, city, state, image_url")
         .eq("available", true);
 
       if (searchSpecies && searchSpecies !== "all") {
@@ -89,23 +85,7 @@ const Browse = () => {
 
       if (error) throw error;
 
-      let filteredPets = data || [];
-      
-      // Filter by distance if user location is set
-      if (userLocation && filteredPets.length > 0) {
-        filteredPets = filteredPets.filter((pet) => {
-          if (!pet.latitude || !pet.longitude) return true;
-          const distance = calculateDistance(
-            userLocation.latitude,
-            userLocation.longitude,
-            pet.latitude,
-            pet.longitude
-          );
-          return distance <= parseInt(searchRadius);
-        });
-      }
-
-      setPets(filteredPets);
+      setPets(data || []);
     } catch (error) {
       console.error("Error fetching pets:", error);
     } finally {
@@ -113,43 +93,6 @@ const Browse = () => {
     }
   };
 
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 3959; // Earth's radius in miles
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-  };
-
-  const handleLocationSearch = async () => {
-    if (!searchZip || searchZip.length !== 5) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await fetch(`https://api.zippopotam.us/us/${searchZip}`);
-      if (!response.ok) throw new Error("ZIP code not found");
-
-      const data = await response.json();
-      const place = data.places[0];
-      
-      setUserLocation({
-        latitude: parseFloat(place.latitude),
-        longitude: parseFloat(place.longitude),
-      });
-
-      await fetchPets();
-    } catch (error) {
-      console.error("Error geocoding ZIP:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleBreedToggle = (breed: string) => {
     setSelectedBreeds(prev => 
@@ -181,49 +124,19 @@ const Browse = () => {
               Browse <span className="bg-gradient-hero bg-clip-text text-transparent">Available Pets</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Discover quality breeding partners and adorable puppies & kittens
+              Discover quality breeding partners and adorable puppies & kittens. Search by city and state.
             </p>
           </div>
 
           <Card className="mb-8">
             <CardHeader>
               <CardTitle>Search Filters</CardTitle>
-              <CardDescription>Find pets within your area (up to 250 miles)</CardDescription>
+              <CardDescription>Find pets by city, state, species, and breed</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 {/* Location Filters */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div>
-                    <Label htmlFor="zip">Your ZIP Code</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="zip"
-                        placeholder="12345"
-                        maxLength={5}
-                        value={searchZip}
-                        onChange={(e) => setSearchZip(e.target.value)}
-                      />
-                      <Button onClick={handleLocationSearch}>
-                        <Search className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="radius">Search Radius (miles)</Label>
-                    <Select value={searchRadius} onValueChange={setSearchRadius}>
-                      <SelectTrigger id="radius">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="50">50 miles</SelectItem>
-                        <SelectItem value="100">100 miles</SelectItem>
-                        <SelectItem value="150">150 miles</SelectItem>
-                        <SelectItem value="200">200 miles</SelectItem>
-                        <SelectItem value="250">250 miles</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="city">City</Label>
                     <Input

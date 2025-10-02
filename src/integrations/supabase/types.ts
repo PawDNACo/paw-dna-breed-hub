@@ -741,6 +741,7 @@ export type Database = {
           stripe_identity_verification_token: string | null
           two_factor_enabled: boolean | null
           updated_at: string
+          username: string | null
           verification_completed_at: string | null
           verification_status: string | null
           verification_type: string | null
@@ -765,6 +766,7 @@ export type Database = {
           stripe_identity_verification_token?: string | null
           two_factor_enabled?: boolean | null
           updated_at?: string
+          username?: string | null
           verification_completed_at?: string | null
           verification_status?: string | null
           verification_type?: string | null
@@ -789,6 +791,7 @@ export type Database = {
           stripe_identity_verification_token?: string | null
           two_factor_enabled?: boolean | null
           updated_at?: string
+          username?: string | null
           verification_completed_at?: string | null
           verification_status?: string | null
           verification_type?: string | null
@@ -1221,6 +1224,10 @@ export type Database = {
         Args: { _user1_id: string; _user2_id: string }
         Returns: number
       }
+      get_email_from_username: {
+        Args: { _username: string }
+        Returns: string
+      }
       get_partner_location: {
         Args: { _partner_id: string }
         Returns: {
@@ -1237,6 +1244,10 @@ export type Database = {
       }
       is_pet_owner: {
         Args: { _pet_id: string; _user_id: string }
+        Returns: boolean
+      }
+      username_exists: {
+        Args: { _username: string }
         Returns: boolean
       }
       users_have_active_conversation: {

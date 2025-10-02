@@ -114,6 +114,12 @@ export const signUpSchema = z.object({
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number"),
   
+  username: z.string()
+    .trim()
+    .min(3, "Username must be at least 3 characters")
+    .max(20, "Username must be at most 20 characters")
+    .regex(/^[a-z0-9_-]+$/, "Username can only contain lowercase letters, numbers, underscore, or hyphen"),
+  
   full_name: z.string()
     .trim()
     .min(1, "Full name is required")
@@ -122,9 +128,10 @@ export const signUpSchema = z.object({
 });
 
 export const signInSchema = z.object({
-  email: z.string()
+  identifier: z.string()
     .trim()
-    .email("Invalid email address"),
+    .min(1, "Username or email is required")
+    .max(255, "Input must be less than 255 characters"),
   
   password: z.string()
     .min(1, "Password is required"),

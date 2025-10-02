@@ -15,9 +15,11 @@ import { TrustBadgesCompact } from "@/components/TrustBadges";
 export const AuthPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [identifier, setIdentifier] = useState(""); // Can be email or username
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
   const [showLocationInput, setShowLocationInput] = useState(false);
   const [signupData, setSignupData] = useState<any>(null);
 
@@ -37,6 +39,20 @@ export const AuthPage = () => {
     setLoading(true);
 
     try {
+      // Validate username format
+      if (!/^[a-z0-9_-]{3,20}$/i.test(username)) {
+        throw new Error("Username must be 3-20 characters (letters, numbers, _ or - only)");
+      }
+
+      // Check if username already exists
+      const { data: usernameExists } = await supabase.rpc('username_exists', {
+        _username: username
+      });
+
+      if (usernameExists) {
+        throw new Error("Username already taken. Please choose another.");
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -49,6 +65,16 @@ export const AuthPage = () => {
       });
 
       if (error) throw error;
+
+      // Update profile with username
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ username: username.toLowerCase() })
+          .eq("id", data.user.id);
+
+        if (profileError) throw profileError;
+      }
 
       setSignupData(data);
       setShowLocationInput(true);
@@ -83,12 +109,29 @@ export const AuthPage = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Use custom edge function that supports username OR email
+      const { data, error } = await supabase.functions.invoke('sign-in-with-username', {
+        body: {
+          identifier: identifier, // Can be username or email
+          password: password,
+        },
       });
 
       if (error) throw error;
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Set the session manually
+      if (data.session) {
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
+
+        if (sessionError) throw sessionError;
+      }
 
       toast.success("Welcome back!");
       navigate("/browse");
@@ -132,18 +175,18 @@ export const AuthPage = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Welcome Back</CardTitle>
-                  <CardDescription>Sign in to browse pet details</CardDescription>
+                  <CardDescription>Sign in with username or email</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSignIn} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="signin-email">Email</Label>
+                      <Label htmlFor="signin-identifier">Username or Email</Label>
                       <Input
-                        id="signin-email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        id="signin-identifier"
+                        type="text"
+                        placeholder="username or you@example.com"
+                        value={identifier}
+                        onChange={(e) => setIdentifier(e.target.value)}
                         required
                       />
                     </div>
@@ -230,6 +273,23 @@ export const AuthPage = () => {
                         onChange={(e) => setFullName(e.target.value)}
                         required
                       />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-username">Username</Label>
+                      <Input
+                        id="signup-username"
+                        type="text"
+                        placeholder="pawlover123"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                        required
+                        minLength={3}
+                        maxLength={20}
+                        pattern="[a-zA-Z0-9_-]+"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        3-20 characters. Letters, numbers, underscore, or hyphen only.
+                      </p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="signup-email">Email</Label>

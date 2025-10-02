@@ -31,6 +31,12 @@ PawDNA implements comprehensive security measures to protect user data, prevent 
    - Implemented UPDATE policy preventing modification of system-managed fields
    - Ensured all views use `security_invoker = true`
 
+5. ✅ **Conversation Partner Profile Security**
+   - Recreated `conversation_partner_profiles` view with `security_invoker = true`
+   - View is self-securing through WHERE clause filtering with auth.uid()
+   - Only shows profiles of users with approved conversations or completed transactions
+   - No separate RLS policies needed - security enforced at view definition level
+
 ## Critical Data Protection
 
 ### Payment Verification Tokens
@@ -100,8 +106,27 @@ FROM profiles;
 -- Conversation partner profiles: Requires active relationship
 CREATE VIEW conversation_partner_profiles WITH (security_invoker=true) AS
 SELECT id, full_name, city, state, is_verified, verification_status
-FROM profiles
-WHERE active_conversation_or_transaction_exists;
+FROM profiles p
+WHERE 
+  -- Only show profiles with approved conversations
+  EXISTS (
+    SELECT 1 FROM conversations c
+    WHERE c.status = 'approved'
+      AND ((c.buyer_id = auth.uid() AND c.breeder_id = p.id) OR
+           (c.breeder_id = auth.uid() AND c.buyer_id = p.id))
+  )
+  OR
+  -- Or completed transactions
+  EXISTS (
+    SELECT 1 FROM sales s
+    WHERE (s.buyer_id = auth.uid() AND s.breeder_id = p.id) OR
+          (s.breeder_id = auth.uid() AND s.buyer_id = p.id)
+  );
+
+-- SECURITY NOTE: Views don't need RLS policies - they're secured by:
+-- 1. security_invoker = true (uses querying user's permissions)
+-- 2. WHERE clause filtering with auth.uid()
+-- 3. Underlying table RLS policies
 ```
 
 ##### 3. Approximate Distance Function

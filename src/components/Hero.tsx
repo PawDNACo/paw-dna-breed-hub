@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-pets.jpg";
+import { TrustBadgesCompact } from "@/components/TrustBadges";
 
 export const Hero = () => {
   return (
@@ -55,6 +56,11 @@ export const Hero = () => {
                 <div className="text-2xl font-bold text-primary">Verified</div>
                 <div className="text-muted-foreground">Secure Platform</div>
               </div>
+            </div>
+            
+            {/* Trust Badges */}
+            <div className="mt-12 pt-8 border-t border-border/50">
+              <TrustBadgesCompact />
             </div>
           </div>
         </div>

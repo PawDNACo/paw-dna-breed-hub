@@ -1,6 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { PawPrint, Heart, Shield, Users } from "lucide-react";
+import { TrustBadges } from "@/components/TrustBadges";
 
 export default function AboutUs() {
   return (
@@ -160,10 +161,10 @@ export default function AboutUs() {
           </section>
 
           {/* Call to Action */}
-          <section className="text-center bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-8 md:p-12">
+          <section className="text-center bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-8 md:p-12 mb-16">
             <h2 className="text-3xl font-bold mb-4">Join the PawDNA Community</h2>
             <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Whether you\'re a breeder looking to connect with loving families or a buyer seeking 
+              Whether you're a breeder looking to connect with loving families or a buyer seeking 
               your perfect companion, PawDNA is here to make the process transparent, safe, and rewarding.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -180,6 +181,11 @@ export default function AboutUs() {
                 Browse Pets
               </a>
             </div>
+          </section>
+
+          {/* Trust Badges */}
+          <section className="mb-16">
+            <TrustBadges variant="grid" showAll />
           </section>
         </div>
       </main>

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { PawPrint } from "lucide-react";
 import { LocationInput } from "@/components/LocationInput";
 import { SecurityDisclaimer } from "./SecurityDisclaimer";
+import { TrustBadgesCompact } from "@/components/TrustBadges";
 
 export const AuthPage = () => {
   const navigate = useNavigate();
@@ -202,7 +203,7 @@ export const AuthPage = () => {
                     </Button>
                   </div>
                   <p className="mt-4 text-xs text-center text-muted-foreground">
-                    Configure social login in Lovable Cloud backend
+                    Note: Social login requires backend configuration
                   </p>
                 </CardContent>
               </Card>
@@ -259,12 +260,17 @@ export const AuthPage = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-          </Tabs>
+        </Tabs>
         )}
 
         <p className="text-center text-sm text-muted-foreground mt-4">
           Free account to browse. Subscribe to hire or sell pets.
         </p>
+        
+        {/* Trust Badges */}
+        <div className="mt-8 pt-8 border-t border-border/50">
+          <TrustBadgesCompact />
+        </div>
       </div>
     </div>
   );

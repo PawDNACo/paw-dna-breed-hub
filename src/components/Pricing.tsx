@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { TrustBadges } from "@/components/TrustBadges";
 
 const sellerPlans = [
   {
@@ -155,7 +156,7 @@ export const Pricing = () => {
         </div>
 
         {/* Add-ons */}
-        <div>
+        <div className="mb-16">
           <h3 className="text-2xl font-bold text-center mb-8">Premium Add-Ons</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {addOns.map((addon, index) => (
@@ -174,6 +175,11 @@ export const Pricing = () => {
               </Card>
             ))}
           </div>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="mt-16 pt-12 border-t border-border">
+          <TrustBadges variant="grid" showAll />
         </div>
       </div>
     </section>

@@ -1,9 +1,16 @@
 import { PawPrint } from "lucide-react";
+import { TrustBadges } from "@/components/TrustBadges";
 
 export const Footer = () => {
   return (
     <footer className="bg-muted/50 border-t border-border py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Trust Badges Section */}
+        <div className="mb-12 pb-8 border-b border-border">
+          <h3 className="text-center text-lg font-semibold mb-6">Trusted & Secure Platform</h3>
+          <TrustBadges variant="horizontal" />
+        </div>
+
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
           {/* Brand */}
           <div>

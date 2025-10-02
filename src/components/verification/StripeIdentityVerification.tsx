@@ -21,17 +21,17 @@ export const StripeIdentityVerification = ({ userType }: StripeIdentityVerificat
       if (!user) throw new Error("Not authenticated");
 
       // Call edge function to create Stripe Identity verification session
+      // The edge function stores tokens server-side and only returns the redirect URL
       const { data, error } = await supabase.functions.invoke("create-identity-verification", {
         body: { userType },
       });
 
       if (error) throw error;
 
-      // Store session info
+      // Only store verification type (no sensitive tokens on client)
       await supabase
         .from("profiles")
         .update({
-          stripe_identity_session_id: data.sessionId,
           verification_type: userType,
         })
         .eq("id", user.id);

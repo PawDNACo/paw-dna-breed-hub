@@ -7,6 +7,8 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Users, Package, ShoppingBag, DollarSign, Settings, Database } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUserRole } from "@/hooks/useUserRole";
+import { toast } from "sonner";
 
 interface Stats {
   totalUsers: number;
@@ -17,6 +19,8 @@ interface Stats {
 }
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
     totalPets: 0,
@@ -25,19 +29,53 @@ export default function AdminDashboard() {
     activeBuyers: 0,
   });
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     checkAuthAndLoadStats();
-  }, []);
+  }, [isAdmin, roleLoading]);
+
+  const logAdminAction = async (action: string, metadata: any = {}) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // @ts-ignore - admin_session_log table exists but types not yet regenerated
+      await (supabase as any).from("admin_session_log").insert({
+        admin_user_id: session?.user?.id,
+        session_id: session?.access_token,
+        action,
+        metadata,
+      });
+    } catch (error) {
+      console.error("Failed to log admin action:", error);
+    }
+  };
 
   const checkAuthAndLoadStats = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      
       if (!user) {
         navigate("/auth");
         return;
       }
+
+      // Wait for role loading to complete
+      if (roleLoading) return;
+
+      // Check if user has admin role
+      if (!isAdmin) {
+        toast.error("Access Denied: Admin privileges required");
+        await logAdminAction("unauthorized_access_attempt", { 
+          attempted_page: "admin_dashboard" 
+        });
+        navigate("/");
+        return;
+      }
+
+      // Log successful admin access
+      await logAdminAction("dashboard_access", { 
+        timestamp: new Date().toISOString() 
+      });
 
       // Load statistics
       const [usersRes, petsRes, subsRes, breedersRes, buyersRes] = await Promise.all([
@@ -62,12 +100,16 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading) {
+  if (loading || roleLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
+  }
+
+  if (!isAdmin) {
+    return null; // Already redirected in useEffect
   }
 
   return (

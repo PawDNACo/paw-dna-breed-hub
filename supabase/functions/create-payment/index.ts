@@ -3,7 +3,7 @@ import Stripe from "https://esm.sh/stripe@14.21.0";
 import { rateLimitMiddleware } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://www.pawdna.org',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 

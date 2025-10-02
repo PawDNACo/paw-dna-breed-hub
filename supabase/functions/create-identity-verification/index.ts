@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { rateLimitMiddleware } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://www.pawdna.org",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
@@ -20,8 +20,8 @@ serve(async (req) => {
     );
 
     const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user } } = await supabaseClient.auth.getUser(token);
+    const authToken = authHeader.replace("Bearer ", "");
+    const { data: { user } } = await supabaseClient.auth.getUser(authToken);
 
     if (!user?.email) throw new Error("User not authenticated");
 
@@ -47,7 +47,7 @@ serve(async (req) => {
       metadata: {
         user_id: user.id,
         user_type: userType,
-        email: user.email,
+        // SECURITY: Do not include email in metadata - it's stored server-side
       },
       options: {
         document: {
@@ -61,23 +61,38 @@ serve(async (req) => {
 
     console.log("Verification session created:", verificationSession.id);
 
-    // Store session ID as token (for security)
-    const verificationToken = `vt_${crypto.randomUUID()}`;
+    // SECURITY: Store session ID and token SERVER-SIDE ONLY
+    // Create a secure verification token
+    const token = `vt_${crypto.randomUUID()}`;
     
-    await supabaseClient
+    // Use service role client to bypass RLS for storing sensitive data
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+    
+    const { error: updateError } = await supabaseAdmin
       .from("profiles")
       .update({
         stripe_identity_session_id: verificationSession.id,
-        stripe_identity_verification_token: verificationToken,
+        stripe_identity_verification_token: token,
         verification_type: userType,
       })
       .eq("id", user.id);
 
+    if (updateError) {
+      console.error("Error updating profile:", updateError);
+      throw new Error("Failed to store verification details");
+    }
+
+    console.log("Successfully created verification session and stored token server-side");
+
+    // SECURITY: Only return redirect URL to client, never tokens or session IDs
     return new Response(
       JSON.stringify({
-        sessionId: verificationSession.id,
         url: verificationSession.url,
-        token: verificationToken,
+        // sessionId and token are intentionally omitted for security
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

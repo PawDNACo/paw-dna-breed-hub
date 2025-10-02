@@ -137,6 +137,54 @@ export const signInSchema = z.object({
     .min(1, "Password is required"),
 });
 
+// Profile update validation schema
+export const profileUpdateSchema = z.object({
+  username: z.string()
+    .trim()
+    .min(3, "Username must be at least 3 characters")
+    .max(20, "Username must be at most 20 characters")
+    .regex(/^[a-z0-9_-]+$/, "Username can only contain lowercase letters, numbers, underscore, or hyphen")
+    .optional(),
+  
+  full_name: z.string()
+    .trim()
+    .min(1, "Full name is required")
+    .max(100, "Name must be less than 100 characters")
+    .optional(),
+  
+  city: z.string()
+    .trim()
+    .min(1, "City is required")
+    .max(100, "City must be less than 100 characters")
+    .optional(),
+  
+  state: z.string()
+    .trim()
+    .min(2, "State is required")
+    .max(50, "State must be less than 50 characters")
+    .optional(),
+  
+  zip_code: z.string()
+    .trim()
+    .regex(/^\d{5}(-\d{4})?$/, "Invalid zip code format")
+    .optional(),
+  
+  latitude: z.number()
+    .min(-90, "Invalid latitude")
+    .max(90, "Invalid latitude")
+    .optional(),
+  
+  longitude: z.number()
+    .min(-180, "Invalid longitude")
+    .max(180, "Invalid longitude")
+    .optional(),
+  
+  county: z.string()
+    .trim()
+    .max(100, "County must be less than 100 characters")
+    .optional(),
+});
+
 // Conversation request validation
 export const conversationRequestSchema = z.object({
   pet_id: z.string().uuid("Invalid pet ID"),

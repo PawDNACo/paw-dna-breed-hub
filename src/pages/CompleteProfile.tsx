@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { PawPrint } from "lucide-react";
 import { LocationInput } from "@/components/LocationInput";
+import { profileUpdateSchema, validateData } from "@/utils/validation";
 
 /**
  * Complete Profile Page
@@ -60,9 +61,10 @@ export default function CompleteProfile() {
     try {
       if (!userId) throw new Error("Not authenticated");
 
-      // Validate username format
-      if (!/^[a-z0-9_-]{3,20}$/i.test(username)) {
-        throw new Error("Username must be 3-20 characters (letters, numbers, _ or - only)");
+      // Validate username using schema
+      const validation = validateData(profileUpdateSchema, { username: username.toLowerCase() });
+      if (!validation.success) {
+        throw new Error(validation.errors?.[0] || "Invalid username");
       }
 
       // Check if username already exists
@@ -95,9 +97,15 @@ export default function CompleteProfile() {
     if (!userId) return;
 
     try {
+      // Validate location data using schema
+      const validation = validateData(profileUpdateSchema, location);
+      if (!validation.success) {
+        throw new Error(validation.errors?.[0] || "Invalid location data");
+      }
+
       const { error } = await supabase
         .from("profiles")
-        .update(location)
+        .update(validation.data)
         .eq("id", userId);
 
       if (error) throw error;

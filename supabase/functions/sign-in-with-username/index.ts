@@ -13,13 +13,13 @@ serve(async (req) => {
   }
 
   try {
-    const { identifier, password } = await req.json();
+    const { username, password } = await req.json();
 
-    if (!identifier || !password) {
+    if (!username || !password) {
       throw new Error("Username/email and password are required");
     }
 
-    console.log('Sign in attempt with identifier:', identifier);
+    console.log('Sign in attempt with username:', username);
 
     // Initialize Supabase client
     const supabaseClient = createClient(
@@ -27,16 +27,16 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_ANON_KEY") ?? ""
     );
 
-    let email = identifier;
+    let email = username;
 
-    // Check if identifier is an email (contains @)
-    if (!identifier.includes('@')) {
+    // Check if username is an email (contains @)
+    if (!username.includes('@')) {
       // It's a username, look up the email
-      console.log('Identifier is username, looking up email...');
+      console.log('Username provided, looking up email...');
       
       const { data: emailData, error: emailError } = await supabaseClient.rpc(
         'get_email_from_username',
-        { _username: identifier }
+        { _username: username }
       );
 
       if (emailError) {

@@ -46,7 +46,7 @@ export const HowItWorks = () => {
             <Card key={index} className="relative overflow-hidden hover:shadow-glow transition-all duration-300">
               <div className="absolute top-0 left-0 w-2 h-full bg-gradient-hero" />
               <CardHeader>
-                <div className="flex items-start gap-4">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-4 text-center md:text-left">
                   <div className="text-5xl font-bold text-primary/20">
                     {step.number}
                   </div>

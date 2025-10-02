@@ -107,7 +107,7 @@ export const Navigation = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-border">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 text-center">
               <a href="/#features" className="text-sm font-medium hover:text-primary transition-colors">
                 Services
               </a>

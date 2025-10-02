@@ -11,9 +11,9 @@ export const Footer = () => {
           <TrustBadges variant="horizontal" />
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8 text-center md:text-left">
           {/* Brand */}
-          <div>
+          <div className="flex flex-col items-center md:items-start">
             <div 
               className="flex items-center gap-2 mb-4 cursor-pointer" 
               onClick={() => window.location.href = "/"}
@@ -23,13 +23,13 @@ export const Footer = () => {
                 PawDNA
               </span>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground max-w-xs">
               The premier pet breeding marketplace connecting responsible breeders with loving pet owners.
             </p>
           </div>
 
           {/* Services */}
-          <div>
+          <div className="flex flex-col items-center md:items-start">
             <h3 className="font-semibold mb-4">Services</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="#" className="hover:text-primary transition-colors">Breeding Services</a></li>
@@ -39,7 +39,7 @@ export const Footer = () => {
           </div>
 
           {/* Company */}
-          <div>
+          <div className="flex flex-col items-center md:items-start">
             <h3 className="font-semibold mb-4">Company</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="/about" className="hover:text-primary transition-colors">About Us</a></li>
@@ -49,7 +49,7 @@ export const Footer = () => {
           </div>
 
           {/* Legal */}
-          <div>
+          <div className="flex flex-col items-center md:items-start">
             <h3 className="font-semibold mb-4">Legal</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="/terms" className="hover:text-primary transition-colors">Terms of Service</a></li>
@@ -61,7 +61,7 @@ export const Footer = () => {
           </div>
 
           {/* Developers */}
-          <div>
+          <div className="flex flex-col items-center md:items-start">
             <h3 className="font-semibold mb-4">Developers</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="/admin" className="hover:text-primary transition-colors">Admin</a></li>

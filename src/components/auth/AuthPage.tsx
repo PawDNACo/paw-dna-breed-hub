@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { PawPrint } from "lucide-react";
 import { LocationInput } from "@/components/LocationInput";
+import { SecurityDisclaimer } from "./SecurityDisclaimer";
 
 export const AuthPage = () => {
   const navigate = useNavigate();
@@ -172,6 +173,7 @@ export const AuthPage = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  <SecurityDisclaimer />
                   <form onSubmit={handleSignUp} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="signup-name">Full Name</Label>

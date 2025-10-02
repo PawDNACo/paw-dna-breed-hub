@@ -55,6 +55,54 @@ export type Database = {
           },
         ]
       }
+      banking_change_requests: {
+        Row: {
+          approved_date: string | null
+          created_at: string | null
+          id: string
+          request_date: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+          verification_request_id: string | null
+        }
+        Insert: {
+          approved_date?: string | null
+          created_at?: string | null
+          id?: string
+          request_date?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+          verification_request_id?: string | null
+        }
+        Update: {
+          approved_date?: string | null
+          created_at?: string | null
+          id?: string
+          request_date?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+          verification_request_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banking_change_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banking_change_requests_verification_request_id_fkey"
+            columns: ["verification_request_id"]
+            isOneToOne: false
+            referencedRelation: "verification_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       buyer_requests: {
         Row: {
           breed: string
@@ -161,6 +209,44 @@ export type Database = {
           },
         ]
       }
+      frozen_funds: {
+        Row: {
+          amount: number
+          created_at: string | null
+          frozen_at: string | null
+          id: string
+          release_date: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string | null
+          frozen_at?: string | null
+          id?: string
+          release_date?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          frozen_at?: string | null
+          id?: string
+          release_date?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "frozen_funds_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pets: {
         Row: {
           age_months: number | null
@@ -246,42 +332,54 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: Database["public"]["Enums"]["account_status"] | null
           city: string | null
           county: string | null
           created_at: string
           email: string | null
+          frozen_at: string | null
+          frozen_reason: string | null
           full_name: string | null
           id: string
           latitude: number | null
           longitude: number | null
           state: string | null
           updated_at: string
+          verification_status: string | null
           zip_code: string | null
         }
         Insert: {
+          account_status?: Database["public"]["Enums"]["account_status"] | null
           city?: string | null
           county?: string | null
           created_at?: string
           email?: string | null
+          frozen_at?: string | null
+          frozen_reason?: string | null
           full_name?: string | null
           id: string
           latitude?: number | null
           longitude?: number | null
           state?: string | null
           updated_at?: string
+          verification_status?: string | null
           zip_code?: string | null
         }
         Update: {
+          account_status?: Database["public"]["Enums"]["account_status"] | null
           city?: string | null
           county?: string | null
           created_at?: string
           email?: string | null
+          frozen_at?: string | null
+          frozen_reason?: string | null
           full_name?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null
           state?: string | null
           updated_at?: string
+          verification_status?: string | null
           zip_code?: string | null
         }
         Relationships: []
@@ -380,6 +478,121 @@ export type Database = {
           },
         ]
       }
+      user_reports: {
+        Row: {
+          action_taken: string | null
+          created_at: string | null
+          id: string
+          report_details: string | null
+          report_reason: string
+          reported_user_id: string
+          reporter_user_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+        }
+        Insert: {
+          action_taken?: string | null
+          created_at?: string | null
+          id?: string
+          report_details?: string | null
+          report_reason: string
+          reported_user_id: string
+          reporter_user_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          action_taken?: string | null
+          created_at?: string | null
+          id?: string
+          report_details?: string | null
+          report_reason?: string
+          reported_user_id?: string
+          reporter_user_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reports_reporter_user_id_fkey"
+            columns: ["reporter_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verification_requests: {
+        Row: {
+          created_at: string | null
+          id: string
+          notes: string | null
+          request_type: Database["public"]["Enums"]["verification_type"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          submitted_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          request_type: Database["public"]["Enums"]["verification_type"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          request_type?: Database["public"]["Enums"]["verification_type"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "verification_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -389,13 +602,25 @@ export type Database = {
         Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
       }
+      check_banking_change_limit: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       is_pet_owner: {
         Args: { _pet_id: string; _user_id: string }
         Returns: boolean
       }
     }
     Enums: {
-      [_ in never]: never
+      account_status:
+        | "active"
+        | "frozen"
+        | "pending_verification"
+        | "permanently_deleted"
+      verification_type:
+        | "account_recovery"
+        | "banking_change"
+        | "report_investigation"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -522,6 +747,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      account_status: [
+        "active",
+        "frozen",
+        "pending_verification",
+        "permanently_deleted",
+      ],
+      verification_type: [
+        "account_recovery",
+        "banking_change",
+        "report_investigation",
+      ],
+    },
   },
 } as const

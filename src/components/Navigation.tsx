@@ -74,6 +74,9 @@ export const Navigation = () => {
                 <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
                   Admin
                 </Button>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/developer")}>
+                  Developer
+                </Button>
               </>
             )}
             {user ? (
@@ -133,6 +136,9 @@ export const Navigation = () => {
                   </Button>
                   <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/admin")}>
                     Admin
+                  </Button>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/developer")}>
+                    Developer
                   </Button>
                 </>
               )}

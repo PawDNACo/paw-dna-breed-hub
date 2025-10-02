@@ -1,8 +1,51 @@
-# Welcome to your Lovable project
+# PawDNA - Pet Breeding Marketplace
 
-## Project info
+A comprehensive pet breeding marketplace connecting responsible breeders with loving pet owners.
+
+## Project Info
 
 **URL**: https://lovable.dev/projects/b0c50632-8ae4-4cb2-85f2-a7512b4e4743
+
+## Features
+
+- **Verified Users**: Stripe Identity verification for all users
+- **Secure Transactions**: Stripe-powered payment processing
+- **Role-Based Access**: Admin, Breeder, and Buyer roles
+- **Pet Listings**: Browse and list dogs and cats
+- **Messaging System**: Secure communication between buyers and breeders
+- **Trust & Safety**: RLS policies, rate limiting, and comprehensive security
+
+## Developer Dashboard
+
+### Accessing the Developer Dashboard
+
+1. **Sign up/Login**: Create an account at `/auth`
+2. **Get Admin Access**: Have an admin assign you the "admin" role in the database
+3. **Access Dashboard**: Navigate to `/developer` to access the full-stack management interface
+
+### Dashboard Features
+
+#### Overview Tab
+- Real-time statistics (users, pets, verified accounts)
+- Quick links to admin and backend tools
+
+#### Users Tab
+- View all registered users
+- Assign roles (admin, breeder, buyer)
+- View verification status
+- Monitor account status
+
+#### Database Tab
+- Direct access to backend dashboard
+- View database structure
+- Monitor recent pet listings
+- Toggle pet availability
+
+#### Security Tab
+- View security configurations
+- RLS status
+- Rate limiting info
+- Identity verification status
 
 ## How can I edit this code?
 
@@ -36,38 +79,119 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Tech Stack
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **Frontend**: React, TypeScript, Tailwind CSS, Shadcn UI
+- **Backend**: Supabase (PostgreSQL, Auth, RLS)
+- **Payments**: Stripe
+- **Identity**: Stripe Identity
+- **Hosting**: Lovable Cloud
 
-**Use GitHub Codespaces**
+## Database Schema
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Key tables:
+- `profiles`: User profiles with verification status
+- `user_roles`: Role-based access control (admin, breeder, buyer)
+- `pets`: Pet listings
+- `conversations`: Message threads
+- `messages`: Direct messages
+- `sales`: Transaction records
+- `frozen_funds`: Security holds
+- `user_reports`: Trust & safety reports
 
-## What technologies are used for this project?
+## Security Features
 
-This project is built with:
+1. **Row Level Security (RLS)** - All tables protected with RLS policies
+2. **Identity Verification** - Stripe Identity integration required for listing/purchasing
+3. **Rate Limiting** - Edge function rate limits on sensitive operations
+4. **Screenshot Prevention** - Privacy protection for sensitive data
+5. **Input Validation** - Zod schemas for all user inputs
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Making Changes
 
-## How can I deploy this project?
+### Frontend Changes
+1. Edit components in `/src/components`
+2. Pages in `/src/pages`
+3. Styles in `/src/index.css` and `tailwind.config.ts`
 
-Simply open [Lovable](https://lovable.dev/projects/b0c50632-8ae4-4cb2-85f2-a7512b4e4743) and click on Share -> Publish.
+### Backend Changes
+1. **Database migrations**: Use the Lovable Cloud migration tool
+2. **Edge functions**: Create in `/supabase/functions`
+3. **RLS policies**: Apply via SQL migrations
 
-## Can I connect a custom domain to my Lovable project?
+### Testing
+- Sign in with test account
+- Access developer dashboard at `/developer`
+- Use admin tools for testing
 
-Yes, you can!
+## API Documentation
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Authentication
+```typescript
+// Sign up
+const { data, error } = await supabase.auth.signUp({
+  email: 'user@example.com',
+  password: 'password',
+  options: {
+    emailRedirectTo: window.location.origin
+  }
+});
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+// Sign in
+const { data, error } = await supabase.auth.signInWithPassword({
+  email: 'user@example.com',
+  password: 'password'
+});
+```
+
+### Database Queries
+```typescript
+// Fetch pets
+const { data: pets } = await supabase
+  .from('pets')
+  .select('*')
+  .eq('available', true);
+
+// Create pet listing (requires authentication)
+const { data, error } = await supabase
+  .from('pets')
+  .insert({
+    name: 'Max',
+    species: 'dog',
+    breed: 'Labrador',
+    price: 1500
+  });
+```
+
+### Role Management
+
+To assign roles (requires admin access):
+```sql
+INSERT INTO user_roles (user_id, role)
+VALUES ('user-uuid', 'admin');
+```
+
+Available roles:
+- `buyer`: Can purchase pets
+- `breeder`: Can list pets
+- `admin`: Full system access
+
+## Deployment
+
+Simply open [Lovable](https://lovable.dev/projects/b0c50632-8ae4-4cb2-85f2-a7512b4e4743) and click on Share → Publish.
+
+## Custom Domain
+
+You can connect a custom domain by navigating to Project > Settings > Domains and clicking Connect Domain.
+
+Read more: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## Support
+
+- Documentation: [Lovable Docs](https://docs.lovable.dev)
+- Developer Dashboard: `/developer` (admin access required)
+- Backend Dashboard: Access via navigation bar when logged in
+
+## License
+
+Proprietary - All rights reserved

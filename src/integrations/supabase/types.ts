@@ -759,6 +759,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       verification_requests: {
         Row: {
           created_at: string | null
@@ -830,6 +851,13 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_pet_owner: {
         Args: { _pet_id: string; _user_id: string }
         Returns: boolean
@@ -841,6 +869,7 @@ export type Database = {
         | "frozen"
         | "pending_verification"
         | "permanently_deleted"
+      app_role: "admin" | "breeder" | "buyer"
       verification_type:
         | "account_recovery"
         | "banking_change"
@@ -978,6 +1007,7 @@ export const Constants = {
         "pending_verification",
         "permanently_deleted",
       ],
+      app_role: ["admin", "breeder", "buyer"],
       verification_type: [
         "account_recovery",
         "banking_change",

@@ -6,14 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { StripeIdentityVerification } from "@/components/verification/StripeIdentityVerification";
+import { SecurityDisclaimer } from "@/components/security/SecurityDisclaimer";
 import { CheckCircle2, XCircle, Clock, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUserRole } from "@/hooks/useUserRole";
 
 export default function VerificationDashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { roles, loading: rolesLoading, isAdmin, isBreeder, isBuyer } = useUserRole();
 
   useEffect(() => {
     loadProfile();
@@ -172,6 +175,53 @@ export default function VerificationDashboard() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Account Roles</CardTitle>
+              <CardDescription>
+                Your permissions and access levels
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {rolesLoading ? (
+                <div className="flex justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {roles.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No roles assigned</p>
+                  ) : (
+                    <>
+                      {isBuyer && (
+                        <div className="flex items-center gap-2">
+                          <Badge>Buyer</Badge>
+                          <span className="text-sm text-muted-foreground">Can purchase pets</span>
+                        </div>
+                      )}
+                      {isBreeder && (
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-blue-600">Breeder</Badge>
+                          <span className="text-sm text-muted-foreground">Can list pets</span>
+                        </div>
+                      )}
+                      {isAdmin && (
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-purple-600">Admin</Badge>
+                          <span className="text-sm text-muted-foreground">Full system access</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="mt-6">
+          <SecurityDisclaimer />
         </div>
 
         {profile?.verification_status !== "verified" && (

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ShareButton } from "@/components/social/ShareButton";
+import { SecurityDisclaimer } from "@/components/security/SecurityDisclaimer";
 import { useVerificationCheck } from "@/hooks/useVerificationCheck";
 
 interface Pet {
@@ -218,6 +219,10 @@ const PetDetail = () => {
                   </CardContent>
                 </Card>
               )}
+              
+              <div className="pt-4">
+                <SecurityDisclaimer />
+              </div>
             </CardContent>
           </Card>
         </div>

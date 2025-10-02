@@ -1,6 +1,29 @@
 import { toast } from "sonner";
 
-// Prevent screenshots on web
+/**
+ * SECURITY DISCLAIMER: Client-side screenshot prevention is NOT foolproof.
+ * 
+ * Limitations:
+ * - Users can still take screenshots using:
+ *   - Third-party screenshot tools
+ *   - Phone camera pointed at screen
+ *   - Browser extensions
+ *   - Virtual machines
+ *   - Screen recording software
+ * 
+ * This implementation provides:
+ * - Basic deterrent against casual screenshot attempts
+ * - User awareness that screenshots are discouraged
+ * - Compliance gesture for security policies
+ * 
+ * For true security:
+ * - Never display sensitive data that shouldn't be captured
+ * - Use watermarks on sensitive content
+ * - Implement server-side access logging
+ * - Use time-limited access tokens
+ */
+
+// Prevent screenshots on web (BASIC DETERRENT ONLY)
 export const preventWebScreenshots = () => {
   // Detect screenshot attempts via keyboard shortcuts
   const handleKeyDown = (e: KeyboardEvent) => {

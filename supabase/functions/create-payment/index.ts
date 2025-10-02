@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
+import { rateLimitMiddleware } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,11 +13,28 @@ serve(async (req) => {
   }
 
   try {
+    // Rate limiting: 20 payment creation attempts per 5 minutes per IP
+    const clientIp = req.headers.get("x-forwarded-for") || "unknown";
+    const rateLimitResponse = rateLimitMiddleware(
+      clientIp,
+      { maxRequests: 20, windowMs: 5 * 60 * 1000, keyPrefix: "create-payment" },
+      corsHeaders
+    );
+    if (rateLimitResponse) return rateLimitResponse;
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     });
 
     const { type, amount, description, metadata, paymentMethodTypes } = await req.json();
+
+    // Input validation
+    if (!amount || amount <= 0) {
+      throw new Error("Invalid amount");
+    }
+    if (amount > 1000000) {
+      throw new Error("Amount exceeds maximum allowed");
+    }
 
     console.log('Creating payment:', { type, amount, description, metadata });
 

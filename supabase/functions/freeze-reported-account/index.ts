@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { rateLimitMiddleware } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,6 +23,15 @@ serve(async (req) => {
     if (!reportedUserId) {
       throw new Error("Reported user ID is required");
     }
+
+    // Rate limiting: 10 report submissions per hour per IP
+    const clientIp = req.headers.get("x-forwarded-for") || "unknown";
+    const rateLimitResponse = rateLimitMiddleware(
+      clientIp,
+      { maxRequests: 10, windowMs: 60 * 60 * 1000, keyPrefix: "freeze-account" },
+      corsHeaders
+    );
+    if (rateLimitResponse) return rateLimitResponse;
 
     console.log(`Freezing account for user: ${reportedUserId}`);
     console.log(`Reason: ${reportReason}`);

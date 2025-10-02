@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { rateLimitMiddleware } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,6 +24,14 @@ serve(async (req) => {
     const { data: { user } } = await supabaseClient.auth.getUser(token);
 
     if (!user?.email) throw new Error("User not authenticated");
+
+    // Rate limiting: 3 verification attempts per hour per user
+    const rateLimitResponse = rateLimitMiddleware(
+      user.id,
+      { maxRequests: 3, windowMs: 60 * 60 * 1000, keyPrefix: "identity-verify" },
+      corsHeaders
+    );
+    if (rateLimitResponse) return rateLimitResponse;
 
     const { userType } = await req.json();
 

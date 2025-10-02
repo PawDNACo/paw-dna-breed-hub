@@ -35,7 +35,7 @@ const Browse = () => {
   const [loading, setLoading] = useState(true);
   const [searchZip, setSearchZip] = useState("");
   const [searchRadius, setSearchRadius] = useState("250");
-  const [searchSpecies, setSearchSpecies] = useState("");
+  const [searchSpecies, setSearchSpecies] = useState("all");
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const Browse = () => {
         .select("*")
         .eq("available", true);
 
-      if (searchSpecies) {
+      if (searchSpecies && searchSpecies !== "all") {
         query = query.eq("species", searchSpecies);
       }
 
@@ -178,7 +178,7 @@ const Browse = () => {
                       <SelectValue placeholder="All species" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All species</SelectItem>
+                      <SelectItem value="all">All species</SelectItem>
                       <SelectItem value="dog">Dog</SelectItem>
                       <SelectItem value="cat">Cat</SelectItem>
                       <SelectItem value="bird">Bird</SelectItem>

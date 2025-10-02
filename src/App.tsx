@@ -8,6 +8,9 @@ import Browse from "./pages/Browse";
 import PetDetail from "./pages/PetDetail";
 import BreederDashboard from "./pages/BreederDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
+import CarePackageManager from "./pages/CarePackageManager";
+import AccessoriesManager from "./pages/AccessoriesManager";
+import AdminDashboard from "./pages/AdminDashboard";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -45,6 +48,30 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <BuyerDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/care-packages" 
+            element={
+              <ProtectedRoute>
+                <CarePackageManager />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/accessories" 
+            element={
+              <ProtectedRoute>
+                <AccessoriesManager />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
               </ProtectedRoute>
             } 
           />

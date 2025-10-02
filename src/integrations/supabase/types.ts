@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      accessories: {
+        Row: {
+          active: boolean
+          breeder_id: string
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          breeder_id: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          breeder_id?: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accessories_breeder_id_fkey"
+            columns: ["breeder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       buyer_requests: {
         Row: {
           breed: string
@@ -70,6 +111,50 @@ export type Database = {
           {
             foreignKeyName: "buyer_requests_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      care_packages: {
+        Row: {
+          active: boolean
+          base_price: number
+          breeder_id: string
+          created_at: string
+          description: string | null
+          id: string
+          items: Json
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          base_price?: number
+          breeder_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          base_price?: number
+          breeder_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_packages_breeder_id_fkey"
+            columns: ["breeder_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

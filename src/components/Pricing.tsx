@@ -53,9 +53,9 @@ const hirerPlan = {
 
 const addOns = [
   { name: "Vaccination Package", price: "$299" },
-  { name: "Care Package", price: "$149" },
+  { name: "Care Package", price: "$149", description: "Customizable by breeders" },
   { name: "Cleaning Service", price: "$19.99" },
-  { name: "Accessories Bundle", price: "$2.99" },
+  { name: "Accessories Bundle", price: "$2.99 each", description: "Select multiple items" },
 ];
 
 export const Pricing = () => {
@@ -157,6 +157,11 @@ export const Pricing = () => {
                   <div className="text-2xl font-bold text-accent mt-2">
                     {addon.price}
                   </div>
+                  {addon.description && (
+                    <CardDescription className="mt-2">
+                      {addon.description}
+                    </CardDescription>
+                  )}
                 </CardHeader>
               </Card>
             ))}

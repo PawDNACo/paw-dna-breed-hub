@@ -65,6 +65,9 @@ export const Navigation = () => {
                 <Button variant="ghost" size="sm" onClick={() => navigate("/buyer-dashboard")}>
                   Buyer
                 </Button>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
+                  Admin
+                </Button>
               </>
             )}
             {user ? (
@@ -112,6 +115,15 @@ export const Navigation = () => {
                   </Button>
                   <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/buyer-dashboard")}>
                     Buyer Dashboard
+                  </Button>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/care-packages")}>
+                    Care Packages
+                  </Button>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/accessories")}>
+                    Accessories
+                  </Button>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/admin")}>
+                    Admin
                   </Button>
                 </>
               )}

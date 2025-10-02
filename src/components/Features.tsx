@@ -24,8 +24,8 @@ const features = [
   },
   {
     icon: Star,
-    title: "Premium Care Packages",
-    description: "Add vaccinations, cleaning, and care packages to ensure the best start for every pet.",
+    title: "Premium Add-Ons",
+    description: "Add vaccinations, cleaning, and customizable accessories to ensure the best start for every pet.",
   },
   {
     icon: Package,

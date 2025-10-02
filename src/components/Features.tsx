@@ -15,7 +15,7 @@ const features = [
   {
     icon: DollarSign,
     title: "Fair Royalties",
-    description: "Breeders earn 15% royalties on every puppy sold through our transparent royalty program.",
+    description: "Breeders earn 85% royalties on every puppy sold. PawDNA takes only 15%.",
   },
   {
     icon: Users,
@@ -25,7 +25,7 @@ const features = [
   {
     icon: Star,
     title: "Premium Add-Ons",
-    description: "Add vaccinations, cleaning, and customizable accessories to ensure the best start for every pet.",
+    description: "Add vaccinations, cleaning, and additional accessories to ensure the best start for every pet.",
   },
   {
     icon: Package,

@@ -25,7 +25,6 @@ export const Footer = () => {
               <li><a href="#" className="hover:text-primary transition-colors">Breeding Services</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Buy Puppies</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Buy Kittens</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Care Packages</a></li>
             </ul>
           </div>
 

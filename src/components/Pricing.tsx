@@ -12,7 +12,8 @@ const sellerPlans = [
     features: [
       "List male or female pets",
       "Sell puppies & kittens",
-      "15% royalty on sales",
+      "Earn 85% on all sales",
+      "PawDNA takes only 15%",
       "Vaccination add-ons",
       "Care packages",
       "$499.99 refundable deposit",
@@ -27,7 +28,8 @@ const sellerPlans = [
     features: [
       "List males & females",
       "Sell puppies & kittens",
-      "15% royalty on sales",
+      "Earn 85% on all sales",
+      "PawDNA takes only 15%",
       "All add-on packages",
       "Priority support",
       "$499.99 refundable deposit",
@@ -53,7 +55,7 @@ const hirerPlan = {
 
 const addOns = [
   { name: "Vaccination Package", price: "$299" },
-  { name: "Care Package", price: "$149", description: "Customizable by breeders" },
+  { name: "Care Package", price: "Starting at $149", description: "Additional items" },
   { name: "Cleaning Service", price: "$19.99" },
   { name: "Accessories Bundle", price: "$2.99 each", description: "Select multiple items" },
 ];

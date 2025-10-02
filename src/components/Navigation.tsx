@@ -57,6 +57,16 @@ export const Navigation = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate("/browse")}>
               Browse Pets
             </Button>
+            {user && (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/breeder-dashboard")}>
+                  Breeder
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/buyer-dashboard")}>
+                  Buyer
+                </Button>
+              </>
+            )}
             {user ? (
               <Button variant="ghost" size="sm" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4 mr-2" />
@@ -95,6 +105,16 @@ export const Navigation = () => {
               <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/browse")}>
                 Browse Pets
               </Button>
+              {user && (
+                <>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/breeder-dashboard")}>
+                    Breeder Dashboard
+                  </Button>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/buyer-dashboard")}>
+                    Buyer Dashboard
+                  </Button>
+                </>
+              )}
               {user ? (
                 <Button variant="ghost" size="sm" className="w-full" onClick={handleSignOut}>
                   <LogOut className="h-4 w-4 mr-2" />

@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Browse from "./pages/Browse";
 import PetDetail from "./pages/PetDetail";
+import BreederDashboard from "./pages/BreederDashboard";
+import BuyerDashboard from "./pages/BuyerDashboard";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -27,6 +29,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <PetDetail />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/breeder-dashboard" 
+            element={
+              <ProtectedRoute>
+                <BreederDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/buyer-dashboard" 
+            element={
+              <ProtectedRoute>
+                <BuyerDashboard />
               </ProtectedRoute>
             } 
           />

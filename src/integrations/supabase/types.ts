@@ -14,60 +14,140 @@ export type Database = {
   }
   public: {
     Tables: {
+      buyer_requests: {
+        Row: {
+          breed: string
+          city: string | null
+          county: string | null
+          created_at: string
+          description: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          max_price: number | null
+          species: string
+          state: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          zip_code: string | null
+        }
+        Insert: {
+          breed: string
+          city?: string | null
+          county?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          max_price?: number | null
+          species: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          zip_code?: string | null
+        }
+        Update: {
+          breed?: string
+          city?: string | null
+          county?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          max_price?: number | null
+          species?: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          zip_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buyer_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pets: {
         Row: {
           age_months: number | null
           available: boolean | null
           breed: string
+          city: string | null
+          county: string | null
           created_at: string
           description: string | null
           gender: string
           id: string
           image_url: string | null
+          latitude: number | null
           listing_type: string
+          longitude: number | null
           name: string
           owner_id: string
           price: number | null
           size: string | null
           species: string
+          state: string | null
           updated_at: string
           vaccinated: boolean | null
+          zip_code: string | null
         }
         Insert: {
           age_months?: number | null
           available?: boolean | null
           breed: string
+          city?: string | null
+          county?: string | null
           created_at?: string
           description?: string | null
           gender: string
           id?: string
           image_url?: string | null
+          latitude?: number | null
           listing_type: string
+          longitude?: number | null
           name: string
           owner_id: string
           price?: number | null
           size?: string | null
           species: string
+          state?: string | null
           updated_at?: string
           vaccinated?: boolean | null
+          zip_code?: string | null
         }
         Update: {
           age_months?: number | null
           available?: boolean | null
           breed?: string
+          city?: string | null
+          county?: string | null
           created_at?: string
           description?: string | null
           gender?: string
           id?: string
           image_url?: string | null
+          latitude?: number | null
           listing_type?: string
+          longitude?: number | null
           name?: string
           owner_id?: string
           price?: number | null
           size?: string | null
           species?: string
+          state?: string | null
           updated_at?: string
           vaccinated?: boolean | null
+          zip_code?: string | null
         }
         Relationships: [
           {
@@ -81,25 +161,43 @@ export type Database = {
       }
       profiles: {
         Row: {
+          city: string | null
+          county: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
+          state: string | null
           updated_at: string
+          zip_code: string | null
         }
         Insert: {
+          city?: string | null
+          county?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
+          latitude?: number | null
+          longitude?: number | null
+          state?: string | null
           updated_at?: string
+          zip_code?: string | null
         }
         Update: {
+          city?: string | null
+          county?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
+          state?: string | null
           updated_at?: string
+          zip_code?: string | null
         }
         Relationships: []
       }
@@ -146,7 +244,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_distance: {
+        Args: { lat1: number; lat2: number; lon1: number; lon2: number }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

@@ -30,11 +30,11 @@ export const Hero = () => {
               exceptional pet ownership.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="hero" size="xl">
+              <Button variant="hero" size="xl" onClick={() => window.location.href = "/auth"}>
                 Start Breeding
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button variant="outline" size="xl">
+              <Button variant="outline" size="xl" onClick={() => window.location.href = "/browse"}>
                 Browse Pets
               </Button>
             </div>

@@ -1,9 +1,35 @@
 import { Button } from "@/components/ui/button";
-import { Menu, PawPrint } from "lucide-react";
-import { useState } from "react";
+import { Menu, PawPrint, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 export const Navigation = () => {
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast.success("Signed out successfully");
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -19,17 +45,29 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">
+            <a href="/#features" className="text-sm font-medium hover:text-primary transition-colors">
               Services
             </a>
-            <a href="#pricing" className="text-sm font-medium hover:text-primary transition-colors">
+            <a href="/#pricing" className="text-sm font-medium hover:text-primary transition-colors">
               Pricing
             </a>
-            <a href="#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
+            <a href="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
               How It Works
             </a>
-            <Button variant="ghost" size="sm">Sign In</Button>
-            <Button variant="hero" size="sm">Get Started</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/browse")}>
+              Browse Pets
+            </Button>
+            {user ? (
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>Sign In</Button>
+                <Button variant="hero" size="sm" onClick={() => navigate("/auth")}>Get Started</Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -45,17 +83,29 @@ export const Navigation = () => {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col gap-4">
-              <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">
+              <a href="/#features" className="text-sm font-medium hover:text-primary transition-colors">
                 Services
               </a>
-              <a href="#pricing" className="text-sm font-medium hover:text-primary transition-colors">
+              <a href="/#pricing" className="text-sm font-medium hover:text-primary transition-colors">
                 Pricing
               </a>
-              <a href="#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
+              <a href="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
                 How It Works
               </a>
-              <Button variant="ghost" size="sm" className="w-full">Sign In</Button>
-              <Button variant="hero" size="sm" className="w-full">Get Started</Button>
+              <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/browse")}>
+                Browse Pets
+              </Button>
+              {user ? (
+                <Button variant="ghost" size="sm" className="w-full" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              ) : (
+                <>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/auth")}>Sign In</Button>
+                  <Button variant="hero" size="sm" className="w-full" onClick={() => navigate("/auth")}>Get Started</Button>
+                </>
+              )}
             </div>
           </div>
         )}

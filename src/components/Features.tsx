@@ -15,7 +15,7 @@ const features = [
   {
     icon: DollarSign,
     title: "Fair Royalties",
-    description: "Breeders earn 85% royalties on every puppy sold. PawDNA takes only 15%.",
+    description: "Breeders earn up to 85% royalties on every puppy sold. PawDNA takes a small percentage.",
   },
   {
     icon: Users,

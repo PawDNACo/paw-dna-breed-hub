@@ -114,8 +114,8 @@ export default function PetPurchasePayment({
             <strong>Payment Breakdown:</strong>
             <ul className="mt-2 space-y-1 text-sm">
               <li>• Total: ${price.toFixed(2)}</li>
-              <li>• Breeder receives: ${breederEarnings.toFixed(2)} (85%)</li>
-              <li>• Platform fee: ${platformFee.toFixed(2)} (15%)</li>
+              <li>• Breeder receives: ${breederEarnings.toFixed(2)}</li>
+              <li>• Platform fee: ${platformFee.toFixed(2)}</li>
               <li>• Funds available to breeder after 72 hours</li>
             </ul>
           </AlertDescription>

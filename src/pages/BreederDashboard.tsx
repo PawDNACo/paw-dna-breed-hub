@@ -12,6 +12,9 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useVerificationCheck } from "@/hooks/useVerificationCheck";
+import { VerificationRequired } from "@/components/verification/VerificationRequired";
+import { StripeIdentityVerification } from "@/components/verification/StripeIdentityVerification";
 
 interface Pet {
   id: string;
@@ -47,6 +50,7 @@ export default function BreederDashboard() {
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { isVerified, loading: verificationLoading, requireVerification } = useVerificationCheck();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -109,6 +113,11 @@ export default function BreederDashboard() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check verification first
+    if (!requireVerification("list pets")) {
+      return;
+    }
 
     if (!subscription) {
       toast({
@@ -252,6 +261,12 @@ export default function BreederDashboard() {
               <Button onClick={() => navigate("/")}>View Pricing</Button>
             </CardContent>
           </Card>
+        )}
+
+        {!isVerified && (
+          <div className="mb-8">
+            <StripeIdentityVerification userType="breeder" />
+          </div>
         )}
 
         {(!profile?.zip_code || !profile?.state) && (

@@ -12,8 +12,8 @@ const sellerPlans = [
     features: [
       "List male or female pets",
       "Sell puppies & kittens",
-      "Earn 85% on all sales",
-      "PawDNA takes only 15%",
+      "Earn up to 85% on all sales",
+      "PawDNA takes a small percentage",
       "Vaccination add-ons",
       "Care packages",
       "$499.99 refundable deposit",
@@ -28,8 +28,8 @@ const sellerPlans = [
     features: [
       "List males & females",
       "Sell puppies & kittens",
-      "Earn 85% on all sales",
-      "PawDNA takes only 15%",
+      "Earn up to 85% on all sales",
+      "PawDNA takes a small percentage",
       "All add-on packages",
       "Priority support",
       "$499.99 refundable deposit",

@@ -270,7 +270,7 @@ export default function BreederPayouts() {
                           ${Number(sale.breeder_earnings).toFixed(2)}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          (${Number(sale.sale_price).toFixed(2)} - 15% fee)
+                          (${Number(sale.sale_price).toFixed(2)} - platform fee)
                         </div>
                         {sale.payout_status !== "paid" && sale.payout_status !== "cancelled" && (
                           <div className="text-xs text-primary mt-1">
@@ -305,7 +305,7 @@ export default function BreederPayouts() {
               <div className="flex items-start gap-2">
                 <DollarSign className="h-4 w-4 text-primary mt-0.5" />
                 <p>
-                  <strong>Platform Fee:</strong> PawDNA retains 15% of each sale. You earn 85% of the sale price.
+                  <strong>Platform Fee:</strong> PawDNA retains a small percentage of each sale. You earn up to 85% of the sale price.
                 </p>
               </div>
               <div className="flex items-start gap-2">

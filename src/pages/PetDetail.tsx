@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { ShareButton } from "@/components/social/ShareButton";
+import { useVerificationCheck } from "@/hooks/useVerificationCheck";
 
 interface Pet {
   id: string;
@@ -30,6 +32,7 @@ const PetDetail = () => {
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasSubscription, setHasSubscription] = useState(false);
+  const { isVerified, requireVerification } = useVerificationCheck();
 
   useEffect(() => {
     fetchPetDetails();
@@ -74,6 +77,11 @@ const PetDetail = () => {
   };
 
   const handleContact = () => {
+    // Check verification first
+    if (!requireVerification("contact breeders")) {
+      return;
+    }
+
     if (!hasSubscription) {
       toast.error("Subscribe to contact breeders", {
         description: "You need an active subscription to hire or sell pets.",
@@ -125,13 +133,20 @@ const PetDetail = () => {
           <Card className="overflow-hidden">
             <CardHeader className="bg-gradient-card pb-8">
               <div className="flex items-start justify-between">
-                <div>
+                <div className="flex-1">
                   <CardTitle className="text-3xl mb-2">{pet.name}</CardTitle>
                   <CardDescription className="text-lg">{pet.breed}</CardDescription>
                 </div>
-                <Badge variant={pet.species === "dog" ? "default" : "secondary"} className="text-base px-4 py-1">
-                  {pet.species}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <ShareButton 
+                    petId={pet.id} 
+                    petName={pet.name}
+                    petImage={pet.image_url}
+                  />
+                  <Badge variant={pet.species === "dog" ? "default" : "secondary"} className="text-base px-4 py-1">
+                    {pet.species}
+                  </Badge>
+                </div>
               </div>
             </CardHeader>
 

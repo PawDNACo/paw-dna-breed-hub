@@ -24,7 +24,7 @@ const steps = [
   {
     number: "05",
     title: "Sale & Delivery",
-    description: "List and sell puppies or kittens. Earn 15% royalties on sales. Funds released after confirmed delivery.",
+    description: "List and sell puppies or kittens. Earn up to 85% on sales. Funds released after confirmed delivery.",
   },
 ];
 

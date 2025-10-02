@@ -96,8 +96,8 @@ export default function BreederAgreement() {
                 PawDNA operates on a fair royalty structure:
               </p>
               <ul className="list-disc pl-6 space-y-2">
-                <li><strong>Breeders earn 85%</strong> of all sales made through the platform</li>
-                <li><strong>PawDNA retains 15%</strong> to maintain platform services, security, and support</li>
+                <li><strong>Breeders earn up to 85%</strong> of all sales made through the platform</li>
+                <li><strong>PawDNA retains a small percentage</strong> to maintain platform services, security, and support</li>
               </ul>
               <p className="mt-4">
                 Payments to Breeders are processed within 5-7 business days after successful delivery 

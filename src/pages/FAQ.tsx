@@ -80,7 +80,7 @@ export default function FAQ() {
               <AccordionItem value="breeder-3">
                 <AccordionTrigger>How much do breeders earn per sale?</AccordionTrigger>
                 <AccordionContent>
-                  Breeders earn 85% of all sales made through the platform. PawDNA retains only 15% to 
+                  Breeders earn up to 85% of all sales made through the platform. PawDNA retains a small percentage to 
                   maintain platform services, security, and support. Payments are processed within 5-7 
                   business days after confirmed delivery or pickup.
                 </AccordionContent>

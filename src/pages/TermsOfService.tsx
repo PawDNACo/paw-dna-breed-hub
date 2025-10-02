@@ -70,7 +70,7 @@ export default function TermsOfService() {
             <section>
               <h2 className="text-2xl font-semibold mb-4">7. Payment Structure</h2>
               <p>
-                Breeders earn 85% of all sales made through the platform. PawDNA retains 15% to maintain and 
+                Breeders earn up to 85% of all sales made through the platform. PawDNA retains a small percentage to maintain and 
                 improve platform services, provide customer support, and ensure transaction security.
               </p>
             </section>

@@ -7,7 +7,10 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <div 
+              className="flex items-center gap-2 mb-4 cursor-pointer" 
+              onClick={() => window.location.href = "/"}
+            >
               <PawPrint className="h-6 w-6 text-primary" />
               <span className="text-lg font-bold bg-gradient-hero bg-clip-text text-transparent">
                 PawDNA

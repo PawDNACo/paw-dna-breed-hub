@@ -36,7 +36,10 @@ export const Navigation = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <div 
+            className="flex items-center gap-2 cursor-pointer" 
+            onClick={() => navigate("/")}
+          >
             <PawPrint className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold bg-gradient-hero bg-clip-text text-transparent">
               PawDNA
@@ -61,6 +64,9 @@ export const Navigation = () => {
               <>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/breeder-dashboard")}>
                   Breeder
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/breeder-payouts")}>
+                  Payouts
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/buyer-dashboard")}>
                   Buyer
@@ -112,6 +118,9 @@ export const Navigation = () => {
                 <>
                   <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/breeder-dashboard")}>
                     Breeder Dashboard
+                  </Button>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/breeder-payouts")}>
+                    Breeder Payouts
                   </Button>
                   <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/buyer-dashboard")}>
                     Buyer Dashboard

@@ -18,6 +18,7 @@ import BreederAgreement from "./pages/BreederAgreement";
 import BuyerAgreement from "./pages/BuyerAgreement";
 import AboutUs from "./pages/AboutUs";
 import FAQ from "./pages/FAQ";
+import BreederPayouts from "./pages/BreederPayouts";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -51,6 +52,14 @@ const App = () => (
             } 
           />
           <Route 
+            path="/breeder-payouts" 
+            element={
+              <ProtectedRoute>
+                <BreederPayouts />
+              </ProtectedRoute>
+            } 
+          />
+          <Route
             path="/buyer-dashboard" 
             element={
               <ProtectedRoute>

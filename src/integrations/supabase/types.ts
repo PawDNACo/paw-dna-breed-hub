@@ -286,6 +286,62 @@ export type Database = {
         }
         Relationships: []
       }
+      sales: {
+        Row: {
+          breeder_earnings: number
+          breeder_id: string
+          buyer_id: string
+          created_at: string
+          funds_available_date: string
+          id: string
+          payout_date: string | null
+          payout_status: string
+          pet_id: string
+          platform_fee: number
+          sale_date: string
+          sale_price: number
+          updated_at: string
+        }
+        Insert: {
+          breeder_earnings?: number
+          breeder_id: string
+          buyer_id: string
+          created_at?: string
+          funds_available_date?: string
+          id?: string
+          payout_date?: string | null
+          payout_status?: string
+          pet_id: string
+          platform_fee?: number
+          sale_date?: string
+          sale_price: number
+          updated_at?: string
+        }
+        Update: {
+          breeder_earnings?: number
+          breeder_id?: string
+          buyer_id?: string
+          created_at?: string
+          funds_available_date?: string
+          id?: string
+          payout_date?: string | null
+          payout_status?: string
+          pet_id?: string
+          platform_fee?: number
+          sale_date?: string
+          sale_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           created_at: string

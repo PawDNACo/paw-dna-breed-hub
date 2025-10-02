@@ -23,6 +23,8 @@ import VerificationComplete from "./pages/VerificationComplete";
 import VerificationDashboard from "./pages/VerificationDashboard";
 import ConversationsDashboard from "./pages/ConversationsDashboard";
 import DeveloperDashboard from "./pages/DeveloperDashboard";
+import AuthCallback from "./pages/AuthCallback";
+import CompleteProfile from "./pages/CompleteProfile";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -38,6 +40,15 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route 
+            path="/complete-profile" 
+            element={
+              <ProtectedRoute>
+                <CompleteProfile />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/browse" element={<Browse />} />
           <Route 
             path="/pet/:id" 

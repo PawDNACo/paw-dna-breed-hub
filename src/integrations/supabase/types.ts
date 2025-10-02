@@ -50,6 +50,13 @@ export type Database = {
             foreignKeyName: "accessories_breeder_id_fkey"
             columns: ["breeder_id"]
             isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accessories_breeder_id_fkey"
+            columns: ["breeder_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -94,6 +101,13 @@ export type Database = {
           verification_request_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "banking_change_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "banking_change_requests_user_id_fkey"
             columns: ["user_id"]
@@ -201,6 +215,13 @@ export type Database = {
             foreignKeyName: "buyer_requests_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -248,6 +269,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "care_packages_breeder_id_fkey"
+            columns: ["breeder_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "care_packages_breeder_id_fkey"
             columns: ["breeder_id"]
@@ -300,6 +328,13 @@ export type Database = {
             foreignKeyName: "conversations_breeder_id_fkey"
             columns: ["breeder_id"]
             isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_breeder_id_fkey"
+            columns: ["breeder_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -308,6 +343,13 @@ export type Database = {
             columns: ["breeder_id"]
             isOneToOne: false
             referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -362,6 +404,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "frozen_funds_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "frozen_funds_user_id_fkey"
             columns: ["user_id"]
@@ -424,6 +473,13 @@ export type Database = {
             foreignKeyName: "messages_recipient_id_fkey"
             columns: ["recipient_id"]
             isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -432,6 +488,13 @@ export type Database = {
             columns: ["recipient_id"]
             isOneToOne: false
             referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -587,6 +650,13 @@ export type Database = {
             foreignKeyName: "pets_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pets_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -628,6 +698,13 @@ export type Database = {
           user_agent?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "profile_access_logs_accessed_profile_id_fkey"
+            columns: ["accessed_profile_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "profile_access_logs_accessed_profile_id_fkey"
             columns: ["accessed_profile_id"]
@@ -775,6 +852,36 @@ export type Database = {
           },
         ]
       }
+      security_audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          table_name: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          table_name: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          table_name?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -804,6 +911,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "subscriptions_user_id_fkey"
             columns: ["user_id"]
@@ -862,6 +976,13 @@ export type Database = {
             foreignKeyName: "user_reports_reported_user_id_fkey"
             columns: ["reported_user_id"]
             isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -876,6 +997,13 @@ export type Database = {
             foreignKeyName: "user_reports_reporter_user_id_fkey"
             columns: ["reporter_user_id"]
             isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reports_reporter_user_id_fkey"
+            columns: ["reporter_user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -884,6 +1012,13 @@ export type Database = {
             columns: ["reporter_user_id"]
             isOneToOne: false
             referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -965,6 +1100,13 @@ export type Database = {
             foreignKeyName: "verification_requests_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "verification_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -973,6 +1115,13 @@ export type Database = {
             columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "verification_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -993,6 +1142,33 @@ export type Database = {
       }
     }
     Views: {
+      conversation_partner_profiles: {
+        Row: {
+          city: string | null
+          full_name: string | null
+          id: string | null
+          is_verified: boolean | null
+          state: string | null
+          verification_status: string | null
+        }
+        Insert: {
+          city?: string | null
+          full_name?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          state?: string | null
+          verification_status?: string | null
+        }
+        Update: {
+          city?: string | null
+          full_name?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          state?: string | null
+          verification_status?: string | null
+        }
+        Relationships: []
+      }
       public_profiles: {
         Row: {
           city: string | null
@@ -1044,6 +1220,13 @@ export type Database = {
       get_approximate_distance: {
         Args: { _user1_id: string; _user2_id: string }
         Returns: number
+      }
+      get_partner_location: {
+        Args: { _partner_id: string }
+        Returns: {
+          city: string
+          state: string
+        }[]
       }
       has_role: {
         Args: {

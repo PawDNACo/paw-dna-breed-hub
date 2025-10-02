@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 /**
  * Get public profile information (safe to display)
  * This only includes: id, full_name, city, state, is_verified, verification_status
+ * SECURITY: Uses public_profiles view which never exposes email, payment tokens, or precise location
  */
 export async function getPublicProfile(userId: string) {
   const { data, error } = await supabase
@@ -34,6 +35,43 @@ export async function getPublicProfile(userId: string) {
   }
 
   return data;
+}
+
+/**
+ * Get conversation partner profile information (requires active conversation or transaction)
+ * This only includes: id, full_name, city, state, is_verified, verification_status
+ * SECURITY: Automatically filtered to only show partners with active relationships
+ */
+export async function getConversationPartnerProfile(partnerId: string) {
+  const { data, error } = await supabase
+    .from("conversation_partner_profiles")
+    .select("*")
+    .eq("id", partnerId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching conversation partner profile:", error);
+    return null;
+  }
+
+  return data;
+}
+
+/**
+ * Get partner location (city and state only)
+ * SECURITY: Only returns location if there's an active conversation or transaction
+ */
+export async function getPartnerLocation(partnerId: string): Promise<{ city: string; state: string } | null> {
+  const { data, error } = await supabase.rpc("get_partner_location", {
+    _partner_id: partnerId,
+  });
+
+  if (error) {
+    console.error("Error fetching partner location:", error);
+    return null;
+  }
+
+  return data?.[0] || null;
 }
 
 /**
@@ -140,13 +178,16 @@ export async function getOwnProfile() {
 
 export const LOCATION_SECURITY_GUIDELINES = {
   publicFields: ["id", "full_name", "city", "state", "is_verified", "verification_status"],
-  sensitiveFields: ["latitude", "longitude", "zip_code", "county", "email"],
+  sensitiveFields: ["latitude", "longitude", "zip_code", "county", "email", "stripe_identity_verification_token", "stripe_identity_session_id"],
   conversationFields: ["city", "state"], // What conversation partners can see
-  transactionFields: ["city", "state", "zip_code"], // What transaction partners can see
+  transactionFields: ["city", "state"], // What transaction partners can see (zip removed for privacy)
   
   notes: {
+    paymentTokens: "Stripe verification tokens are NEVER exposed to anyone except the profile owner",
+    emailAddresses: "Email addresses are NEVER exposed to other users under any circumstances",
     distanceCalculations: "Use get_approximate_distance() which rounds to 5-mile increments",
-    profileQueries: "Always query public_profiles view unless accessing own profile",
+    profileQueries: "Always query public_profiles or conversation_partner_profiles views, never profiles table directly",
     auditLogging: "All profile accesses by other users are logged for security monitoring",
+    partnerLocation: "Use get_partner_location() function to safely get partner city/state only",
   }
 } as const;

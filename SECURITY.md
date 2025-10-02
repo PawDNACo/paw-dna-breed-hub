@@ -4,58 +4,104 @@
 
 PawDNA implements comprehensive security measures to protect user data, prevent fraud, and ensure safe transactions between breeders and buyers.
 
-## Location Data Protection
+## Critical Data Protection
 
-### Problem
+### Payment Verification Tokens
+
+#### Problem
+Stripe identity verification tokens (`stripe_identity_verification_token`, `stripe_identity_session_id`) could be stolen and misused to impersonate users or manipulate verification status.
+
+#### Solution
+- **RLS Policy**: Only the authenticated user can view their own payment tokens
+- **Database Security**: Sensitive columns explicitly marked as "SECURITY CRITICAL"
+- **Code Enforcement**: All profile queries use secure views that exclude payment tokens
+- **Zero Exposure**: Tokens NEVER returned in any query except user's own profile
+
+```sql
+-- Only owner can see payment tokens
+COMMENT ON COLUMN profiles.stripe_identity_verification_token IS 
+  'SECURITY CRITICAL: Payment verification token. Only visible to profile owner.';
+```
+
+### Email Address Privacy
+
+#### Problem
+User email addresses could be harvested by spammers, competitors, or used for phishing attacks.
+
+#### Solution
+- **Complete Isolation**: Email addresses NEVER exposed to other users under any circumstances
+- **RLS Policy**: Emails only visible to profile owner
+- **Secure Views**: `public_profiles` and `conversation_partner_profiles` explicitly exclude email column
+- **No Bulk Access**: Impossible to query multiple user emails
+
+```sql
+-- Email never exposed to other users
+COMMENT ON COLUMN profiles.email IS 
+  'SECURITY CRITICAL: Only visible to profile owner. NEVER expose to other users.';
+```
+
+### Location Data Protection
+
+#### Problem
 User location data (addresses, GPS coordinates) is highly sensitive. Competitors could harvest this data to:
 - Identify and target breeders
 - Map user locations
 - Steal business opportunities
 - Exploit unverified users
 
-### Solution
-Multi-layered protection system:
+#### Solution - Multi-layered Protection System
 
-#### 1. Row Level Security (RLS)
+##### 1. Row Level Security (RLS)
 ```sql
--- Users can only view their own profile
+-- Users can ONLY view their own complete profile
 CREATE POLICY "Authenticated users can view their own profile"
 ON profiles FOR SELECT
 USING (auth.uid() = id);
 
--- Conversation partners can see city/state only
-CREATE POLICY "Users can view city/state of conversation partners"
-ON profiles FOR SELECT
-USING (
-  id != auth.uid() AND (
-    users_have_active_conversation(auth.uid(), id) OR
-    users_have_active_transaction(auth.uid(), id)
-  )
-);
+-- Dangerous policy REMOVED: No direct access to profiles table by others
+-- All external access must use secure views
 ```
 
-#### 2. Public Profiles View
-Limited data exposure:
-- ✅ Included: name, city, state, verification status
-- ❌ Excluded: zip code, county, GPS coordinates, email
+##### 2. Secure Views (with security_invoker=true)
+```sql
+-- Public profiles: Limited safe data only
+CREATE VIEW public_profiles WITH (security_invoker=true) AS
+SELECT id, full_name, city, state, is_verified, verification_status, created_at
+FROM profiles;
+-- ❌ Excluded: email, zip_code, county, GPS coordinates, payment tokens
 
-#### 3. Approximate Distance Function
+-- Conversation partner profiles: Requires active relationship
+CREATE VIEW conversation_partner_profiles WITH (security_invoker=true) AS
+SELECT id, full_name, city, state, is_verified, verification_status
+FROM profiles
+WHERE active_conversation_or_transaction_exists;
+```
+
+##### 3. Approximate Distance Function
 ```typescript
 // Returns distance rounded to nearest 5 miles
 const distance = await getApproximateDistance(user1Id, user2Id);
-// Example: 23 miles becomes 25 miles (prevents precise location tracking)
+// Example: 23 miles becomes 25 miles (prevents precise location triangulation)
 ```
 
-#### 4. Audit Logging
-All profile accesses by other users are logged:
+##### 4. Secure Partner Location Function
+```sql
+-- Returns ONLY city/state for active partners
+CREATE FUNCTION get_partner_location(_partner_id uuid)
+RETURNS TABLE(city text, state text)
+-- Automatically verifies active conversation or transaction
+```
+
+##### 5. Audit Logging
+All profile accesses logged in `profile_access_logs` and `security_audit_log`:
 ```typescript
-profile_access_logs {
-  accessor_id: uuid,
-  accessed_profile_id: uuid,
-  access_type: 'view' | 'update' | 'location_query',
-  accessed_at: timestamp,
+security_audit_log {
+  user_id: uuid,
+  action: string,
+  table_name: string,
+  details: jsonb,
   ip_address: inet,
-  user_agent: text
+  created_at: timestamp
 }
 ```
 
@@ -63,35 +109,65 @@ profile_access_logs {
 
 #### ✅ DO:
 ```typescript
-// Use public profile view for other users
-import { getPublicProfile } from '@/lib/profileSecurity';
-const profile = await getPublicProfile(userId);
+// Use public profile view for other users (NEVER query profiles table)
+import { getPublicProfile, getConversationPartnerProfile, getPartnerLocation } from '@/lib/profileSecurity';
+
+// For any user
+const profile = await getPublicProfile(userId); // Safe: only public fields
+
+// For conversation partners
+const partner = await getConversationPartnerProfile(partnerId); // Requires active relationship
+
+// For partner location (city/state only)
+const location = await getPartnerLocation(partnerId); // Returns { city, state }
 
 // Use approximate distance for matchmaking
 import { getApproximateDistance } from '@/lib/profileSecurity';
-const distance = await getApproximateDistance(myId, theirId);
-
-// Check conversation/transaction status before showing data
-const hasConversation = await usersHaveActiveConversation(myId, theirId);
-if (hasConversation) {
-  // Show city/state only
-}
+const distance = await getApproximateDistance(myId, theirId); // Rounded to 5 miles
 ```
 
 #### ❌ DON'T:
 ```typescript
-// Never query profiles for other users directly
+// NEVER query profiles table for other users
 const { data } = await supabase
   .from('profiles')
-  .select('latitude, longitude, zip_code')
+  .select('*')
   .neq('id', myId); // ❌ BLOCKED BY RLS
 
-// Don't expose exact coordinates
-console.log(`User at ${lat}, ${lng}`); // ❌ NEVER
+// NEVER expose sensitive fields
+console.log(profile.email); // ❌ NEVER - emails are private
+console.log(profile.stripe_identity_verification_token); // ❌ NEVER - payment tokens are private
+console.log(`User at ${lat}, ${lng}`); // ❌ NEVER - exact coordinates are private
+console.log(profile.zip_code); // ❌ NEVER - zip codes enable location targeting
 
-// Don't create bulk export APIs
-const allUsers = await getAllProfiles(); // ❌ SECURITY RISK
+// NEVER create bulk export APIs
+const allUsers = await getAllProfiles(); // ❌ MAJOR SECURITY RISK
+
+// NEVER pass sensitive data to external APIs
+sendWhatsApp(`Contact ${user.email}`); // ❌ PRIVACY VIOLATION
 ```
+
+### Data Classification
+
+**🔴 NEVER EXPOSE (Owner Only)**
+- Email addresses
+- Payment verification tokens (stripe_identity_verification_token, stripe_identity_session_id)
+- GPS coordinates (latitude, longitude)
+- Zip codes
+- County names
+- Phone numbers
+- Financial details
+
+**🟡 RESTRICTED (Active Relationships Only)**
+- City name
+- State name
+- Approximate distance (rounded to 5 miles)
+
+**🟢 PUBLIC (Anyone Can See)**
+- User ID
+- Full name
+- Verification status (is_verified, verification_status)
+- Account creation date
 
 ## Role-Based Access Control (RBAC)
 

@@ -422,9 +422,39 @@ export default function DeveloperDashboard() {
 
                 <div className="flex items-center justify-between p-4 border border-border rounded-lg">
                   <div>
+                    <div className="font-medium">Payment Token Security</div>
+                    <div className="text-sm text-muted-foreground">
+                      Stripe verification tokens never exposed
+                    </div>
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                  <div>
+                    <div className="font-medium">Email Privacy Protection</div>
+                    <div className="text-sm text-muted-foreground">
+                      Email addresses only visible to owners
+                    </div>
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                  <div>
                     <div className="font-medium">Location Data Protection</div>
                     <div className="text-sm text-muted-foreground">
-                      GPS coordinates restricted to owners only
+                      GPS coordinates & zip codes restricted to owners
+                    </div>
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                  <div>
+                    <div className="font-medium">Secure Profile Views</div>
+                    <div className="text-sm text-muted-foreground">
+                      Public views exclude all sensitive data
                     </div>
                   </div>
                   <CheckCircle className="h-5 w-5 text-green-600" />
@@ -452,9 +482,9 @@ export default function DeveloperDashboard() {
 
                 <div className="flex items-center justify-between p-4 border border-border rounded-lg">
                   <div>
-                    <div className="font-medium">Profile Access Audit Logs</div>
+                    <div className="font-medium">Security Audit Logs</div>
                     <div className="text-sm text-muted-foreground">
-                      Tracking all profile access attempts
+                      Tracking all sensitive data access attempts
                     </div>
                   </div>
                   <CheckCircle className="h-5 w-5 text-green-600" />
@@ -462,18 +492,23 @@ export default function DeveloperDashboard() {
 
                 <Alert className="mt-6">
                   <Shield className="h-4 w-4" />
-                  <AlertTitle>Enhanced Location Privacy</AlertTitle>
+                  <AlertTitle>Critical Data Protection Active</AlertTitle>
                   <AlertDescription className="mt-2 space-y-2">
-                    <p><strong>New Security Features:</strong></p>
+                    <p><strong>Enhanced Security Measures:</strong></p>
                     <ul className="list-disc list-inside text-sm space-y-1">
-                      <li>GPS coordinates visible to owners only</li>
-                      <li>Conversation partners see city/state only</li>
-                      <li>Distance calculations rounded to 5-mile increments</li>
-                      <li>Public profile view excludes sensitive data</li>
-                      <li>All profile access logged for audit</li>
+                      <li><strong>Payment Tokens:</strong> Stripe verification tokens never exposed to anyone</li>
+                      <li><strong>Email Privacy:</strong> Email addresses completely isolated, only visible to owner</li>
+                      <li><strong>Location Data:</strong> GPS coordinates & zip codes restricted to owner only</li>
+                      <li><strong>Partner Access:</strong> Active partners see city/state only, no sensitive data</li>
+                      <li><strong>Distance Privacy:</strong> All distances rounded to 5-mile increments</li>
+                      <li><strong>Secure Views:</strong> public_profiles & conversation_partner_profiles exclude all PII</li>
+                      <li><strong>Audit Trail:</strong> All access attempts logged in security_audit_log</li>
                     </ul>
-                    <p className="mt-3 text-xs">
-                      See <code>SECURITY.md</code> for full documentation
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      <strong>Zero Tolerance:</strong> Emails, payment tokens, and precise locations are NEVER exposed under any circumstances
+                    </p>
+                    <p className="mt-2 text-xs">
+                      See <code>SECURITY.md</code> for complete documentation
                     </p>
                   </AlertDescription>
                 </Alert>

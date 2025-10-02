@@ -28,6 +28,8 @@ import SecuritySettings from "./pages/SecuritySettings";
 import AuthCallback from "./pages/AuthCallback";
 import CompleteProfile from "./pages/CompleteProfile";
 import Contact from "./pages/Contact";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -44,6 +46,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/sign-up" element={<AuthPage mode="signup" />} />
           <Route path="/login" element={<AuthPage mode="login" />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route 
             path="/complete-profile" 

@@ -293,7 +293,15 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="signin-password">Password</Label>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="signin-password">Password</Label>
+                          <Link 
+                            to="/forgot-password" 
+                            className="text-xs text-primary hover:underline"
+                          >
+                            Forgot password?
+                          </Link>
+                        </div>
                         <Input
                           id="signin-password"
                           type="password"

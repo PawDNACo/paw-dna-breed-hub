@@ -909,6 +909,7 @@ export type Database = {
           is_verified: boolean | null
           latitude: number | null
           longitude: number | null
+          phone: string | null
           social_provider: string | null
           state: string | null
           two_factor_enabled: boolean | null
@@ -931,6 +932,7 @@ export type Database = {
           is_verified?: boolean | null
           latitude?: number | null
           longitude?: number | null
+          phone?: string | null
           social_provider?: string | null
           state?: string | null
           two_factor_enabled?: boolean | null
@@ -953,6 +955,7 @@ export type Database = {
           is_verified?: boolean | null
           latitude?: number | null
           longitude?: number | null
+          phone?: string | null
           social_provider?: string | null
           state?: string | null
           two_factor_enabled?: boolean | null

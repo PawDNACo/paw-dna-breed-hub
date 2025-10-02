@@ -57,10 +57,16 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
         throw new Error("Username must be 3-20 characters (letters, numbers, _ or - only)");
       }
 
+      console.log('Checking if username exists:', username);
       // Check if username already exists
-      const { data: usernameExists } = await supabase.rpc('username_exists', {
+      const { data: usernameExists, error: checkError } = await supabase.rpc('username_exists', {
         _username: username
       });
+
+      if (checkError) {
+        console.error('Username check error:', checkError);
+        throw new Error("Failed to validate username. Please try again.");
+      }
 
       if (usernameExists) {
         throw new Error("Username already taken. Please choose another.");
@@ -68,6 +74,7 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
 
       const redirectUrl = `${window.location.origin}/auth/callback`;
 
+      console.log('Creating account with email:', email, 'username:', username);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -80,14 +87,19 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Signup error:', error);
+        throw error;
+      }
 
       if (data?.user) {
+        console.log('User created successfully:', data.user.id);
         setSignupData(data.user);
         setShowLocationInput(true);
         toast.success("Account created! Please add your location to continue.");
       }
     } catch (error: any) {
+      console.error('Signup failed:', error);
       toast.error(error.message || "Failed to sign up");
     } finally {
       setLoading(false);
@@ -117,49 +129,59 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
     setLoading(true);
 
     try {
+      let emailToUse = identifier;
       const isEmail = identifier.includes('@');
       
+      // If username provided, look up the email
       if (!isEmail) {
-        const { data, error } = await supabase.functions.invoke('sign-in-with-username', {
-          body: { username: identifier, password }
-        });
+        console.log('Looking up email for username:', identifier);
+        const { data: emailData, error: emailError } = await supabase.rpc(
+          'get_email_from_username',
+          { _username: identifier }
+        );
 
-        if (error) throw error;
+        console.log('Email lookup result:', { emailData, emailError });
 
-        if (data.requires_mfa) {
-          setMfaFactorId(data.factor_id);
+        if (emailError) {
+          console.error('Email lookup error:', emailError);
+          throw new Error("Invalid username or password");
+        }
+
+        if (!emailData) {
+          console.log('No email found for username');
+          throw new Error("Invalid username or password");
+        }
+
+        emailToUse = emailData;
+        console.log('Found email, attempting sign in');
+      }
+
+      // Sign in with email and password
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailToUse,
+        password,
+      });
+
+      if (error) {
+        console.error('Sign in error:', error);
+        throw error;
+      }
+
+      if (data.user) {
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        
+        if (factors && factors.totp && factors.totp.length > 0) {
+          setMfaFactorId(factors.totp[0].id);
           setShow2FA(true);
           toast.info("Please enter your 2FA code");
           return;
         }
 
-        if (data.success) {
-          toast.success("Signed in successfully!");
-          navigate("/");
-        }
-      } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: identifier,
-          password,
-        });
-
-        if (error) throw error;
-
-        if (data.user) {
-          const { data: factors } = await supabase.auth.mfa.listFactors();
-          
-          if (factors && factors.totp && factors.totp.length > 0) {
-            setMfaFactorId(factors.totp[0].id);
-            setShow2FA(true);
-            toast.info("Please enter your 2FA code");
-            return;
-          }
-
-          toast.success("Signed in successfully!");
-          navigate("/");
-        }
+        toast.success("Signed in successfully!");
+        navigate("/");
       }
     } catch (error: any) {
+      console.error('Sign in failed:', error);
       toast.error(error.message || "Failed to sign in");
     } finally {
       setLoading(false);

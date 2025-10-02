@@ -422,6 +422,16 @@ export default function DeveloperDashboard() {
 
                 <div className="flex items-center justify-between p-4 border border-border rounded-lg">
                   <div>
+                    <div className="font-medium">Location Data Protection</div>
+                    <div className="text-sm text-muted-foreground">
+                      GPS coordinates restricted to owners only
+                    </div>
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                  <div>
                     <div className="font-medium">Identity Verification</div>
                     <div className="text-sm text-muted-foreground">
                       Stripe Identity verification enabled
@@ -440,10 +450,49 @@ export default function DeveloperDashboard() {
                   <CheckCircle className="h-5 w-5 text-green-600" />
                 </div>
 
-                <Button variant="outline" onClick={() => navigate("/verification-dashboard")}>
-                  <Shield className="mr-2 h-4 w-4" />
-                  View Full Security Dashboard
-                </Button>
+                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                  <div>
+                    <div className="font-medium">Profile Access Audit Logs</div>
+                    <div className="text-sm text-muted-foreground">
+                      Tracking all profile access attempts
+                    </div>
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+
+                <Alert className="mt-6">
+                  <Shield className="h-4 w-4" />
+                  <AlertTitle>Enhanced Location Privacy</AlertTitle>
+                  <AlertDescription className="mt-2 space-y-2">
+                    <p><strong>New Security Features:</strong></p>
+                    <ul className="list-disc list-inside text-sm space-y-1">
+                      <li>GPS coordinates visible to owners only</li>
+                      <li>Conversation partners see city/state only</li>
+                      <li>Distance calculations rounded to 5-mile increments</li>
+                      <li>Public profile view excludes sensitive data</li>
+                      <li>All profile access logged for audit</li>
+                    </ul>
+                    <p className="mt-3 text-xs">
+                      See <code>SECURITY.md</code> for full documentation
+                    </p>
+                  </AlertDescription>
+                </Alert>
+
+                <div className="grid gap-3 pt-4">
+                  <Button variant="outline" onClick={() => navigate("/verification")}>
+                    <Shield className="mr-2 h-4 w-4" />
+                    View Security Dashboard
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      window.open('https://github.com/yourusername/pawdna/blob/main/SECURITY.md', '_blank');
+                    }}
+                  >
+                    <Code className="mr-2 h-4 w-4" />
+                    View Security Documentation
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

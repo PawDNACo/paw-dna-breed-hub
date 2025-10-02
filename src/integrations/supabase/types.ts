@@ -14,7 +14,133 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      pets: {
+        Row: {
+          age_months: number | null
+          available: boolean | null
+          breed: string
+          created_at: string
+          description: string | null
+          gender: string
+          id: string
+          image_url: string | null
+          listing_type: string
+          name: string
+          owner_id: string
+          price: number | null
+          size: string | null
+          species: string
+          updated_at: string
+          vaccinated: boolean | null
+        }
+        Insert: {
+          age_months?: number | null
+          available?: boolean | null
+          breed: string
+          created_at?: string
+          description?: string | null
+          gender: string
+          id?: string
+          image_url?: string | null
+          listing_type: string
+          name: string
+          owner_id: string
+          price?: number | null
+          size?: string | null
+          species: string
+          updated_at?: string
+          vaccinated?: boolean | null
+        }
+        Update: {
+          age_months?: number | null
+          available?: boolean | null
+          breed?: string
+          created_at?: string
+          description?: string | null
+          gender?: string
+          id?: string
+          image_url?: string | null
+          listing_type?: string
+          name?: string
+          owner_id?: string
+          price?: number | null
+          size?: string | null
+          species?: string
+          updated_at?: string
+          vaccinated?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pets_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          started_at: string
+          status: string
+          subscription_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+          subscription_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+          subscription_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

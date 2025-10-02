@@ -462,6 +462,46 @@ export default function DeveloperDashboard() {
 
                 <div className="flex items-center justify-between p-4 border border-border rounded-lg">
                   <div>
+                    <div className="font-medium">Transaction Data Security</div>
+                    <div className="text-sm text-muted-foreground">
+                      Sales records only visible to participants
+                    </div>
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                  <div>
+                    <div className="font-medium">Message Privacy</div>
+                    <div className="text-sm text-muted-foreground">
+                      Messages only visible to sender/recipient
+                    </div>
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                  <div>
+                    <div className="font-medium">Financial Data Protection</div>
+                    <div className="text-sm text-muted-foreground">
+                      Frozen funds & subscriptions isolated
+                    </div>
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                  <div>
+                    <div className="font-medium">Anonymous User Blocking</div>
+                    <div className="text-sm text-muted-foreground">
+                      Zero access to sensitive data for non-authenticated users
+                    </div>
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                  <div>
                     <div className="font-medium">Identity Verification</div>
                     <div className="text-sm text-muted-foreground">
                       Stripe Identity verification enabled
@@ -492,20 +532,21 @@ export default function DeveloperDashboard() {
 
                 <Alert className="mt-6">
                   <Shield className="h-4 w-4" />
-                  <AlertTitle>Critical Data Protection Active</AlertTitle>
+                  <AlertTitle>Comprehensive Data Protection Active</AlertTitle>
                   <AlertDescription className="mt-2 space-y-2">
-                    <p><strong>Enhanced Security Measures:</strong></p>
+                    <p><strong>Critical Security Layers:</strong></p>
                     <ul className="list-disc list-inside text-sm space-y-1">
-                      <li><strong>Payment Tokens:</strong> Stripe verification tokens never exposed to anyone</li>
-                      <li><strong>Email Privacy:</strong> Email addresses completely isolated, only visible to owner</li>
-                      <li><strong>Location Data:</strong> GPS coordinates & zip codes restricted to owner only</li>
-                      <li><strong>Partner Access:</strong> Active partners see city/state only, no sensitive data</li>
-                      <li><strong>Distance Privacy:</strong> All distances rounded to 5-mile increments</li>
-                      <li><strong>Secure Views:</strong> public_profiles & conversation_partner_profiles exclude all PII</li>
-                      <li><strong>Audit Trail:</strong> All access attempts logged in security_audit_log</li>
+                      <li><strong>Customer PII:</strong> Email, full name, and location data completely secured</li>
+                      <li><strong>Identity Data:</strong> Verification tokens and status never exposed to public</li>
+                      <li><strong>Transaction Security:</strong> Sales data only visible to buyer/breeder participants</li>
+                      <li><strong>Message Privacy:</strong> Messages restricted to sender/recipient only</li>
+                      <li><strong>Financial Isolation:</strong> Frozen funds, subscriptions, banking requests owner-only</li>
+                      <li><strong>Anonymous Blocking:</strong> All sensitive tables deny anonymous access</li>
+                      <li><strong>Audit Trails:</strong> Sales, profiles, 2FA, and security events all logged</li>
+                      <li><strong>Edge Function Control:</strong> Sales creation only via authorized backend functions</li>
                     </ul>
-                    <p className="mt-3 text-xs text-muted-foreground">
-                      <strong>Zero Tolerance:</strong> Emails, payment tokens, and precise locations are NEVER exposed under any circumstances
+                    <p className="mt-3 text-xs text-destructive font-semibold">
+                      ZERO TOLERANCE: Customer PII, payment tokens, identity data, and transactions are completely isolated
                     </p>
                     <p className="mt-2 text-xs">
                       See <code>SECURITY.md</code> for complete documentation

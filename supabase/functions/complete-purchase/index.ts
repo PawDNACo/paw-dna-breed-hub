@@ -12,12 +12,13 @@ serve(async (req) => {
   }
 
   try {
+    // Use service role key to bypass RLS for sales creation
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+        auth: {
+          persistSession: false,
         },
       }
     );
@@ -37,7 +38,7 @@ serve(async (req) => {
       throw new Error('Failed to update pet status');
     }
 
-    // Create sales record with 72-hour hold
+    // Create sales record with 72-hour hold (using service role to bypass RLS)
     const { error: saleError } = await supabaseClient
       .from('sales')
       .insert({

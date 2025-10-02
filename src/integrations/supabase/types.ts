@@ -855,6 +855,48 @@ export type Database = {
           },
         ]
       }
+      sales_access_log: {
+        Row: {
+          access_type: string
+          accessed_at: string | null
+          id: string
+          ip_address: unknown | null
+          sale_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          access_type: string
+          accessed_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          sale_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          access_type?: string
+          accessed_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          sale_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_access_log_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "my_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_access_log_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_audit_log: {
         Row: {
           action: string
@@ -1199,6 +1241,24 @@ export type Database = {
         }
         Relationships: []
       }
+      my_transactions: {
+        Row: {
+          breed: string | null
+          breeder_earnings: number | null
+          funds_available_date: string | null
+          id: string | null
+          other_party_id: string | null
+          payout_date: string | null
+          payout_status: string | null
+          pet_name: string | null
+          platform_fee: number | null
+          sale_date: string | null
+          sale_price: number | null
+          species: string | null
+          transaction_type: string | null
+        }
+        Relationships: []
+      }
       public_profiles: {
         Row: {
           city: string | null
@@ -1242,6 +1302,10 @@ export type Database = {
       calculate_distance: {
         Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
+      }
+      can_access_transaction: {
+        Args: { _sale_id: string; _user_id: string }
+        Returns: boolean
       }
       check_banking_change_limit: {
         Args: { _user_id: string }

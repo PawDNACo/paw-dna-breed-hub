@@ -247,26 +247,50 @@ rateLimitMiddleware(clientIp, {
 - **Payment Creation**: 20 per 5 min per IP
 - **Account Freezing**: 10/hour per IP
 
-## Payment Security
+## Payment & Transaction Security
+
+### Critical Protections
+
+#### Customer Personal Information (PII)
+- **Email addresses**: NEVER exposed to other users
+- **Full names**: Only visible in authorized transactions
+- **Location data**: GPS coordinates owner-only, city/state for active partners only
+- **Identity verification tokens**: Completely isolated, owner-only access
+
+#### Transaction Data Protection
+- **Sales records**: Only visible to buyer and breeder participants
+- **No client-side inserts**: Sales creation restricted to authorized edge functions only
+- **Audit logging**: All sales access logged in `sales_access_log` table
+- **Anonymous users blocked**: Zero access to transaction data
+- **Secure view**: `my_transactions` view provides safe access to own transactions only
+
+#### Financial Data Security
+- **No payment method storage**: Credit cards, bank accounts stored in Stripe only
+- **Frozen funds isolation**: Users can only view their own frozen funds, no modifications allowed
+- **Subscription privacy**: Subscription data only visible to subscriber
+- **Banking change requests**: Completely private, owner-only access
 
 ### Stripe Integration
 - PCI-compliant payment processing
-- Client-side secret tokens
+- Client-side secret tokens (ephemeral, single-use)
 - Server-side verification
 - 72-hour hold on breeder payouts
+- Payment intents never stored in database
 
-### Transaction Flow
-1. Buyer initiates purchase
-2. Stripe creates payment intent
-3. Payment processed securely
-4. Funds held for 72 hours
-5. Breeder payout after hold period
+### Transaction Flow Security
+1. Buyer initiates purchase (authenticated & verified users only)
+2. Edge function creates Stripe payment intent (server-side only)
+3. Payment processed through Stripe (PCI compliant)
+4. Edge function records sale (bypasses client RLS)
+5. Funds held for 72 hours (fraud protection)
+6. Breeder payout after hold period (if no disputes)
 
 ### Fraud Prevention
-- Identity verification required
-- User reporting system
-- Account freezing on reports
-- Frozen funds management
+- Identity verification required for all transactions
+- User reporting system with automatic account freeze
+- Account freezing triggers 90-day fund hold
+- Frozen funds management (admin-controlled release)
+- Transaction audit trails
 
 ## Screenshot Prevention
 
@@ -319,10 +343,46 @@ const petListingSchema = z.object({
 
 ## Database Security
 
-### RLS Policies
-Every table has RLS enabled:
+### Row Level Security (RLS)
+Every table has RLS enabled with strict access controls:
+
 ```sql
+-- All sensitive tables have RLS enabled
 ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
+```
+
+### Owner-Only Access Tables
+These tables are restricted to owner access only:
+- `profiles`: Complete profile data (email, location, payment tokens)
+- `frozen_funds`: User's frozen fund balances and release dates
+- `subscriptions`: User's subscription status and details
+- `verification_requests`: Identity verification submissions
+- `banking_change_requests`: Banking information change requests
+
+### Participant-Only Access Tables
+These tables restrict access to transaction/conversation participants:
+- `sales`: Transaction records (buyer and breeder only)
+- `messages`: Conversation messages (sender and recipient only)
+- `conversations`: Conversation details (buyer and breeder only)
+
+### Anonymous User Restrictions
+Anonymous (unauthenticated) users have ZERO access to:
+- All transaction data (`sales`, `frozen_funds`)
+- All financial data (`subscriptions`, `banking_change_requests`)
+- All verification data (`verification_requests`)
+- All conversation data (`conversations`, `messages`)
+- All user reports (`user_reports`)
+- Profile details beyond public view
+
+### Secure Views (security_invoker=true)
+```sql
+-- Safe profile views that exclude sensitive data
+public_profiles: id, full_name, city, state, is_verified, verification_status
+conversation_partner_profiles: Same fields + relationship verification
+my_transactions: User's own purchases and sales only
+
+-- ❌ Excluded from ALL public views:
+-- Email, payment tokens, GPS coordinates, zip codes, financial details
 ```
 
 ### Security Definer Functions
@@ -331,20 +391,25 @@ CREATE FUNCTION function_name()
 SECURITY DEFINER
 SET search_path = public
 -- Prevents SQL injection and path manipulation
+-- Used for: role checking, distance calculation, access validation
 ```
 
-### Sensitive Data
+### Critical Column Protection
+All sensitive columns explicitly marked and protected:
 ```sql
--- Documented sensitive columns
-COMMENT ON COLUMN profiles.latitude IS 
-  'SENSITIVE: Only visible to profile owner';
+-- Never exposed to other users
+COMMENT ON COLUMN profiles.email IS 'CRITICAL PII: Email address - NEVER expose';
+COMMENT ON COLUMN profiles.stripe_identity_verification_token IS 'CRITICAL SECURITY: Never expose';
+COMMENT ON COLUMN profiles.latitude IS 'CRITICAL PII: Precise location - Owner only';
+COMMENT ON COLUMN profiles.longitude IS 'CRITICAL PII: Precise location - Owner only';
 ```
 
 ## Monitoring & Audit
 
-### Audit Logs
+### Comprehensive Audit Logging
+
+#### Profile Access Logs
 ```typescript
-// Profile access tracking
 profile_access_logs {
   accessor_id: uuid,
   accessed_profile_id: uuid,
@@ -355,11 +420,46 @@ profile_access_logs {
 }
 ```
 
+#### Sales Access Logs
+```typescript
+sales_access_log {
+  user_id: uuid,
+  sale_id: uuid,
+  access_type: string,
+  accessed_at: timestamp,
+  ip_address: inet
+}
+```
+
+#### Security Audit Logs
+```typescript
+security_audit_log {
+  user_id: uuid,
+  action: string,
+  table_name: string,
+  details: jsonb,
+  ip_address: inet,
+  created_at: timestamp
+}
+```
+
+#### Two-Factor Authentication Logs
+```typescript
+two_factor_audit_log {
+  user_id: uuid,
+  event_type: 'enrolled' | 'unenrolled' | 'verified' | 'failed_verification',
+  ip_address: inet,
+  user_agent: text,
+  created_at: timestamp
+}
+```
+
 ### Admin Dashboard
-- View audit logs (`/developer`)
-- Monitor user activity
-- Review security alerts
-- Manage frozen accounts
+- View all audit logs (`/developer`)
+- Monitor user activity patterns
+- Review security alerts and anomalies
+- Manage frozen accounts and disputes
+- Track authentication events
 
 ## Incident Response
 

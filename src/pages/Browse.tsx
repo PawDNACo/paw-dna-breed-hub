@@ -9,7 +9,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowRight, Search } from "lucide-react";
+
+const DOG_BREEDS = [
+  "Labrador Retriever", "German Shepherd", "Golden Retriever", "French Bulldog",
+  "Bulldog", "Poodle", "Beagle", "Rottweiler", "Yorkshire Terrier", "German Shorthaired Pointer",
+  "Boxer", "Dachshund", "Pembroke Welsh Corgi", "Siberian Husky", "Australian Shepherd",
+  "Great Dane", "Doberman Pinscher", "Cavalier King Charles Spaniel", "Miniature Schnauzer",
+  "Shih Tzu", "Boston Terrier", "Pomeranian", "Havanese", "Shetland Sheepdog", "Brittany",
+  "English Springer Spaniel", "Mastiff", "Cocker Spaniel", "Border Collie", "Chihuahua"
+];
+
+const CAT_BREEDS = [
+  "Persian", "Maine Coon", "Ragdoll", "British Shorthair", "Siamese",
+  "Abyssinian", "Bengal", "Birman", "American Shorthair", "Scottish Fold",
+  "Sphynx", "Devon Rex", "Russian Blue", "Exotic Shorthair", "Norwegian Forest Cat",
+  "Oriental", "Siberian", "Burmese", "Tonkinese", "Cornish Rex"
+];
 
 interface Pet {
   id: string;
@@ -36,6 +53,9 @@ const Browse = () => {
   const [searchZip, setSearchZip] = useState("");
   const [searchRadius, setSearchRadius] = useState("250");
   const [searchSpecies, setSearchSpecies] = useState("all");
+  const [searchCity, setSearchCity] = useState("");
+  const [searchState, setSearchState] = useState("");
+  const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   useEffect(() => {
@@ -51,6 +71,18 @@ const Browse = () => {
 
       if (searchSpecies && searchSpecies !== "all") {
         query = query.eq("species", searchSpecies);
+      }
+
+      if (searchCity) {
+        query = query.ilike("city", `%${searchCity}%`);
+      }
+
+      if (searchState) {
+        query = query.ilike("state", `%${searchState}%`);
+      }
+
+      if (selectedBreeds.length > 0) {
+        query = query.in("breed", selectedBreeds);
       }
 
       const { data, error } = await query.order("created_at", { ascending: false });
@@ -119,6 +151,25 @@ const Browse = () => {
     }
   };
 
+  const handleBreedToggle = (breed: string) => {
+    setSelectedBreeds(prev => 
+      prev.includes(breed) 
+        ? prev.filter(b => b !== breed)
+        : [...prev, breed]
+    );
+  };
+
+  const getAvailableBreeds = () => {
+    if (searchSpecies === "dog") return DOG_BREEDS;
+    if (searchSpecies === "cat") return CAT_BREEDS;
+    return [...DOG_BREEDS, ...CAT_BREEDS];
+  };
+
+  const handleSpeciesChange = (value: string) => {
+    setSearchSpecies(value);
+    setSelectedBreeds([]); // Clear breed selections when species changes
+  };
+
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -140,40 +191,63 @@ const Browse = () => {
               <CardDescription>Find pets within your area (up to 250 miles)</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <Label htmlFor="zip">Your ZIP Code</Label>
-                  <div className="flex gap-2">
+              <div className="space-y-6">
+                {/* Location Filters */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <Label htmlFor="zip">Your ZIP Code</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="zip"
+                        placeholder="12345"
+                        maxLength={5}
+                        value={searchZip}
+                        onChange={(e) => setSearchZip(e.target.value)}
+                      />
+                      <Button onClick={handleLocationSearch}>
+                        <Search className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="radius">Search Radius (miles)</Label>
+                    <Select value={searchRadius} onValueChange={setSearchRadius}>
+                      <SelectTrigger id="radius">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="50">50 miles</SelectItem>
+                        <SelectItem value="100">100 miles</SelectItem>
+                        <SelectItem value="150">150 miles</SelectItem>
+                        <SelectItem value="200">200 miles</SelectItem>
+                        <SelectItem value="250">250 miles</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="city">City</Label>
                     <Input
-                      id="zip"
-                      placeholder="12345"
-                      maxLength={5}
-                      value={searchZip}
-                      onChange={(e) => setSearchZip(e.target.value)}
+                      id="city"
+                      placeholder="Enter city"
+                      value={searchCity}
+                      onChange={(e) => setSearchCity(e.target.value)}
                     />
-                    <Button onClick={handleLocationSearch}>
-                      <Search className="h-4 w-4" />
-                    </Button>
+                  </div>
+                  <div>
+                    <Label htmlFor="state">State</Label>
+                    <Input
+                      id="state"
+                      placeholder="Enter state"
+                      value={searchState}
+                      onChange={(e) => setSearchState(e.target.value)}
+                    />
                   </div>
                 </div>
-                <div>
-                  <Label htmlFor="radius">Search Radius (miles)</Label>
-                  <Select value={searchRadius} onValueChange={setSearchRadius}>
-                    <SelectTrigger id="radius">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="50">50 miles</SelectItem>
-                      <SelectItem value="100">100 miles</SelectItem>
-                      <SelectItem value="150">150 miles</SelectItem>
-                      <SelectItem value="200">200 miles</SelectItem>
-                      <SelectItem value="250">250 miles</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+
+                {/* Species Filter */}
                 <div>
                   <Label htmlFor="species">Species</Label>
-                  <Select value={searchSpecies} onValueChange={setSearchSpecies}>
+                  <Select value={searchSpecies} onValueChange={handleSpeciesChange}>
                     <SelectTrigger id="species">
                       <SelectValue placeholder="All species" />
                     </SelectTrigger>
@@ -181,14 +255,49 @@ const Browse = () => {
                       <SelectItem value="all">All species</SelectItem>
                       <SelectItem value="dog">Dog</SelectItem>
                       <SelectItem value="cat">Cat</SelectItem>
-                      <SelectItem value="bird">Bird</SelectItem>
-                      <SelectItem value="reptile">Reptile</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex items-end">
-                  <Button onClick={fetchPets} className="w-full">
+
+                {/* Breed Multi-Select */}
+                <div>
+                  <Label className="mb-3 block">
+                    Breeds {selectedBreeds.length > 0 && `(${selectedBreeds.length} selected)`}
+                  </Label>
+                  <div className="max-h-64 overflow-y-auto border border-border rounded-lg p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      {getAvailableBreeds().map((breed) => (
+                        <div key={breed} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={breed}
+                            checked={selectedBreeds.includes(breed)}
+                            onCheckedChange={() => handleBreedToggle(breed)}
+                          />
+                          <label
+                            htmlFor={breed}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          >
+                            {breed}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {selectedBreeds.length > 0 && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setSelectedBreeds([])}
+                      className="mt-2"
+                    >
+                      Clear breed selections
+                    </Button>
+                  )}
+                </div>
+
+                {/* Apply Filters Button */}
+                <div className="flex justify-end">
+                  <Button onClick={fetchPets} size="lg">
                     Apply Filters
                   </Button>
                 </div>

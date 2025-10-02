@@ -4,7 +4,7 @@ export const Footer = () => {
   return (
     <footer className="bg-muted/50 border-t border-border py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
           {/* Brand */}
           <div>
             <div 
@@ -50,6 +50,14 @@ export const Footer = () => {
               <li><a href="/breeder-agreement" className="hover:text-primary transition-colors">Breeder Agreement</a></li>
               <li><a href="/buyer-agreement" className="hover:text-primary transition-colors">Buyer Agreement</a></li>
               <li><a href="/refund-policy" className="hover:text-primary transition-colors">Refund Policy</a></li>
+            </ul>
+          </div>
+
+          {/* Developers */}
+          <div>
+            <h3 className="font-semibold mb-4">Developers</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><a href="/admin" className="hover:text-primary transition-colors">Admin</a></li>
             </ul>
           </div>
         </div>

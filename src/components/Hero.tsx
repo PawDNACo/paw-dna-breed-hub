@@ -44,7 +44,7 @@ export const Hero = () => {
                 <div className="text-muted-foreground">Sign Up - No Upfront Cost</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-primary">$1,500+</div>
+                <div className="text-2xl font-bold text-primary">$150+</div>
                 <div className="text-muted-foreground">Average Breeding Value</div>
               </div>
               <div>

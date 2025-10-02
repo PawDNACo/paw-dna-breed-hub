@@ -7,21 +7,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, MessageSquare } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useVerificationCheck } from "@/hooks/useVerificationCheck";
-import { VerificationRequired } from "@/components/verification/VerificationRequired";
 import { StripeIdentityVerification } from "@/components/verification/StripeIdentityVerification";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Pet {
   id: string;
   name: string;
   species: string;
   breed: string;
-  age_months: number;
+  age_months?: number;
+  birth_date?: string;
+  expected_date?: string;
   gender: string;
   price: number;
   description: string;
@@ -31,6 +34,8 @@ interface Pet {
   city?: string;
   state?: string;
   zip_code?: string;
+  is_special_breed?: boolean;
+  delivery_method?: string;
 }
 
 interface Profile {
@@ -48,6 +53,8 @@ export default function BreederDashboard() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [parentImages, setParentImages] = useState<string[]>([]);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { isVerified, loading: verificationLoading, requireVerification } = useVerificationCheck();
@@ -57,11 +64,14 @@ export default function BreederDashboard() {
     species: "",
     breed: "",
     age_months: "",
+    birth_date: "",
+    expected_date: "",
     gender: "",
     price: "",
     description: "",
     listing_type: "sale",
-    image_url: "",
+    is_special_breed: false,
+    delivery_method: "",
   });
 
   useEffect(() => {
@@ -76,7 +86,6 @@ export default function BreederDashboard() {
         return;
       }
 
-      // Load profile
       const { data: profileData } = await supabase
         .from("profiles")
         .select("*")
@@ -85,7 +94,6 @@ export default function BreederDashboard() {
 
       setProfile(profileData);
 
-      // Check subscription
       const { data: subData } = await supabase
         .from("subscriptions")
         .select("*")
@@ -95,7 +103,6 @@ export default function BreederDashboard() {
 
       setSubscription(subData);
 
-      // Load pets
       const { data: petsData, error } = await supabase
         .from("pets")
         .select("*")
@@ -114,7 +121,6 @@ export default function BreederDashboard() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Check verification first
     if (!requireVerification("list pets")) {
       return;
     }
@@ -123,6 +129,24 @@ export default function BreederDashboard() {
       toast({
         title: "Subscription Required",
         description: "You need an active subscription to list pets.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (uploadedImages.length < 5) {
+      toast({
+        title: "More Photos Required",
+        description: "Please upload at least 5 photos of your pet.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (parentImages.length < 2) {
+      toast({
+        title: "Parent Photos Required",
+        description: "Please upload at least 2 photos of the parents.",
         variant: "destructive",
       });
       return;
@@ -143,7 +167,9 @@ export default function BreederDashboard() {
 
       const petData = {
         ...formData,
-        age_months: parseInt(formData.age_months),
+        age_months: formData.age_months ? parseInt(formData.age_months) : null,
+        birth_date: formData.birth_date || null,
+        expected_date: formData.expected_date || null,
         price: parseFloat(formData.price),
         owner_id: user.id,
         zip_code: profile.zip_code,
@@ -151,6 +177,8 @@ export default function BreederDashboard() {
         state: profile.state,
         latitude: profile.latitude,
         longitude: profile.longitude,
+        image_url: uploadedImages[0],
+        parent_images: parentImages,
       };
 
       if (editingPet) {
@@ -172,17 +200,7 @@ export default function BreederDashboard() {
 
       setDialogOpen(false);
       setEditingPet(null);
-      setFormData({
-        name: "",
-        species: "",
-        breed: "",
-        age_months: "",
-        gender: "",
-        price: "",
-        description: "",
-        listing_type: "sale",
-        image_url: "",
-      });
+      resetForm();
       checkSubscriptionAndLoadPets();
     } catch (error: any) {
       toast({
@@ -193,18 +211,40 @@ export default function BreederDashboard() {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      species: "",
+      breed: "",
+      age_months: "",
+      birth_date: "",
+      expected_date: "",
+      gender: "",
+      price: "",
+      description: "",
+      listing_type: "sale",
+      is_special_breed: false,
+      delivery_method: "",
+    });
+    setUploadedImages([]);
+    setParentImages([]);
+  };
+
   const handleEdit = (pet: Pet) => {
     setEditingPet(pet);
     setFormData({
       name: pet.name,
       species: pet.species,
       breed: pet.breed,
-      age_months: pet.age_months.toString(),
+      age_months: pet.age_months?.toString() || "",
+      birth_date: pet.birth_date || "",
+      expected_date: pet.expected_date || "",
       gender: pet.gender,
       price: pet.price.toString(),
       description: pet.description || "",
       listing_type: pet.listing_type,
-      image_url: pet.image_url || "",
+      is_special_breed: pet.is_special_breed || false,
+      delivery_method: pet.delivery_method || "",
     });
     setDialogOpen(true);
   };
@@ -243,10 +283,18 @@ export default function BreederDashboard() {
       <Navigation />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Breeder Dashboard</h1>
-          <p className="text-muted-foreground">
-            Manage your pet listings and reach buyers in your area
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Breeder Dashboard</h1>
+              <p className="text-muted-foreground">
+                Manage your pet listings and reach buyers in your area
+              </p>
+            </div>
+            <Button onClick={() => navigate("/conversations")} variant="outline">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Conversations
+            </Button>
+          </div>
         </div>
 
         {!subscription && (
@@ -288,13 +336,19 @@ export default function BreederDashboard() {
                 <Plus className="mr-2 h-4 w-4" /> Add New Listing
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{editingPet ? "Edit" : "Add New"} Pet Listing</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
+                <Alert>
+                  <AlertDescription>
+                    <strong>Important:</strong> Do not include personal information (phone numbers, email, social media) in the description. All communication must happen through our secure messaging system.
+                  </AlertDescription>
+                </Alert>
+
                 <div>
-                  <Label htmlFor="name">Pet Name</Label>
+                  <Label htmlFor="name">Pet Name *</Label>
                   <Input
                     id="name"
                     required
@@ -302,9 +356,10 @@ export default function BreederDashboard() {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="species">Species</Label>
+                    <Label htmlFor="species">Species *</Label>
                     <Select
                       value={formData.species}
                       onValueChange={(value) => setFormData({ ...formData, species: value })}
@@ -315,14 +370,11 @@ export default function BreederDashboard() {
                       <SelectContent>
                         <SelectItem value="dog">Dog</SelectItem>
                         <SelectItem value="cat">Cat</SelectItem>
-                        <SelectItem value="bird">Bird</SelectItem>
-                        <SelectItem value="reptile">Reptile</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="breed">Breed</Label>
+                    <Label htmlFor="breed">Breed *</Label>
                     <Input
                       id="breed"
                       required
@@ -331,79 +383,123 @@ export default function BreederDashboard() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="age_months">Age (months)</Label>
-                    <Input
-                      id="age_months"
-                      type="number"
-                      required
-                      value={formData.age_months}
-                      onChange={(e) => setFormData({ ...formData, age_months: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="gender">Gender</Label>
-                    <Select
-                      value={formData.gender}
-                      onValueChange={(value) => setFormData({ ...formData, gender: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="price">Price ($)</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      step="0.01"
-                      required
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="listing_type">Listing Type</Label>
-                    <Select
-                      value={formData.listing_type}
-                      onValueChange={(value) => setFormData({ ...formData, listing_type: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sale">For Sale</SelectItem>
-                        <SelectItem value="breeding">Breeding Service</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="image_url">Image URL (optional)</Label>
-                  <Input
-                    id="image_url"
-                    type="url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="is_special_breed"
+                    checked={formData.is_special_breed}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_special_breed: checked })}
                   />
+                  <Label htmlFor="is_special_breed">Special Breed</Label>
                 </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="birth_date">Birth Date</Label>
+                    <Input
+                      id="birth_date"
+                      type="date"
+                      value={formData.birth_date}
+                      onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="expected_date">Expected Date (if not born yet)</Label>
+                    <Input
+                      id="expected_date"
+                      type="date"
+                      value={formData.expected_date}
+                      onChange={(e) => setFormData({ ...formData, expected_date: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="gender">Gender *</Label>
+                  <Select
+                    value={formData.gender}
+                    onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="price">Price ($) * (Minimum $50 for non-special breeds)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    min={formData.is_special_breed ? "0" : "50"}
+                    required
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {parseFloat(formData.price) < 50 && !formData.is_special_breed && "Below $50 requires $49.99 listing fee"}
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="delivery_method">Delivery Method *</Label>
+                  <Select
+                    value={formData.delivery_method}
+                    onValueChange={(value) => setFormData({ ...formData, delivery_method: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select delivery method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pickup">Pickup Only</SelectItem>
+                      <SelectItem value="delivery">Will Deliver</SelectItem>
+                      <SelectItem value="both">Both Options Available</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Pet Photos * (Minimum 5 required)</Label>
+                  <div className="mt-2 border-2 border-dashed rounded-lg p-4">
+                    <div className="flex items-center gap-2">
+                      <Upload className="h-5 w-5 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">Upload at least 5 photos</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Photos: {uploadedImages.length}/5+
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Parent Photos * (Minimum 2 required)</Label>
+                  <div className="mt-2 border-2 border-dashed rounded-lg p-4">
+                    <div className="flex items-center gap-2">
+                      <Upload className="h-5 w-5 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">Upload photos of both parents</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Parent Photos: {parentImages.length}/2+
+                    </p>
+                  </div>
+                </div>
+
                 <div>
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
                     rows={4}
+                    placeholder="Describe your pet's personality, health status, etc. Do NOT include contact information."
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
                 </div>
+
                 <Button type="submit" className="w-full">
                   {editingPet ? "Update" : "Create"} Listing
                 </Button>
@@ -425,13 +521,19 @@ export default function BreederDashboard() {
               <CardHeader>
                 <CardTitle>{pet.name}</CardTitle>
                 <CardDescription>
-                  {pet.breed} • {pet.species} • {pet.age_months} months
+                  {pet.breed} • {pet.species}
+                  {pet.is_special_breed && " • Special Breed"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold mb-2">${pet.price}</p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {pet.delivery_method === "pickup" && "Pickup Only"}
+                  {pet.delivery_method === "delivery" && "Will Deliver"}
+                  {pet.delivery_method === "both" && "Pickup or Delivery"}
+                </p>
                 <p className="text-sm text-muted-foreground mb-4">
-                  {pet.city}, {pet.state} {pet.zip_code}
+                  {pet.city}, {pet.state}
                 </p>
                 <div className="flex gap-2">
                   <Button

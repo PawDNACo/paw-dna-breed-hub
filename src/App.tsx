@@ -20,6 +20,8 @@ import AboutUs from "./pages/AboutUs";
 import FAQ from "./pages/FAQ";
 import BreederPayouts from "./pages/BreederPayouts";
 import VerificationComplete from "./pages/VerificationComplete";
+import VerificationDashboard from "./pages/VerificationDashboard";
+import ConversationsDashboard from "./pages/ConversationsDashboard";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -104,6 +106,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <VerificationComplete />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/verification" 
+            element={
+              <ProtectedRoute>
+                <VerificationDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/conversations" 
+            element={
+              <ProtectedRoute>
+                <ConversationsDashboard />
               </ProtectedRoute>
             } 
           />

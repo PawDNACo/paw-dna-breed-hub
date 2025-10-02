@@ -103,6 +103,33 @@ export type Database = {
           },
         ]
       }
+      breed_pricing: {
+        Row: {
+          breed_name: string
+          created_at: string | null
+          id: string
+          is_special_breed: boolean | null
+          min_price: number
+          updated_at: string | null
+        }
+        Insert: {
+          breed_name: string
+          created_at?: string | null
+          id?: string
+          is_special_breed?: boolean | null
+          min_price?: number
+          updated_at?: string | null
+        }
+        Update: {
+          breed_name?: string
+          created_at?: string | null
+          id?: string
+          is_special_breed?: boolean | null
+          min_price?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       buyer_requests: {
         Row: {
           breed: string
@@ -209,6 +236,61 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          approved_at: string | null
+          breeder_id: string
+          buyer_id: string
+          created_at: string | null
+          id: string
+          pet_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          breeder_id: string
+          buyer_id: string
+          created_at?: string | null
+          id?: string
+          pet_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          breeder_id?: string
+          buyer_id?: string
+          created_at?: string | null
+          id?: string
+          pet_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_breeder_id_fkey"
+            columns: ["breeder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       frozen_funds: {
         Row: {
           amount: number
@@ -247,23 +329,124 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          conversation_id: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message_content: string
+          pet_id: string | null
+          recipient_id: string
+          sender_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message_content: string
+          pet_id?: string | null
+          recipient_id: string
+          sender_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message_content?: string
+          pet_id?: string | null
+          recipient_id?: string
+          sender_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pet_images: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          id: string
+          image_url: string
+          is_parent_image: boolean | null
+          pet_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_parent_image?: boolean | null
+          pet_id: string
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_parent_image?: boolean | null
+          pet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pet_images_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pets: {
         Row: {
           age_months: number | null
           available: boolean | null
+          birth_date: string | null
           breed: string
+          breeder_earnings_percentage: number | null
           city: string | null
           county: string | null
           created_at: string
+          delivery_method: string | null
           description: string | null
+          expected_date: string | null
           gender: string
           id: string
           image_url: string | null
+          is_special_breed: boolean | null
           latitude: number | null
+          listing_fee_amount: number | null
+          listing_fee_paid: boolean | null
           listing_type: string
           longitude: number | null
           name: string
           owner_id: string
+          parent_images: Json | null
           price: number | null
           size: string | null
           species: string
@@ -275,19 +458,27 @@ export type Database = {
         Insert: {
           age_months?: number | null
           available?: boolean | null
+          birth_date?: string | null
           breed: string
+          breeder_earnings_percentage?: number | null
           city?: string | null
           county?: string | null
           created_at?: string
+          delivery_method?: string | null
           description?: string | null
+          expected_date?: string | null
           gender: string
           id?: string
           image_url?: string | null
+          is_special_breed?: boolean | null
           latitude?: number | null
+          listing_fee_amount?: number | null
+          listing_fee_paid?: boolean | null
           listing_type: string
           longitude?: number | null
           name: string
           owner_id: string
+          parent_images?: Json | null
           price?: number | null
           size?: string | null
           species: string
@@ -299,19 +490,27 @@ export type Database = {
         Update: {
           age_months?: number | null
           available?: boolean | null
+          birth_date?: string | null
           breed?: string
+          breeder_earnings_percentage?: number | null
           city?: string | null
           county?: string | null
           created_at?: string
+          delivery_method?: string | null
           description?: string | null
+          expected_date?: string | null
           gender?: string
           id?: string
           image_url?: string | null
+          is_special_breed?: boolean | null
           latitude?: number | null
+          listing_fee_amount?: number | null
+          listing_fee_paid?: boolean | null
           listing_type?: string
           longitude?: number | null
           name?: string
           owner_id?: string
+          parent_images?: Json | null
           price?: number | null
           size?: string | null
           species?: string
@@ -341,11 +540,18 @@ export type Database = {
           frozen_reason: string | null
           full_name: string | null
           id: string
+          is_verified: boolean | null
           latitude: number | null
           longitude: number | null
+          social_provider: string | null
           state: string | null
+          stripe_identity_session_id: string | null
+          stripe_identity_verification_token: string | null
+          two_factor_enabled: boolean | null
           updated_at: string
+          verification_completed_at: string | null
           verification_status: string | null
+          verification_type: string | null
           zip_code: string | null
         }
         Insert: {
@@ -358,11 +564,18 @@ export type Database = {
           frozen_reason?: string | null
           full_name?: string | null
           id: string
+          is_verified?: boolean | null
           latitude?: number | null
           longitude?: number | null
+          social_provider?: string | null
           state?: string | null
+          stripe_identity_session_id?: string | null
+          stripe_identity_verification_token?: string | null
+          two_factor_enabled?: boolean | null
           updated_at?: string
+          verification_completed_at?: string | null
           verification_status?: string | null
+          verification_type?: string | null
           zip_code?: string | null
         }
         Update: {
@@ -375,11 +588,18 @@ export type Database = {
           frozen_reason?: string | null
           full_name?: string | null
           id?: string
+          is_verified?: boolean | null
           latitude?: number | null
           longitude?: number | null
+          social_provider?: string | null
           state?: string | null
+          stripe_identity_session_id?: string | null
+          stripe_identity_verification_token?: string | null
+          two_factor_enabled?: boolean | null
           updated_at?: string
+          verification_completed_at?: string | null
           verification_status?: string | null
+          verification_type?: string | null
           zip_code?: string | null
         }
         Relationships: []
@@ -598,6 +818,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_breeder_earnings_percentage: {
+        Args: { sale_price: number }
+        Returns: number
+      }
       calculate_distance: {
         Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number

@@ -19,6 +19,7 @@ import BuyerAgreement from "./pages/BuyerAgreement";
 import AboutUs from "./pages/AboutUs";
 import FAQ from "./pages/FAQ";
 import BreederPayouts from "./pages/BreederPayouts";
+import VerificationComplete from "./pages/VerificationComplete";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -98,6 +99,14 @@ const App = () => (
           <Route path="/buyer-agreement" element={<BuyerAgreement />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route 
+            path="/verification-complete" 
+            element={
+              <ProtectedRoute>
+                <VerificationComplete />
+              </ProtectedRoute>
+            } 
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -89,8 +89,8 @@ export const Navigation = () => {
               </Button>
             ) : (
               <>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>Sign In</Button>
-                <Button variant="hero" size="sm" onClick={() => navigate("/auth")}>Get Started</Button>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>Sign In</Button>
+                <Button variant="hero" size="sm" onClick={() => navigate("/sign-up")}>Get Started</Button>
               </>
             )}
           </div>
@@ -155,8 +155,8 @@ export const Navigation = () => {
                 </Button>
               ) : (
                 <>
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/auth")}>Sign In</Button>
-                  <Button variant="hero" size="sm" className="w-full" onClick={() => navigate("/auth")}>Get Started</Button>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/login")}>Sign In</Button>
+                  <Button variant="hero" size="sm" className="w-full" onClick={() => navigate("/sign-up")}>Get Started</Button>
                 </>
               )}
             </div>

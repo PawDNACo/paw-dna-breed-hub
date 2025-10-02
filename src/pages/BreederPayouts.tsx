@@ -42,7 +42,7 @@ export default function BreederPayouts() {
     
     if (!user) {
       toast.error("Please log in to view payouts");
-      navigate("/auth");
+      navigate("/login");
       return;
     }
 

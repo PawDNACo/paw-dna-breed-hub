@@ -43,7 +43,7 @@ export default function CarePackageManager() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/auth");
+        navigate("/login");
         return;
       }
 

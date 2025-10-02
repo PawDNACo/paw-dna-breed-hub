@@ -24,13 +24,13 @@ export default function AuthCallback() {
       if (error) {
         console.error("Auth callback error:", error);
         toast.error("Authentication failed. Please try again.");
-        navigate("/auth");
+        navigate("/login");
         return;
       }
 
       if (!session) {
         console.log("No session found in callback");
-        navigate("/auth");
+        navigate("/login");
         return;
       }
 
@@ -54,7 +54,7 @@ export default function AuthCallback() {
     } catch (error: any) {
       console.error("Error handling auth callback:", error);
       toast.error("Something went wrong. Please try again.");
-      navigate("/auth");
+      navigate("/login");
     } finally {
       setChecking(false);
     }

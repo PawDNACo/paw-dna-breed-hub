@@ -118,6 +118,7 @@ export const Pricing = () => {
                   <Button 
                     className="w-full" 
                     variant={plan.popular ? "hero" : "default"}
+                    onClick={() => window.location.href = "/sign-up"}
                   >
                     Get Started
                   </Button>
@@ -148,7 +149,7 @@ export const Pricing = () => {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full" variant="secondary">
+              <Button className="w-full" variant="secondary" onClick={() => window.location.href = "/sign-up"}>
                 Find Breeding Partner
               </Button>
             </CardContent>

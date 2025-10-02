@@ -54,7 +54,7 @@ export default function AccessoriesManager() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/auth");
+        navigate("/login");
         return;
       }
 

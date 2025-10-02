@@ -46,6 +46,7 @@ export const Footer = () => {
               <li><a href="/terms" className="hover:text-primary transition-colors">Terms of Service</a></li>
               <li><a href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</a></li>
               <li><a href="/breeder-agreement" className="hover:text-primary transition-colors">Breeder Agreement</a></li>
+              <li><a href="/buyer-agreement" className="hover:text-primary transition-colors">Buyer Agreement</a></li>
               <li><a href="/refund-policy" className="hover:text-primary transition-colors">Refund Policy</a></li>
             </ul>
           </div>

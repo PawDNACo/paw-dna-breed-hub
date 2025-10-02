@@ -70,8 +70,12 @@ export const Pricing = () => {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
             Transparent <span className="bg-gradient-hero bg-clip-text text-transparent">Pricing</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
             Choose the plan that works best for your breeding business
+          </p>
+          <p className="text-sm text-muted-foreground max-w-3xl mx-auto">
+            <strong>Subscriptions:</strong> Pay via card, bank, Cash App, Venmo, Zelle, or other popular methods. 
+            <strong className="ml-2">Deposits:</strong> Must be paid via checking account and settled before transactions.
           </p>
         </div>
 

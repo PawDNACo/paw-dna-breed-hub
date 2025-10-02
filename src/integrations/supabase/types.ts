@@ -403,6 +403,13 @@ export type Database = {
             referencedRelation: "pets"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "conversations_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "public_pet_listings"
+            referencedColumns: ["id"]
+          },
         ]
       }
       email_access_log: {
@@ -582,6 +589,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "messages_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "public_pet_listings"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "messages_recipient_id_fkey"
             columns: ["recipient_id"]
             isOneToOne: false
@@ -656,6 +670,13 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pet_images_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "public_pet_listings"
             referencedColumns: ["id"]
           },
         ]
@@ -954,6 +975,13 @@ export type Database = {
             columns: ["pet_id"]
             isOneToOne: false
             referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "public_pet_listings"
             referencedColumns: ["id"]
           },
         ]
@@ -1359,6 +1387,78 @@ export type Database = {
           sale_price: number | null
           species: string | null
           transaction_type: string | null
+        }
+        Relationships: []
+      }
+      public_pet_listings: {
+        Row: {
+          age_months: number | null
+          available: boolean | null
+          birth_date: string | null
+          breed: string | null
+          city: string | null
+          created_at: string | null
+          delivery_method: string | null
+          description: string | null
+          gender: string | null
+          id: string | null
+          image_url: string | null
+          is_special_breed: boolean | null
+          listing_fee_paid: boolean | null
+          listing_type: string | null
+          name: string | null
+          price: number | null
+          size: string | null
+          species: string | null
+          state: string | null
+          updated_at: string | null
+          vaccinated: boolean | null
+        }
+        Insert: {
+          age_months?: number | null
+          available?: boolean | null
+          birth_date?: string | null
+          breed?: string | null
+          city?: string | null
+          created_at?: string | null
+          delivery_method?: string | null
+          description?: string | null
+          gender?: string | null
+          id?: string | null
+          image_url?: string | null
+          is_special_breed?: boolean | null
+          listing_fee_paid?: boolean | null
+          listing_type?: string | null
+          name?: string | null
+          price?: number | null
+          size?: string | null
+          species?: string | null
+          state?: string | null
+          updated_at?: string | null
+          vaccinated?: boolean | null
+        }
+        Update: {
+          age_months?: number | null
+          available?: boolean | null
+          birth_date?: string | null
+          breed?: string | null
+          city?: string | null
+          created_at?: string | null
+          delivery_method?: string | null
+          description?: string | null
+          gender?: string | null
+          id?: string | null
+          image_url?: string | null
+          is_special_breed?: boolean | null
+          listing_fee_paid?: boolean | null
+          listing_type?: string | null
+          name?: string | null
+          price?: number | null
+          size?: string | null
+          species?: string | null
+          state?: string | null
+          updated_at?: string | null
+          vaccinated?: boolean | null
         }
         Relationships: []
       }

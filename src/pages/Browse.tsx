@@ -60,10 +60,11 @@ const Browse = () => {
 
   const fetchPets = async () => {
     try {
+      // SECURITY: Use public_pet_listings view which excludes exact coordinates
+      // This protects breeders from stalkers by only showing city/state
       let query = supabase
-        .from("pets")
-        .select("id, name, species, breed, gender, size, age_months, price, listing_type, vaccinated, city, state, image_url")
-        .eq("available", true);
+        .from("public_pet_listings")
+        .select("id, name, species, breed, gender, size, age_months, price, listing_type, vaccinated, city, state, image_url");
 
       if (searchSpecies && searchSpecies !== "all") {
         query = query.eq("species", searchSpecies);

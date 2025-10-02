@@ -11,11 +11,13 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Plus, Pencil, Trash2, Upload, MessageSquare } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, MessageSquare, Shield } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useVerificationCheck } from "@/hooks/useVerificationCheck";
 import { StripeIdentityVerification } from "@/components/verification/StripeIdentityVerification";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { addWatermarkToImage, batchWatermarkImages } from "@/utils/imageWatermark";
+import { WatermarkPreview } from "@/components/WatermarkPreview";
 
 interface Pet {
   id: string;
@@ -55,6 +57,8 @@ export default function BreederDashboard() {
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [parentImages, setParentImages] = useState<string[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [watermarkPreview, setWatermarkPreview] = useState<{ original: File; watermarked: Blob } | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { isVerified, loading: verificationLoading, requireVerification } = useVerificationCheck();
@@ -228,6 +232,57 @@ export default function BreederDashboard() {
     });
     setUploadedImages([]);
     setParentImages([]);
+  };
+
+  const handleImageUpload = async (
+    files: FileList | null,
+    type: "pet" | "parent"
+  ) => {
+    if (!files || files.length === 0) return;
+
+    setUploadingImages(true);
+    try {
+      const fileArray = Array.from(files);
+      
+      // Show preview of first image
+      if (fileArray.length > 0) {
+        const watermarked = await addWatermarkToImage(fileArray[0]);
+        setWatermarkPreview({ original: fileArray[0], watermarked });
+      }
+
+      // Add watermarks to all images
+      const watermarkedBlobs = await batchWatermarkImages(fileArray);
+
+      // Convert to base64 for storage (in production, upload to storage bucket)
+      const base64Images = await Promise.all(
+        watermarkedBlobs.map(async (blob) => {
+          return new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+          });
+        })
+      );
+
+      if (type === "pet") {
+        setUploadedImages((prev) => [...prev, ...base64Images]);
+      } else {
+        setParentImages((prev) => [...prev, ...base64Images]);
+      }
+
+      toast({
+        title: "Images Uploaded",
+        description: `${fileArray.length} watermarked image(s) added successfully.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Upload Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingImages(false);
+    }
   };
 
   const handleEdit = (pet: Pet) => {
@@ -465,29 +520,104 @@ export default function BreederDashboard() {
 
                 <div>
                   <Label>Pet Photos * (Minimum 5 required)</Label>
-                  <div className="mt-2 border-2 border-dashed rounded-lg p-4">
-                    <div className="flex items-center gap-2">
-                      <Upload className="h-5 w-5 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">Upload at least 5 photos</p>
+                  <div className="space-y-2">
+                    <div className="mt-2 border-2 border-dashed rounded-lg p-4 cursor-pointer hover:border-primary transition-colors">
+                      <input
+                        type="file"
+                        id="pet-photos"
+                        multiple
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleImageUpload(e.target.files, "pet")}
+                        disabled={uploadingImages}
+                      />
+                      <label htmlFor="pet-photos" className="cursor-pointer flex flex-col items-center gap-2">
+                        {uploadingImages ? (
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                        ) : (
+                          <>
+                            <Upload className="h-5 w-5 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">Click to upload at least 5 photos</p>
+                            <p className="text-xs text-muted-foreground">
+                              <Shield className="inline h-3 w-3 mr-1" />
+                              All images are automatically watermarked
+                            </p>
+                          </>
+                        )}
+                      </label>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Photos: {uploadedImages.length}/5+
+                    <p className="text-xs text-muted-foreground">
+                      Photos uploaded: {uploadedImages.length}/5+
                     </p>
+                    {uploadedImages.length > 0 && (
+                      <div className="grid grid-cols-5 gap-2">
+                        {uploadedImages.map((img, idx) => (
+                          <div key={idx} className="relative aspect-square">
+                            <img
+                              src={img}
+                              alt={`Pet ${idx + 1}`}
+                              className="w-full h-full object-cover rounded border"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div>
                   <Label>Parent Photos * (Minimum 2 required)</Label>
-                  <div className="mt-2 border-2 border-dashed rounded-lg p-4">
-                    <div className="flex items-center gap-2">
-                      <Upload className="h-5 w-5 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">Upload photos of both parents</p>
+                  <div className="space-y-2">
+                    <div className="mt-2 border-2 border-dashed rounded-lg p-4 cursor-pointer hover:border-primary transition-colors">
+                      <input
+                        type="file"
+                        id="parent-photos"
+                        multiple
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleImageUpload(e.target.files, "parent")}
+                        disabled={uploadingImages}
+                      />
+                      <label htmlFor="parent-photos" className="cursor-pointer flex flex-col items-center gap-2">
+                        {uploadingImages ? (
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                        ) : (
+                          <>
+                            <Upload className="h-5 w-5 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">Click to upload photos of both parents</p>
+                            <p className="text-xs text-muted-foreground">
+                              <Shield className="inline h-3 w-3 mr-1" />
+                              All images are automatically watermarked
+                            </p>
+                          </>
+                        )}
+                      </label>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Parent Photos: {parentImages.length}/2+
+                    <p className="text-xs text-muted-foreground">
+                      Parent photos uploaded: {parentImages.length}/2+
                     </p>
+                    {parentImages.length > 0 && (
+                      <div className="grid grid-cols-5 gap-2">
+                        {parentImages.map((img, idx) => (
+                          <div key={idx} className="relative aspect-square">
+                            <img
+                              src={img}
+                              alt={`Parent ${idx + 1}`}
+                              className="w-full h-full object-cover rounded border"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {watermarkPreview && (
+                  <WatermarkPreview
+                    originalFile={watermarkPreview.original}
+                    watermarkedBlob={watermarkPreview.watermarked}
+                  />
+                )}
 
                 <div>
                   <Label htmlFor="description">Description</Label>

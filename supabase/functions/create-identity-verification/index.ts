@@ -61,7 +61,7 @@ serve(async (req) => {
 
     console.log("Verification session created:", verificationSession.id);
 
-    // SECURITY: Store session ID and token SERVER-SIDE ONLY
+    // SECURITY: Store session ID and token SERVER-SIDE ONLY in secure table
     // Create a secure verification token
     const token = `vt_${crypto.randomUUID()}`;
     
@@ -72,18 +72,30 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
     
+    // Store in secure identity_verification_sessions table (only service role can access)
+    const { error: insertError } = await supabaseAdmin
+      .from("identity_verification_sessions")
+      .insert({
+        user_id: user.id,
+        stripe_session_id: verificationSession.id,
+        verification_token: token,
+        verification_type: userType,
+      });
+
+    if (insertError) {
+      console.error("Error storing verification session:", insertError);
+      throw new Error("Failed to store verification details");
+    }
+    
+    // Update profiles table with verification type only (no tokens)
     const { error: updateError } = await supabaseAdmin
       .from("profiles")
-      .update({
-        stripe_identity_session_id: verificationSession.id,
-        stripe_identity_verification_token: token,
-        verification_type: userType,
-      })
+      .update({ verification_type: userType })
       .eq("id", user.id);
 
     if (updateError) {
-      console.error("Error updating profile:", updateError);
-      throw new Error("Failed to store verification details");
+      console.error("Error updating profile verification type:", updateError);
+      // Non-fatal, continue
     }
 
     console.log("Successfully created verification session and stored token server-side");

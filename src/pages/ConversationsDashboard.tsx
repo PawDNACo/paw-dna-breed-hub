@@ -25,7 +25,6 @@ interface Conversation {
   };
   profiles: {
     full_name: string;
-    email: string;
   };
 }
 
@@ -55,7 +54,7 @@ export default function ConversationsDashboard() {
         .select(`
           *,
           pets (name, breed, price),
-          profiles!conversations_buyer_id_fkey (full_name, email)
+          profiles!conversations_buyer_id_fkey (full_name)
         `)
         .eq("breeder_id", user.id)
         .order("created_at", { ascending: false });

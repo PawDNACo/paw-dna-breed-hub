@@ -15,7 +15,7 @@ serve(async (req) => {
   try {
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
     );
 
     const authHeader = req.headers.get("Authorization")!;
@@ -24,18 +24,46 @@ serve(async (req) => {
 
     if (!user) throw new Error("User not authenticated");
 
-    // Get profile with verification info
-    const { data: profile, error: profileError } = await supabaseClient
-      .from("profiles")
-      .select("stripe_identity_session_id, is_verified")
-      .eq("id", user.id)
+    // Use service role to access secure identity_verification_sessions table
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    // Get verification session from secure table
+    const { data: verificationSession, error: sessionError } = await supabaseAdmin
+      .from("identity_verification_sessions")
+      .select("stripe_session_id, verification_token, expires_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
       .single();
 
-    if (profileError) throw profileError;
-
-    if (!profile.stripe_identity_session_id) {
+    if (sessionError || !verificationSession?.stripe_session_id) {
+      console.log("No verification session found for user");
       return new Response(
-        JSON.stringify({ verified: false, status: "not_started" }),
+        JSON.stringify({ 
+          verified: false,
+          status: "not_started",
+          message: "No verification session found" 
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
+    }
+
+    // Check if session is expired
+    if (new Date(verificationSession.expires_at) < new Date()) {
+      console.log("Verification session expired");
+      return new Response(
+        JSON.stringify({ 
+          verified: false,
+          status: "expired",
+          message: "Verification session expired" 
+        }),
         {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 200,
@@ -48,29 +76,43 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
-    const session = await stripe.identity.verificationSessions.retrieve(
-      profile.stripe_identity_session_id
+    console.log(`Checking verification status for session: ${verificationSession.stripe_session_id}`);
+
+    const stripeSession = await stripe.identity.verificationSessions.retrieve(
+      verificationSession.stripe_session_id
     );
 
-    console.log("Verification status:", session.status);
+    console.log(`Verification status: ${stripeSession.status}`);
+
+    // Get current profile status
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("is_verified")
+      .eq("id", user.id)
+      .single();
 
     // Update profile if verified
-    if (session.status === "verified" && !profile.is_verified) {
-      await supabaseClient
+    if (stripeSession.status === "verified" && !profile?.is_verified) {
+      const { error: updateError } = await supabaseAdmin
         .from("profiles")
         .update({
           is_verified: true,
+          verification_status: "verified",
           verification_completed_at: new Date().toISOString(),
         })
         .eq("id", user.id);
 
-      console.log(`User ${user.id} verified successfully`);
+      if (updateError) {
+        console.error("Error updating profile:", updateError);
+      } else {
+        console.log(`User ${user.id} verified successfully`);
+      }
     }
 
     return new Response(
       JSON.stringify({
-        verified: session.status === "verified",
-        status: session.status,
+        verified: stripeSession.status === "verified",
+        status: stripeSession.status,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -69,6 +69,36 @@ export type Database = {
           },
         ]
       }
+      admin_session_log: {
+        Row: {
+          action: string
+          admin_user_id: string | null
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          session_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          session_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          session_id?: string | null
+        }
+        Relationships: []
+      }
       banking_change_requests: {
         Row: {
           approved_date: string | null
@@ -375,6 +405,58 @@ export type Database = {
           },
         ]
       }
+      email_access_log: {
+        Row: {
+          access_type: string
+          accessed_at: string | null
+          accessed_by: string | null
+          id: string
+          ip_address: unknown | null
+          profile_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          access_type: string
+          accessed_at?: string | null
+          accessed_by?: string | null
+          id?: string
+          ip_address?: unknown | null
+          profile_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          access_type?: string
+          accessed_at?: string | null
+          accessed_by?: string | null
+          id?: string
+          ip_address?: unknown | null
+          profile_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_access_log_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_partner_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_access_log_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_access_log_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       frozen_funds: {
         Row: {
           amount: number
@@ -426,6 +508,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      identity_verification_sessions: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          stripe_session_id: string
+          user_id: string
+          verification_token: string
+          verification_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          stripe_session_id: string
+          user_id: string
+          verification_token: string
+          verification_type: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          stripe_session_id?: string
+          user_id?: string
+          verification_token?: string
+          verification_type?: string
+        }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -727,7 +839,6 @@ export type Database = {
           city: string | null
           county: string | null
           created_at: string
-          email: string | null
           frozen_at: string | null
           frozen_reason: string | null
           full_name: string | null
@@ -737,8 +848,6 @@ export type Database = {
           longitude: number | null
           social_provider: string | null
           state: string | null
-          stripe_identity_session_id: string | null
-          stripe_identity_verification_token: string | null
           two_factor_enabled: boolean | null
           updated_at: string
           username: string | null
@@ -752,7 +861,6 @@ export type Database = {
           city?: string | null
           county?: string | null
           created_at?: string
-          email?: string | null
           frozen_at?: string | null
           frozen_reason?: string | null
           full_name?: string | null
@@ -762,8 +870,6 @@ export type Database = {
           longitude?: number | null
           social_provider?: string | null
           state?: string | null
-          stripe_identity_session_id?: string | null
-          stripe_identity_verification_token?: string | null
           two_factor_enabled?: boolean | null
           updated_at?: string
           username?: string | null
@@ -777,7 +883,6 @@ export type Database = {
           city?: string | null
           county?: string | null
           created_at?: string
-          email?: string | null
           frozen_at?: string | null
           frozen_reason?: string | null
           full_name?: string | null
@@ -787,8 +892,6 @@ export type Database = {
           longitude?: number | null
           social_provider?: string | null
           state?: string | null
-          stripe_identity_session_id?: string | null
-          stripe_identity_verification_token?: string | null
           two_factor_enabled?: boolean | null
           updated_at?: string
           username?: string | null
@@ -1317,6 +1420,10 @@ export type Database = {
       }
       get_email_from_username: {
         Args: { _username: string }
+        Returns: string
+      }
+      get_my_email: {
+        Args: Record<PropertyKey, never>
         Returns: string
       }
       get_partner_location: {

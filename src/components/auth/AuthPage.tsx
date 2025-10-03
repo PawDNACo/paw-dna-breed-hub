@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { PawPrint, RefreshCw } from "lucide-react";
 import { LocationInput } from "@/components/LocationInput";
@@ -31,6 +32,7 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
   const [mfaCode, setMfaCode] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(mode === "login" ? "signin" : "signup");
+  const [selectedRole, setSelectedRole] = useState<"buyer" | "breeder" | "both">("buyer");
 
   useEffect(() => {
     checkUser();
@@ -133,17 +135,40 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
     if (!signupData) return;
 
     try {
-      const { error } = await supabase
+      // Update profile with location
+      const { error: profileError } = await supabase
         .from("profiles")
         .update(location)
         .eq("id", signupData.id);
 
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // Assign role(s) based on selection
+      const rolesToInsert = selectedRole === "both" 
+        ? [
+            { user_id: signupData.id, role: "breeder" as const }, 
+            { user_id: signupData.id, role: "buyer" as const }
+          ]
+        : [{ user_id: signupData.id, role: selectedRole as "breeder" | "buyer" }];
+
+      // Delete the default 'buyer' role first if needed
+      await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", signupData.id);
+
+      // Insert the selected role(s)
+      const { error: roleError } = await supabase
+        .from("user_roles")
+        .insert(rolesToInsert);
+
+      if (roleError) throw roleError;
 
       toast.success("Welcome to PawDNA! Your account is ready.");
       navigate("/browse");
     } catch (error: any) {
-      toast.error(error.message || "Failed to update location");
+      console.error("Profile update error:", error);
+      toast.error(error.message || "Failed to complete signup");
     }
   };
 
@@ -463,6 +488,24 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
                         <p className="text-xs text-muted-foreground">
                           Must be at least 8 characters with uppercase, lowercase, and number. Click the refresh icon to generate a strong password.
                         </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>I am signing up as a</Label>
+                        <RadioGroup value={selectedRole} onValueChange={(value: any) => setSelectedRole(value)}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="buyer" id="buyer" />
+                            <Label htmlFor="buyer" className="font-normal cursor-pointer">Buyer</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="breeder" id="breeder" />
+                            <Label htmlFor="breeder" className="font-normal cursor-pointer">Breeder</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="both" id="both" />
+                            <Label htmlFor="both" className="font-normal cursor-pointer">Both Buyer & Breeder</Label>
+                          </div>
+                        </RadioGroup>
                       </div>
 
                       <SecurityDisclaimer />

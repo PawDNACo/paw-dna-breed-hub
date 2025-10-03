@@ -150,7 +150,7 @@ export default function FAQ() {
                 <AccordionTrigger>What are breeding services?</AccordionTrigger>
                 <AccordionContent>
                   For buyers seeking breeding services, we offer a $9.99/month per gender subscription 
-                  with a $1,000 refundable deposit (goes towards breed cost). Access premium breeding 
+                  with a Refundable Deposit (Goes towards the final payment). Access premium breeding 
                   partners with prices starting at $1,500 for small breeds up to $4,500 for rare breeds.
                 </AccordionContent>
               </AccordionItem>

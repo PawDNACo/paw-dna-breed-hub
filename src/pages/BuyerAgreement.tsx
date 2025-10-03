@@ -63,7 +63,7 @@ export default function BuyerAgreement() {
               </p>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>$9.99/month per gender</strong> subscription fee</li>
-                <li><strong>$1,000 refundable deposit</strong> (goes towards breed cost) - must be paid via checking account</li>
+                <li><strong>Refundable Deposit (Goes towards the final payment)</strong> - must be paid via checking account</li>
                 <li>Access to premium breeding partners</li>
                 <li>Small breeds from $1,500</li>
                 <li>Medium breeds from $2,000</li>

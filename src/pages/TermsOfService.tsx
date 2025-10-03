@@ -54,7 +54,7 @@ export default function TermsOfService() {
                 <li>Pay required deposits and fees on time</li>
                 <li>Arrange pickup or delivery within agreed timeframes</li>
                 <li>Treat pets with proper care and responsibility</li>
-                <li>For breeding services, pay $1,000 refundable deposit (goes towards breed cost)</li>
+                <li>For breeding services, pay Refundable Deposit (Goes towards the final payment)</li>
               </ul>
             </section>
 

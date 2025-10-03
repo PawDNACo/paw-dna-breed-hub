@@ -100,7 +100,7 @@ export default function RefundPolicy() {
             <section>
               <h2 className="text-2xl font-semibold mb-4">7. Buyer Breeding Service Deposits</h2>
               <p>
-                For breeding services, buyers pay a $1,000 refundable deposit that goes towards the cost 
+                For breeding services, buyers pay a Refundable Deposit (Goes towards the final payment) that goes towards the cost 
                 of the breed. This deposit:
               </p>
               <ul className="list-disc pl-6 space-y-2">

@@ -84,7 +84,7 @@ const buyerPlans = [
       "Saved favorites",
       "Purchase protection",
       "Access to breeder verification status",
-      "$1,000 refundable deposit (goes towards breed cost)",
+      "Refundable Deposit (Goes towards the final payment)",
       "Average cost: $150+",
       "Specialty breeds: $1,500+",
       "Up to 250 miles delivery/pickup included",
@@ -99,7 +99,7 @@ const buyerPlans = [
     period: "/month",
     description: "Access premium breeding partners",
     features: [
-      "$1,000 refundable deposit (goes towards breed cost)",
+      "Refundable Deposit (Goes towards the final payment)",
       "Average cost: $150+",
       "Specialty breeds: $1,500+",
       "Up to 250 miles delivery/pickup included",

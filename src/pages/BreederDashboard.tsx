@@ -18,6 +18,7 @@ import { StripeIdentityVerification } from "@/components/verification/StripeIden
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { addWatermarkToImage, batchWatermarkImages } from "@/utils/imageWatermark";
 import { WatermarkPreview } from "@/components/WatermarkPreview";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface Pet {
   id: string;
@@ -50,6 +51,7 @@ interface Profile {
 
 export default function BreederDashboard() {
   const [pets, setPets] = useState<Pet[]>([]);
+  const [buyerRequests, setBuyerRequests] = useState<any[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,7 @@ export default function BreederDashboard() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { isVerified, loading: verificationLoading, requireVerification } = useVerificationCheck();
+  const { isBreeder, isBuyer, loading: rolesLoading } = useUserRole();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -80,7 +83,10 @@ export default function BreederDashboard() {
 
   useEffect(() => {
     checkSubscriptionAndLoadPets();
-  }, []);
+    if (isBuyer && !rolesLoading) {
+      loadBuyerRequests();
+    }
+  }, [isBuyer, rolesLoading]);
 
   const checkSubscriptionAndLoadPets = async () => {
     try {
@@ -119,6 +125,24 @@ export default function BreederDashboard() {
       console.error("Error loading data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadBuyerRequests = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("buyer_requests")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setBuyerRequests(data || []);
+    } catch (error: any) {
+      console.error("Error loading buyer requests:", error);
     }
   };
 
@@ -325,7 +349,7 @@ export default function BreederDashboard() {
     }
   };
 
-  if (loading) {
+  if (loading || rolesLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -340,9 +364,15 @@ export default function BreederDashboard() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold mb-2">Breeder Dashboard</h1>
+              <h1 className="text-4xl font-bold mb-2">
+                {isBreeder && isBuyer ? "Profile Dashboard" : isBreeder ? "Breeder Dashboard" : "Buyer Dashboard"}
+              </h1>
               <p className="text-muted-foreground">
-                Manage your pet listings and reach buyers in your area
+                {isBreeder && isBuyer 
+                  ? "Manage your pet listings and buyer requests"
+                  : isBreeder 
+                  ? "Manage your pet listings and reach buyers in your area"
+                  : "Manage your buyer requests and find your perfect pet"}
               </p>
             </div>
             <Button onClick={() => navigate("/conversations")} variant="outline">
@@ -352,7 +382,7 @@ export default function BreederDashboard() {
           </div>
         </div>
 
-        {!subscription && (
+        {!subscription && isBreeder && (
           <Card className="mb-8 border-destructive">
             <CardHeader>
               <CardTitle>Subscription Required</CardTitle>
@@ -383,8 +413,11 @@ export default function BreederDashboard() {
           </Card>
         )}
 
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Your Listings ({pets.length})</h2>
+        {/* Breeder Listings Section */}
+        {isBreeder && (
+          <>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-semibold">Your Listings ({pets.length})</h2>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button disabled={!subscription}>
@@ -700,6 +733,54 @@ export default function BreederDashboard() {
             </CardContent>
           </Card>
         )}
+      </>
+    )}
+
+    {/* Buyer Requests Section */}
+    {isBuyer && (
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold mb-6">Your Requests ({buyerRequests.length})</h2>
+        
+        {buyerRequests.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {buyerRequests.map((request) => (
+              <Card key={request.id}>
+                <CardHeader>
+                  <CardTitle>{request.breed}</CardTitle>
+                  <CardDescription>
+                    {request.species} • {request.city}, {request.state}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm mb-2">
+                    <strong>Max Price:</strong> ${request.max_price || "Not specified"}
+                  </p>
+                  <p className="text-sm mb-2">
+                    <strong>Status:</strong> {request.status}
+                  </p>
+                  {request.description && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {request.description}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card>
+            <CardContent className="text-center py-12">
+              <p className="text-muted-foreground mb-4">
+                You haven't created any buyer requests yet.
+              </p>
+              <Button onClick={() => navigate("/browse")}>
+                Browse Available Pets
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    )}
       </main>
       <Footer />
     </div>

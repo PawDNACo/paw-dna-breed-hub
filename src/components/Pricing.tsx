@@ -155,13 +155,8 @@ export const Pricing = () => {
   };
 
   const handleSubscribeClick = (planType: string) => {
-    if (!user) {
-      // Not logged in, go to sign up with plan type
-      navigate(`/sign-up?role=${planType}`);
-    } else {
-      // Logged in, go to subscription page
-      navigate(`/breeder-subscription?plan=${planType}`);
-    }
+    // Always go to breeder subscription page
+    navigate(`/breeder-subscription?plan=${planType}`);
   };
 
   const isCurrentSubscription = (planType: string): boolean => {

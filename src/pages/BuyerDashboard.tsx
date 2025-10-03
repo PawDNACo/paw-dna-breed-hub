@@ -41,6 +41,7 @@ export default function BuyerDashboard() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRequest, setEditingRequest] = useState<BuyerRequest | null>(null);
+  const [matchingPets, setMatchingPets] = useState<any[]>([]);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -91,6 +92,39 @@ export default function BuyerDashboard() {
 
       if (error) throw error;
       setRequests(requestsData || []);
+
+      // Load matching pets based on buyer preferences
+      if (requestsData && requestsData.length > 0) {
+        const firstRequest = requestsData[0];
+        let query = supabase
+          .from("pets")
+          .select("*")
+          .eq("available", true);
+
+        // Filter by species
+        if (firstRequest.species && firstRequest.species !== "both") {
+          query = query.eq("species", firstRequest.species);
+        }
+
+        const { data: petsData } = await query;
+        
+        // Further filter by breed, gender, and size on client side if they're arrays
+        let filtered = petsData || [];
+        
+        if (firstRequest.gender && firstRequest.gender.length > 0) {
+          filtered = filtered.filter(pet => 
+            firstRequest.gender?.includes(pet.gender?.toLowerCase())
+          );
+        }
+
+        if (firstRequest.size && firstRequest.size.length > 0) {
+          filtered = filtered.filter(pet => 
+            firstRequest.size?.includes(pet.size?.toLowerCase())
+          );
+        }
+
+        setMatchingPets(filtered);
+      }
     } catch (error: any) {
       console.error("Error loading data:", error);
     } finally {
@@ -216,9 +250,40 @@ export default function BuyerDashboard() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Buyer Dashboard</h1>
           <p className="text-muted-foreground">
-            Post breed requests and connect with breeders in your area
+            Find your perfect pet and connect with breeders
           </p>
         </div>
+
+        {/* Matching Pets Feed */}
+        {matchingPets.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4">Pets Matching Your Preferences ({matchingPets.length})</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {matchingPets.map((pet) => (
+                <Card key={pet.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/pet/${pet.id}`)}>
+                  <CardHeader>
+                    {pet.image_url && (
+                      <img src={pet.image_url} alt={pet.name} className="w-full h-48 object-cover rounded-md mb-2" />
+                    )}
+                    <CardTitle>{pet.name}</CardTitle>
+                    <CardDescription>
+                      {pet.breed} • {pet.gender}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold mb-2">${pet.price}</p>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {pet.city}, {pet.state}
+                    </p>
+                    {pet.description && (
+                      <p className="text-sm line-clamp-2">{pet.description}</p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {!subscription && (
           <Card className="mb-8 border-destructive">

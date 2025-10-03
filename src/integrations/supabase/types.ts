@@ -195,10 +195,12 @@ export type Database = {
           county: string | null
           created_at: string
           description: string | null
+          gender: string[] | null
           id: string
           latitude: number | null
           longitude: number | null
           max_price: number | null
+          size: string[] | null
           species: string
           state: string | null
           status: string
@@ -212,10 +214,12 @@ export type Database = {
           county?: string | null
           created_at?: string
           description?: string | null
+          gender?: string[] | null
           id?: string
           latitude?: number | null
           longitude?: number | null
           max_price?: number | null
+          size?: string[] | null
           species: string
           state?: string | null
           status?: string
@@ -229,10 +233,12 @@ export type Database = {
           county?: string | null
           created_at?: string
           description?: string | null
+          gender?: string[] | null
           id?: string
           latitude?: number | null
           longitude?: number | null
           max_price?: number | null
+          size?: string[] | null
           species?: string
           state?: string | null
           status?: string

@@ -10,6 +10,7 @@ import BreedingServices from "./pages/BreedingServices";
 import BreederStandards from "./pages/BreederStandards";
 import PricingPage from "./pages/PricingPage";
 import BreederSubscriptionSignup from "./pages/BreederSubscriptionSignup";
+import BuyerSignup from "./pages/BuyerSignup";
 import Browse from "./pages/Browse";
 import PetDetail from "./pages/PetDetail";
 import BreederDashboard from "./pages/BreederDashboard";
@@ -55,6 +56,7 @@ const App = () => (
           <Route path="/breeder-standards" element={<BreederStandards />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/breeder-subscription" element={<BreederSubscriptionSignup />} />
+          <Route path="/buyer-signup" element={<BuyerSignup />} />
           <Route path="/sign-up" element={<AuthPage mode="signup" />} />
           <Route path="/login" element={<AuthPage mode="login" />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

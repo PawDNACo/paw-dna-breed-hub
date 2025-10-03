@@ -18,7 +18,7 @@ export const Navigation = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const { isAdmin } = useUserRole();
+  const { isAdmin, isBreeder, isBuyer, hasAnyRole } = useUserRole();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -72,9 +72,9 @@ export const Navigation = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate("/browse")}>
               Browse
             </Button>
-            {user && (
-              <Button variant="ghost" size="sm" onClick={() => navigate("/breeder-dashboard")}>
-                Profile
+            {hasAnyRole(["breeder", "buyer"]) && (
+              <Button variant="ghost" size="sm" onClick={() => navigate(isBreeder ? "/breeder-dashboard" : "/buyer-dashboard")}>
+                Dashboard
               </Button>
             )}
             {isAdmin && (
@@ -126,6 +126,11 @@ export const Navigation = () => {
                 <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/browse")}>
                   Browse
                 </Button>
+                {hasAnyRole(["breeder", "buyer"]) && (
+                  <Button variant="ghost" className="justify-start" onClick={() => handleNavigation(isBreeder ? "/breeder-dashboard" : "/buyer-dashboard")}>
+                    Dashboard
+                  </Button>
+                )}
                 {user && (
                   <>
                     <div className="my-2 border-t border-border" />

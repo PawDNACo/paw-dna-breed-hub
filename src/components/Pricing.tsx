@@ -1,8 +1,11 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { TrustBadges } from "@/components/TrustBadges";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const sellerPlans = [
   {
@@ -127,6 +130,57 @@ const addOns = [
 ];
 
 export const Pricing = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkUserAndRoles();
+  }, []);
+
+  const checkUserAndRoles = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+
+    if (user) {
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+      
+      setUserRoles(roles?.map(r => r.role) || []);
+    }
+    setLoading(false);
+  };
+
+  const handleSubscribeClick = (planType: string) => {
+    if (!user) {
+      // Not logged in, go to sign up with plan type
+      navigate(`/sign-up?role=${planType}`);
+    } else {
+      // Logged in, go to subscription page
+      navigate(`/breeder-subscription?plan=${planType}`);
+    }
+  };
+
+  const isCurrentSubscription = (planType: string): boolean => {
+    if (planType === "breeder-single") return userRoles.includes("breeder") && !userRoles.includes("buyer");
+    if (planType === "breeder-both") return userRoles.includes("breeder") && !userRoles.includes("buyer");
+    if (planType === "breeder-multi-single") return userRoles.includes("breeder") && !userRoles.includes("buyer");
+    if (planType === "breeder-multi-both") return userRoles.includes("breeder") && !userRoles.includes("buyer");
+    if (planType === "buyer") return userRoles.includes("buyer") && !userRoles.includes("breeder");
+    if (planType === "both-single") return userRoles.includes("both");
+    if (planType === "both-multi") return userRoles.includes("both");
+    return false;
+  };
+
+  const getButtonText = (planType: string): string => {
+    if (!user) return "Subscribe Now";
+    if (isCurrentSubscription(planType)) return "Current Plan";
+    return "Change Subscription";
+  };
+
   return (
     <section id="pricing" className="py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,9 +238,10 @@ export const Pricing = () => {
                   <Button 
                     className="w-full" 
                     variant={plan.popular ? "hero" : "default"}
-                    onClick={() => window.location.href = "/breeder-subscription"}
+                    onClick={() => handleSubscribeClick(`breeder-${plan.name.toLowerCase().replace(/\s+/g, '-')}`)}
+                    disabled={isCurrentSubscription(`breeder-${plan.name.toLowerCase().replace(/\s+/g, '-')}`)}
                   >
-                    Subscribe Now
+                    {getButtonText(`breeder-${plan.name.toLowerCase().replace(/\s+/g, '-')}`)}
                   </Button>
                 </CardContent>
               </Card>
@@ -215,8 +270,13 @@ export const Pricing = () => {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full" variant="secondary" onClick={() => window.location.href = "/sign-up"}>
-                Find Breeding Partner
+              <Button 
+                className="w-full" 
+                variant="secondary" 
+                onClick={() => handleSubscribeClick("buyer")}
+                disabled={isCurrentSubscription("buyer")}
+              >
+                {getButtonText("buyer")}
               </Button>
             </CardContent>
           </Card>
@@ -263,9 +323,10 @@ export const Pricing = () => {
                   <Button 
                     className="w-full" 
                     variant={plan.popular ? "hero" : "default"}
-                    onClick={() => window.location.href = "/breeder-subscription"}
+                    onClick={() => handleSubscribeClick(`both-${plan.name.toLowerCase()}`)}
+                    disabled={isCurrentSubscription(`both-${plan.name.toLowerCase()}`)}
                   >
-                    Subscribe Now
+                    {getButtonText(`both-${plan.name.toLowerCase()}`)}
                   </Button>
                 </CardContent>
               </Card>

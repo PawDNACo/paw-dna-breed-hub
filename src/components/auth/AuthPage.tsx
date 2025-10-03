@@ -13,6 +13,7 @@ import { LocationInput } from "@/components/LocationInput";
 import { SecurityDisclaimer } from "./SecurityDisclaimer";
 import { TrustBadgesCompact } from "@/components/TrustBadges";
 import { Footer } from "@/components/Footer";
+import { Navigation } from "@/components/Navigation";
 
 interface AuthPageProps {
   mode?: "signup" | "login";
@@ -282,15 +283,9 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
+      <Navigation />
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          <Link to="/" className="flex items-center justify-center gap-2 mb-8 hover:opacity-80 transition-opacity">
-            <PawPrint className="h-10 w-10 text-primary" />
-            <span className="text-3xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-              PawDNA
-            </span>
-          </Link>
-
           {showLocationInput ? (
             <Card>
               <CardHeader>

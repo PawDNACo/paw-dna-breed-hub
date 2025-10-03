@@ -31,6 +31,7 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
   const [showLocationInput, setShowLocationInput] = useState(false);
   const [passwordCopied, setPasswordCopied] = useState(false);
   const [signupData, setSignupData] = useState<any>(null);
@@ -147,6 +148,7 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
           data: {
             full_name: fullName,
             username: username.toLowerCase(),
+            phone: phone,
           },
           emailRedirectTo: redirectUrl,
         },
@@ -507,6 +509,17 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
                           placeholder="you@example.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-phone">Phone Number</Label>
+                        <Input
+                          id="signup-phone"
+                          type="tel"
+                          placeholder="(555) 123-4567"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
                           required
                         />
                       </div>

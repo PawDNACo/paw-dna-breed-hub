@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { PawPrint, RefreshCw, Copy, Check } from "lucide-react";
 import { LocationInput } from "@/components/LocationInput";
 import { signUpSchema } from "@/utils/validation";
+import { Checkbox } from "@/components/ui/checkbox";
 import { SecurityDisclaimer } from "./SecurityDisclaimer";
 import { TrustBadgesCompact } from "@/components/TrustBadges";
 import { Footer } from "@/components/Footer";
@@ -33,6 +34,8 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
   const [showLocationInput, setShowLocationInput] = useState(false);
   const [passwordCopied, setPasswordCopied] = useState(false);
   const [signupData, setSignupData] = useState<any>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [show2FA, setShow2FA] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
@@ -405,11 +408,24 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
                         </div>
                         <Input
                           id="signin-password"
-                          type="password"
+                          type={showPassword ? "text" : "password"}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           required
                         />
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="show-signin-password"
+                            checked={showPassword}
+                            onCheckedChange={(checked) => setShowPassword(checked === true)}
+                          />
+                          <Label 
+                            htmlFor="show-signin-password" 
+                            className="text-sm font-normal cursor-pointer"
+                          >
+                            Show password
+                          </Label>
+                        </div>
                       </div>
                       <Button type="submit" variant="hero" className="w-full" disabled={loading}>
                         {loading ? "Signing in..." : "Sign In"}
@@ -499,7 +515,7 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
                         <div className="relative">
                           <Input
                             id="signup-password"
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -537,18 +553,44 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
                         <p className="text-xs text-muted-foreground">
                           12-16+ characters with uppercase, lowercase, number, and symbol. Cannot match name, username, or email.
                         </p>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="show-signup-password"
+                            checked={showPassword}
+                            onCheckedChange={(checked) => setShowPassword(checked === true)}
+                          />
+                          <Label 
+                            htmlFor="show-signup-password" 
+                            className="text-sm font-normal cursor-pointer"
+                          >
+                            Show password
+                          </Label>
+                        </div>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="confirm-password">Confirm Password</Label>
                         <Input
                           id="confirm-password"
-                          type="password"
+                          type={showConfirmPassword ? "text" : "password"}
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           required
                           minLength={12}
                         />
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="show-confirm-password"
+                            checked={showConfirmPassword}
+                            onCheckedChange={(checked) => setShowConfirmPassword(checked === true)}
+                          />
+                          <Label 
+                            htmlFor="show-confirm-password" 
+                            className="text-sm font-normal cursor-pointer"
+                          >
+                            Show password
+                          </Label>
+                        </div>
                       </div>
 
                   <div className="space-y-2">

@@ -53,6 +53,10 @@ const Browse = () => {
   const [searchCity, setSearchCity] = useState("");
   const [searchState, setSearchState] = useState("");
   const [selectedBreeds, setSelectedBreeds] = useState<string[]>([]);
+  const [showSpecialBreeds, setShowSpecialBreeds] = useState(false);
+  const [showSmallBreeds, setShowSmallBreeds] = useState(false);
+  const [showMediumBreeds, setShowMediumBreeds] = useState(false);
+  const [showLargeBreeds, setShowLargeBreeds] = useState(false);
 
   useEffect(() => {
     fetchPets();
@@ -80,6 +84,22 @@ const Browse = () => {
 
       if (selectedBreeds.length > 0) {
         query = query.in("breed", selectedBreeds);
+      }
+
+      if (showSpecialBreeds) {
+        query = query.eq("is_special_breed", true);
+      }
+
+      if (showSmallBreeds) {
+        query = query.eq("size", "small");
+      }
+
+      if (showMediumBreeds) {
+        query = query.eq("size", "medium");
+      }
+
+      if (showLargeBreeds) {
+        query = query.eq("size", "large");
       }
 
       const { data, error } = await query.order("created_at", { ascending: false });
@@ -171,6 +191,65 @@ const Browse = () => {
                       <SelectItem value="cat">Cat</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                {/* Size Filters */}
+                <div>
+                  <Label className="mb-3 block">Size & Classification</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="special-breeds"
+                        checked={showSpecialBreeds}
+                        onCheckedChange={(checked) => setShowSpecialBreeds(checked as boolean)}
+                      />
+                      <label
+                        htmlFor="special-breeds"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        Special Breeds
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="small-breeds"
+                        checked={showSmallBreeds}
+                        onCheckedChange={(checked) => setShowSmallBreeds(checked as boolean)}
+                      />
+                      <label
+                        htmlFor="small-breeds"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        Small Breeds
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="medium-breeds"
+                        checked={showMediumBreeds}
+                        onCheckedChange={(checked) => setShowMediumBreeds(checked as boolean)}
+                      />
+                      <label
+                        htmlFor="medium-breeds"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        Medium Breeds
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="large-breeds"
+                        checked={showLargeBreeds}
+                        onCheckedChange={(checked) => setShowLargeBreeds(checked as boolean)}
+                      />
+                      <label
+                        htmlFor="large-breeds"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        Large Breeds
+                      </label>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Breed Multi-Select */}

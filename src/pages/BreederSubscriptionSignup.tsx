@@ -13,6 +13,22 @@ import { Badge } from "@/components/ui/badge";
 import { Upload, AlertCircle, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+const DOG_BREEDS = [
+  "Labrador Retriever", "German Shepherd", "Golden Retriever", "French Bulldog",
+  "Bulldog", "Poodle", "Beagle", "Rottweiler", "Yorkshire Terrier", "German Shorthaired Pointer",
+  "Boxer", "Dachshund", "Pembroke Welsh Corgi", "Siberian Husky", "Australian Shepherd",
+  "Great Dane", "Doberman Pinscher", "Cavalier King Charles Spaniel", "Miniature Schnauzer",
+  "Shih Tzu", "Boston Terrier", "Pomeranian", "Havanese", "Shetland Sheepdog", "Brittany",
+  "English Springer Spaniel", "Mastiff", "Cocker Spaniel", "Border Collie", "Chihuahua"
+];
+
+const CAT_BREEDS = [
+  "Persian", "Maine Coon", "Ragdoll", "British Shorthair", "Siamese",
+  "Abyssinian", "Bengal", "Birman", "American Shorthair", "Scottish Fold",
+  "Sphynx", "Devon Rex", "Russian Blue", "Exotic Shorthair", "Norwegian Forest Cat",
+  "Oriental", "Siberian", "Burmese", "Tonkinese", "Cornish Rex"
+];
+
 const BreederSubscriptionSignup = () => {
   const { toast } = useToast();
   const [photos, setPhotos] = useState<File[]>([]);
@@ -27,7 +43,8 @@ const BreederSubscriptionSignup = () => {
     city: "",
     state: "",
     isSpecialBreed: "",
-    size: "",
+    petSize: "",
+    specialBreedSize: "",
     deliveryMethod: "",
     price: "",
     description: "",
@@ -46,7 +63,7 @@ const BreederSubscriptionSignup = () => {
 
   const calculateMinPrice = () => {
     if (formData.isSpecialBreed === "yes") {
-      switch (formData.size) {
+      switch (formData.specialBreedSize) {
         case "small": return 1500;
         case "medium": return 2000;
         case "large": return 3000;
@@ -55,6 +72,12 @@ const BreederSubscriptionSignup = () => {
       }
     }
     return 50;
+  };
+
+  const getAvailableBreeds = () => {
+    if (formData.species === "dog") return DOG_BREEDS;
+    if (formData.species === "cat") return CAT_BREEDS;
+    return [];
   };
 
   const calculateEarnings = (price: number) => {
@@ -201,7 +224,7 @@ const BreederSubscriptionSignup = () => {
                   </div>
                   <div>
                     <Label>Species</Label>
-                    <Select value={formData.species} onValueChange={(v) => setFormData({...formData, species: v})}>
+                    <Select value={formData.species} onValueChange={(v) => setFormData({...formData, species: v, breed: ""})}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select species" />
                       </SelectTrigger>
@@ -213,11 +236,22 @@ const BreederSubscriptionSignup = () => {
                   </div>
                   <div>
                     <Label>Breed</Label>
-                    <Input
-                      required
-                      value={formData.breed}
-                      onChange={(e) => setFormData({...formData, breed: e.target.value})}
-                    />
+                    <Select 
+                      value={formData.breed} 
+                      onValueChange={(v) => setFormData({...formData, breed: v})}
+                      disabled={!formData.species}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={formData.species ? "Select breed" : "Select species first"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAvailableBreeds().map((breed) => (
+                          <SelectItem key={breed} value={breed}>
+                            {breed}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label>Gender</Label>
@@ -231,6 +265,20 @@ const BreederSubscriptionSignup = () => {
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+
+                <div>
+                  <Label>Pet Size</Label>
+                  <Select value={formData.petSize} onValueChange={(v) => setFormData({...formData, petSize: v})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select pet size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="small">Small Breed</SelectItem>
+                      <SelectItem value="medium">Medium Breed</SelectItem>
+                      <SelectItem value="large">Large Breed</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
@@ -320,8 +368,8 @@ const BreederSubscriptionSignup = () => {
 
                 {formData.isSpecialBreed === "yes" && (
                   <div>
-                    <Label>Size Category</Label>
-                    <Select value={formData.size} onValueChange={(v) => setFormData({...formData, size: v})}>
+                    <Label>Special Breed Size Category</Label>
+                    <Select value={formData.specialBreedSize} onValueChange={(v) => setFormData({...formData, specialBreedSize: v})}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select size" />
                       </SelectTrigger>

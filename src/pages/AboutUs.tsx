@@ -14,8 +14,8 @@ export default function AboutUs() {
               About PawDNA
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Connecting responsible breeders with loving pet owners through a trusted, 
-              transparent marketplace built on integrity and care.
+              Where pets swipe right. The revolutionary pet matchmaking platform that brings 
+              breeders and pet lovers together—just like the apps that changed dating forever.
             </p>
           </div>
 
@@ -24,10 +24,11 @@ export default function AboutUs() {
             <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-8 md:p-12">
               <h2 className="text-3xl font-bold mb-6 text-center">Our Mission</h2>
               <p className="text-lg text-muted-foreground leading-relaxed max-w-4xl mx-auto text-center">
-                PawDNA was founded with a simple yet powerful mission: to create a safe, transparent 
-                marketplace where responsible breeders can connect with loving families seeking their 
-                perfect puppy or kitten. We believe that every pet deserves a healthy start in life, 
-                and every family deserves transparency and trust when welcoming a new furry member.
+                PawDNA was founded with a bold vision: to bring the simplicity and excitement of modern 
+                matchmaking to the world of pet breeding and adoption. Just like Tinder, Bumble, and Plenty 
+                of Fish revolutionized how people connect, we're transforming how breeders showcase their 
+                pets and how families find their perfect companion. Every swipe, every match, and every 
+                connection is built on trust, transparency, and a love for animals.
               </p>
             </div>
           </section>
@@ -42,7 +43,7 @@ export default function AboutUs() {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Trust & Safety</h3>
                 <p className="text-muted-foreground">
-                  We verify all breeders and ensure secure transactions to protect both buyers and sellers.
+                  All breeders are verified, and every transaction is secure—because real matches deserve real protection.
                 </p>
               </div>
 
@@ -52,7 +53,7 @@ export default function AboutUs() {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Animal Welfare</h3>
                 <p className="text-muted-foreground">
-                  We promote responsible breeding practices and prioritize the health and happiness of every pet.
+                  Every profile represents a healthy, happy pet from responsible breeders who care about animal welfare.
                 </p>
               </div>
 
@@ -62,7 +63,7 @@ export default function AboutUs() {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Transparency</h3>
                 <p className="text-muted-foreground">
-                  Clear pricing, honest listings, and open communication build trust in our community.
+                  Every profile shows clear pricing, breed info, and care details—no surprises, just honest connections.
                 </p>
               </div>
 
@@ -72,7 +73,7 @@ export default function AboutUs() {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Community</h3>
                 <p className="text-muted-foreground">
-                  We foster connections between breeders and families who share a love for animals.
+                  Swipe, match, and connect with a community that shares your passion for pets and responsible breeding.
                 </p>
               </div>
             </div>
@@ -83,21 +84,22 @@ export default function AboutUs() {
             <h2 className="text-3xl font-bold mb-6 text-center">Our Story</h2>
             <div className="max-w-4xl mx-auto space-y-4 text-lg text-muted-foreground">
               <p>
-                PawDNA was born from a personal experience. Our founders struggled to find a trustworthy 
-                platform to connect with responsible breeders when searching for their family pet. Too 
-                often, they encountered unclear pricing, questionable breeding practices, and a lack of 
-                transparency that made the process stressful and uncertain.
+                PawDNA was born from a simple observation: if apps like Tinder and Bumble could help millions 
+                of people find their perfect match, why couldn't the same concept work for pets? Our founders 
+                experienced firsthand the frustration of searching for a family pet—wading through sketchy 
+                listings, unclear pricing, and questionable breeders. They knew there had to be a better way.
               </p>
               <p>
-                Determined to create a better solution, they envisioned a marketplace built on three 
-                pillars: transparency, trust, and fair treatment for both breeders and buyers. PawDNA 
-                was created to be more than just a listing site—it\'s a community where ethical breeding 
-                meets exceptional pet ownership.
+                Inspired by the simplicity of modern matchmaking apps, they created PawDNA: a platform where 
+                breeders create profiles for their dogs and cats, and buyers swipe through adorable puppies 
+                and kittens to find their perfect companion. It's pet adoption meets modern technology—fun, 
+                safe, and transparent. Breeders can showcase their animals with photos and details, while 
+                buyers can browse, match, and connect with confidence.
               </p>
               <p>
-                Today, PawDNA proudly serves hundreds of responsible breeders and thousands of families 
-                across the country, facilitating connections that result in happy, healthy pets finding 
-                their forever homes.
+                Today, PawDNA is the go-to platform for responsible breeders and pet lovers nationwide. 
+                Whether you're breeding champion bloodlines or searching for your next best friend, PawDNA 
+                makes the process as easy as a swipe. Because love isn't just for humans—it's in their genes. 🐾
               </p>
             </div>
           </section>
@@ -119,7 +121,7 @@ export default function AboutUs() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-1">✓</span>
-                    <span>Reach verified buyers nationwide</span>
+                    <span>Create profiles and reach buyers nationwide</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-1">✓</span>
@@ -137,7 +139,7 @@ export default function AboutUs() {
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-1">✓</span>
-                    <span>Browse verified, responsible breeders</span>
+                    <span>Swipe through verified pets and breeders</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-1">✓</span>
@@ -164,8 +166,8 @@ export default function AboutUs() {
           <section className="text-center bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-8 md:p-12 mb-16">
             <h2 className="text-3xl font-bold mb-4">Join the PawDNA Community</h2>
             <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Whether you're a breeder looking to connect with loving families or a buyer seeking 
-              your perfect companion, PawDNA is here to make the process transparent, safe, and rewarding.
+              Whether you're a breeder ready to showcase your pets or a buyer looking to swipe right 
+              on your perfect companion, PawDNA makes it easy, fun, and safe. Join the matchmaking revolution.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a

@@ -32,9 +32,9 @@ export const Footer = () => {
           <div className="flex flex-col items-center md:items-start">
             <h3 className="font-semibold mb-4">Services</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-primary transition-colors">Breeding Services</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Buy Puppies</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Buy Kittens</a></li>
+              <li><a href="/breeding-services" className="hover:text-primary transition-colors">Breeding Services</a></li>
+              <li><a href="/browse" className="hover:text-primary transition-colors">Buy Puppies</a></li>
+              <li><a href="/browse" className="hover:text-primary transition-colors">Buy Kittens</a></li>
             </ul>
           </div>
 

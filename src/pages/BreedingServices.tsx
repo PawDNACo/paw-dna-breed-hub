@@ -8,6 +8,13 @@ import { Check, Heart, Shield, DollarSign, Users, Camera, TrendingUp } from "luc
 const BreedingServices = () => {
   const navigate = useNavigate();
 
+  const scrollToPricing = () => {
+    const pricingSection = document.getElementById('pricing-section');
+    if (pricingSection) {
+      pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const features = [
     {
       icon: Camera,
@@ -117,20 +124,13 @@ const BreedingServices = () => {
               Join PawDNA's trusted network of professional breeders. List your puppies and kittens, 
               connect with loving families, and grow your breeding business.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button 
                 variant="hero" 
                 size="lg"
-                onClick={() => navigate("/breeder-subscription")}
+                onClick={scrollToPricing}
               >
                 Get Started Today
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg"
-                onClick={() => navigate("/sign-up?role=breeder")}
-              >
-                Create Free Account
               </Button>
             </div>
           </div>
@@ -171,7 +171,7 @@ const BreedingServices = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 bg-muted/30">
+      <section id="pricing-section" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
@@ -240,22 +240,14 @@ const BreedingServices = () => {
                 Join hundreds of professional breeders who trust PawDNA to connect them 
                 with loving families for their puppies and kittens.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex justify-center">
                 <Button 
                   variant="outline" 
                   size="lg"
                   className="bg-white text-primary hover:bg-white/90"
-                  onClick={() => navigate("/breeder-subscription")}
+                  onClick={scrollToPricing}
                 >
-                  View Plans & Pricing
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="border-white text-white hover:bg-white/10"
-                  onClick={() => navigate("/contact")}
-                >
-                  Contact Us
+                  Subscribe Now
                 </Button>
               </div>
             </CardContent>

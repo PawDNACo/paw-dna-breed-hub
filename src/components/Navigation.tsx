@@ -66,7 +66,7 @@ export const Navigation = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate("/pricing")}>
               Pricing
             </Button>
-            <a href="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
+            <a href="/home#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
               How It Works
             </a>
             <Button variant="ghost" size="sm" onClick={() => navigate("/browse")}>
@@ -120,7 +120,7 @@ export const Navigation = () => {
                 <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/pricing")}>
                   Pricing
                 </Button>
-                <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/#how-it-works")}>
+                <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/home#how-it-works")}>
                   How It Works
                 </Button>
                 <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/browse")}>

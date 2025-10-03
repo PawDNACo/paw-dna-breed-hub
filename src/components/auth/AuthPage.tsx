@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ interface AuthPageProps {
 
 export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [identifier, setIdentifier] = useState(""); // Can be email or username
   const [email, setEmail] = useState("");
@@ -32,7 +33,12 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
   const [mfaCode, setMfaCode] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(mode === "login" ? "signin" : "signup");
-  const [selectedRole, setSelectedRole] = useState<"buyer" | "breeder" | "both">("buyer");
+  
+  // Get role from URL parameter if available
+  const roleParam = searchParams.get("role");
+  const [selectedRole, setSelectedRole] = useState<"buyer" | "breeder" | "both" | "browser">(
+    (roleParam === "breeder" || roleParam === "buyer" || roleParam === "both") ? roleParam : "buyer"
+  );
 
   useEffect(() => {
     checkUser();

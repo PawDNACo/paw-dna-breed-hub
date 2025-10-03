@@ -8,8 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { PawPrint, RefreshCw } from "lucide-react";
+import { PawPrint, RefreshCw, Copy, Check } from "lucide-react";
 import { LocationInput } from "@/components/LocationInput";
+import { signUpSchema } from "@/utils/validation";
 import { SecurityDisclaimer } from "./SecurityDisclaimer";
 import { TrustBadgesCompact } from "@/components/TrustBadges";
 import { Footer } from "@/components/Footer";
@@ -26,9 +27,11 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
   const [identifier, setIdentifier] = useState(""); // Can be email or username
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [showLocationInput, setShowLocationInput] = useState(false);
+  const [passwordCopied, setPasswordCopied] = useState(false);
   const [signupData, setSignupData] = useState<any>(null);
   const [show2FA, setShow2FA] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
@@ -57,26 +60,44 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
   };
 
   const generatePassword = () => {
-    const length = 16;
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-    let password = "";
+    const length = Math.floor(Math.random() * 5) + 12; // 12-16 characters
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+    const allChars = uppercase + lowercase + numbers + symbols;
+    
+    let newPassword = "";
     
     // Ensure at least one of each type
-    password += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)];
-    password += "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)];
-    password += "0123456789"[Math.floor(Math.random() * 10)];
-    password += "!@#$%^&*"[Math.floor(Math.random() * 8)];
+    newPassword += uppercase[Math.floor(Math.random() * uppercase.length)];
+    newPassword += lowercase[Math.floor(Math.random() * lowercase.length)];
+    newPassword += numbers[Math.floor(Math.random() * numbers.length)];
+    newPassword += symbols[Math.floor(Math.random() * symbols.length)];
     
     // Fill the rest
-    for (let i = password.length; i < length; i++) {
-      password += charset[Math.floor(Math.random() * charset.length)];
+    for (let i = newPassword.length; i < length; i++) {
+      newPassword += allChars[Math.floor(Math.random() * allChars.length)];
     }
     
     // Shuffle the password
-    password = password.split('').sort(() => Math.random() - 0.5).join('');
+    newPassword = newPassword.split('').sort(() => Math.random() - 0.5).join('');
     
-    setPassword(password);
-    toast.success("Strong password generated!");
+    setPassword(newPassword);
+    setConfirmPassword(newPassword);
+    setPasswordCopied(false);
+    toast.success("Strong password generated! Click copy to save it.");
+  };
+
+  const copyPassword = async () => {
+    try {
+      await navigator.clipboard.writeText(password);
+      setPasswordCopied(true);
+      toast.success("Password copied to clipboard!");
+      setTimeout(() => setPasswordCopied(false), 3000);
+    } catch (error) {
+      toast.error("Failed to copy password");
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -84,9 +105,18 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
     setLoading(true);
 
     try {
-      // Validate username format
-      if (!/^[a-z0-9_-]{3,20}$/i.test(username)) {
-        throw new Error("Username must be 3-20 characters (letters, numbers, _ or - only)");
+      // Validate form data with zod schema
+      const validationResult = signUpSchema.safeParse({
+        email,
+        password,
+        confirmPassword,
+        username,
+        full_name: fullName,
+      });
+
+      if (!validationResult.success) {
+        const firstError = validationResult.error.errors[0];
+        throw new Error(firstError.message);
       }
 
       console.log('Checking if username exists:', username);
@@ -473,22 +503,52 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            minLength={8}
+                            minLength={12}
                           />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-1 top-1 h-8"
-                            onClick={generatePassword}
-                            title="Generate strong password"
-                          >
-                            <RefreshCw className="h-4 w-4" />
-                          </Button>
+                          <div className="absolute right-1 top-1 flex gap-1">
+                            {password && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                onClick={copyPassword}
+                                title="Copy password"
+                              >
+                                {passwordCopied ? (
+                                  <Check className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </Button>
+                            )}
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              onClick={generatePassword}
+                              title="Generate strong password"
+                            >
+                              <RefreshCw className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Must be at least 8 characters with uppercase, lowercase, and number. Click the refresh icon to generate a strong password.
+                          12-16+ characters with uppercase, lowercase, number, and symbol. Cannot match name, username, or email.
                         </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="confirm-password">Confirm Password</Label>
+                        <Input
+                          id="confirm-password"
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          required
+                          minLength={12}
+                        />
                       </div>
 
                   <div className="space-y-2">

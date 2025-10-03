@@ -108,11 +108,15 @@ export const signUpSchema = z.object({
     .max(255, "Email must be less than 255 characters"),
   
   password: z.string()
-    .min(8, "Password must be at least 8 characters")
+    .min(12, "Password must be at least 12 characters")
     .max(128, "Password must be less than 128 characters")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, "Password must contain at least one symbol"),
+  
+  confirmPassword: z.string()
+    .min(1, "Please confirm your password"),
   
   username: z.string()
     .trim()
@@ -125,6 +129,24 @@ export const signUpSchema = z.object({
     .min(1, "Full name is required")
     .max(100, "Name must be less than 100 characters")
     .optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+}).refine((data) => {
+  const lowerPassword = data.password.toLowerCase();
+  const lowerEmail = data.email.toLowerCase();
+  const lowerUsername = data.username.toLowerCase();
+  const lowerName = data.full_name?.toLowerCase() || "";
+  
+  return !lowerPassword.includes(lowerEmail) && 
+         !lowerPassword.includes(lowerUsername) &&
+         !lowerPassword.includes(lowerName) &&
+         !lowerEmail.includes(lowerPassword) &&
+         !lowerUsername.includes(lowerPassword) &&
+         !lowerName.includes(lowerPassword);
+}, {
+  message: "Password cannot contain or match your name, username, or email",
+  path: ["password"],
 });
 
 export const signInSchema = z.object({

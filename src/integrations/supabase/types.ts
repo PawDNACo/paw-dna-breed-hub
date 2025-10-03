@@ -1617,7 +1617,7 @@ export type Database = {
         | "frozen"
         | "pending_verification"
         | "permanently_deleted"
-      app_role: "admin" | "breeder" | "buyer" | "browser"
+      app_role: "admin" | "breeder" | "buyer" | "browser" | "buy_pup_kit"
       verification_type:
         | "account_recovery"
         | "banking_change"
@@ -1755,7 +1755,7 @@ export const Constants = {
         "pending_verification",
         "permanently_deleted",
       ],
-      app_role: ["admin", "breeder", "buyer", "browser"],
+      app_role: ["admin", "breeder", "buyer", "browser", "buy_pup_kit"],
       verification_type: [
         "account_recovery",
         "banking_change",

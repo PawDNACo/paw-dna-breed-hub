@@ -72,20 +72,37 @@ const sellerPlans = [
   },
 ];
 
-const buyerPlan = {
-  name: "Breeding Services",
-  price: "$9.99",
-  period: "/month",
-  description: "Access premium breeding partners",
-  features: [
-    "$1,000 refundable deposit (goes towards breed cost)",
-    "Average cost: $150+",
-    "Specialty breeds: $1,500+",
-    "Up to 250 miles delivery/pickup included",
-    "Beyond 250 miles: $299.99 refundable deposit",
-    "Vaccination & care packages",
-  ],
-};
+const buyerPlans = [
+  {
+    name: "Find Breeding Partner",
+    price: "$9.99",
+    period: "/month",
+    description: "Access premium breeding partners",
+    features: [
+      "$1,000 refundable deposit (goes towards breed cost)",
+      "Average cost: $150+",
+      "Specialty breeds: $1,500+",
+      "Up to 250 miles delivery/pickup included",
+      "Beyond 250 miles: $299.99 refundable deposit",
+      "Vaccination & care packages",
+    ],
+    role: "buyer"
+  },
+  {
+    name: "Buy Only",
+    price: "$5.99",
+    period: "/month",
+    description: "For buyers who just want puppies or kittens",
+    features: [
+      "Browse buyer requests",
+      "Direct messaging with breeders",
+      "Saved favorites",
+      "Purchase protection",
+      "Access to breeder verification status",
+    ],
+    role: "buy_pup_kit"
+  },
+];
 
 const bothPlans = [
   {
@@ -155,7 +172,7 @@ export const Pricing = () => {
   };
 
   const handleSubscribeClick = (planType: string) => {
-    if (planType === "buyer") {
+    if (planType === "buyer" || planType === "buy_pup_kit") {
       navigate('/buyer-subscription');
     } else {
       navigate(`/breeder-subscription?plan=${planType}`);
@@ -168,6 +185,7 @@ export const Pricing = () => {
     if (planType === "breeder-multi-single") return userRoles.includes("breeder") && !userRoles.includes("buyer");
     if (planType === "breeder-multi-both") return userRoles.includes("breeder") && !userRoles.includes("buyer");
     if (planType === "buyer") return userRoles.includes("buyer") && !userRoles.includes("breeder");
+    if (planType === "buy_pup_kit") return userRoles.includes("buy_pup_kit");
     if (planType === "both-single") return userRoles.includes("both");
     if (planType === "both-multi") return userRoles.includes("both");
     return false;
@@ -247,37 +265,41 @@ export const Pricing = () => {
           </div>
         </div>
 
-        {/* Buyer Plan */}
+        {/* Buyer Plans */}
         <div className="mb-16">
           <h3 className="text-2xl font-bold text-center mb-8">For Buyers</h3>
-          <Card className="max-w-2xl mx-auto border-secondary shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl">{buyerPlan.name}</CardTitle>
-              <CardDescription>{buyerPlan.description}</CardDescription>
-              <div className="mt-4">
-                <span className="text-4xl font-bold text-secondary">{buyerPlan.price}</span>
-                <span className="text-muted-foreground">{buyerPlan.period}</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3 mb-6">
-                {buyerPlan.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-secondary shrink-0 mt-0.5" />
-                    <span className="text-sm">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <Button 
-                className="w-full" 
-                variant="secondary" 
-                onClick={() => handleSubscribeClick("buyer")}
-                disabled={isCurrentSubscription("buyer")}
-              >
-                {getButtonText("buyer")}
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {buyerPlans.map((plan, index) => (
+              <Card key={index} className="border-secondary shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                  <CardDescription>{plan.description}</CardDescription>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold text-secondary">{plan.price}</span>
+                    <span className="text-muted-foreground">{plan.period}</span>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3 mb-6">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <Check className="h-5 w-5 text-secondary shrink-0 mt-0.5" />
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button 
+                    className="w-full" 
+                    variant="secondary" 
+                    onClick={() => handleSubscribeClick(plan.role)}
+                    disabled={isCurrentSubscription(plan.role)}
+                  >
+                    {getButtonText(plan.role)}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
         {/* Both Plans */}

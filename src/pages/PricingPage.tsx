@@ -72,20 +72,37 @@ const breederPlans = [
   },
 ];
 
-const buyerPlan = {
-  name: "Breeding Services",
-  price: "$9.99",
-  period: "/month per gender",
-  description: "Access premium breeding partners",
-  features: [
-    "$1,000 refundable deposit (goes towards breed cost)",
-    "Average cost: $150+",
-    "Specialty breeds: $1,500+",
-    "Up to 250 miles delivery/pickup included",
-    "Beyond 250 miles: $299.99 refundable deposit",
-    "Vaccination & care packages",
-  ],
-};
+const buyerPlans = [
+  {
+    name: "Find Breeding Partner",
+    price: "$9.99",
+    period: "/month",
+    description: "Access premium breeding partners",
+    features: [
+      "$1,000 refundable deposit (goes towards breed cost)",
+      "Average cost: $150+",
+      "Specialty breeds: $1,500+",
+      "Up to 250 miles delivery/pickup included",
+      "Beyond 250 miles: $299.99 refundable deposit",
+      "Vaccination & care packages",
+    ],
+    buttonText: "Find Breeding Partner"
+  },
+  {
+    name: "Buy Only",
+    price: "$5.99",
+    period: "/month",
+    description: "For buyers who just want puppies or kittens",
+    features: [
+      "Browse buyer requests",
+      "Direct messaging with breeders",
+      "Saved favorites",
+      "Purchase protection",
+      "Access to breeder verification status",
+    ],
+    buttonText: "Buy Puppies"
+  },
+];
 
 const bothPlans = [
   {
@@ -208,29 +225,33 @@ const PricingPage = () => {
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-center">For Buyers</h2>
               </div>
-              <Card className="max-w-2xl mx-auto border-secondary shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-2xl">{buyerPlan.name}</CardTitle>
-                  <CardDescription>{buyerPlan.description}</CardDescription>
-                  <div className="mt-4">
-                    <span className="text-4xl font-bold text-secondary">{buyerPlan.price}</span>
-                    <span className="text-muted-foreground">{buyerPlan.period}</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 mb-6">
-                    {buyerPlan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-secondary shrink-0 mt-0.5" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button className="w-full" variant="secondary" onClick={() => window.location.href = "/sign-up"}>
-                    Find Breeding Partner
-                  </Button>
-                </CardContent>
-              </Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                {buyerPlans.map((plan, index) => (
+                  <Card key={index} className="border-secondary shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                      <CardDescription>{plan.description}</CardDescription>
+                      <div className="mt-4">
+                        <span className="text-4xl font-bold text-secondary">{plan.price}</span>
+                        <span className="text-muted-foreground">{plan.period}</span>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-3 mb-6">
+                        {plan.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <Check className="h-5 w-5 text-secondary shrink-0 mt-0.5" />
+                            <span className="text-sm">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Button className="w-full" variant="secondary" onClick={() => window.location.href = "/buyer-subscription"}>
+                        {plan.buttonText}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </TabsContent>
 
             <TabsContent value="both" className="mt-0">

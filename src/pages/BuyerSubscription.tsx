@@ -463,7 +463,8 @@ export default function BuyerSubscription() {
                       <SelectValue placeholder="Select plan" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="breeding-services">Breeding Services - $9.99/month</SelectItem>
+                      <SelectItem value="breeding-services">Find Breeding Partner - $9.99/month</SelectItem>
+                      <SelectItem value="buy-only">Buy Only - $5.99/month</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -495,6 +496,34 @@ export default function BuyerSubscription() {
                       <li className="flex items-start gap-2">
                         <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                         <span>Vaccination & care packages</span>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+
+                {formData.subscriptionPlan === "buy-only" && (
+                  <div className="bg-muted p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2">For buyers who just want puppies or kittens</h4>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>Browse buyer requests</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>Direct messaging with breeders</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>Saved favorites</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>Purchase protection</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>Access to breeder verification status</span>
                       </li>
                     </ul>
                   </div>

@@ -133,7 +133,7 @@ const Browse = () => {
         query = query.ilike("city", `%${searchCity}%`);
       }
 
-      if (searchState) {
+      if (searchState && searchState !== "all") {
         query = query.ilike("state", `%${searchState}%`);
       }
 
@@ -242,7 +242,7 @@ const Browse = () => {
                         <SelectValue placeholder="Select state" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All states</SelectItem>
+                        <SelectItem value="all">All states</SelectItem>
                         {US_STATES.map((state) => (
                           <SelectItem key={state.code} value={state.code}>
                             {state.name}

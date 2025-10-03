@@ -19,6 +19,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { addWatermarkToImage, batchWatermarkImages } from "@/utils/imageWatermark";
 import { WatermarkPreview } from "@/components/WatermarkPreview";
 import { useUserRole } from "@/hooks/useUserRole";
+import { RoleSubscriptionForm } from "@/components/subscription/RoleSubscriptionForm";
 
 interface Pet {
   id: string;
@@ -64,7 +65,7 @@ export default function BreederDashboard() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { isVerified, loading: verificationLoading, requireVerification } = useVerificationCheck();
-  const { isBreeder, isBuyer, loading: rolesLoading } = useUserRole();
+  const { isBreeder, isBuyer, isBrowser, loading: rolesLoading, refetch: refetchRoles } = useUserRole();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -382,12 +383,24 @@ export default function BreederDashboard() {
           </div>
         </div>
 
-        {!subscription && isBreeder && (
+        {isBrowser && (
+          <div className="mb-8">
+            <RoleSubscriptionForm 
+              onRoleUpdated={async () => {
+                refetchRoles();
+                checkSubscriptionAndLoadPets();
+                if (isBuyer) loadBuyerRequests();
+              }}
+            />
+          </div>
+        )}
+
+        {!subscription && !isBrowser && (isBreeder || isBuyer) && (
           <Card className="mb-8 border-destructive">
             <CardHeader>
               <CardTitle>Subscription Required</CardTitle>
               <CardDescription>
-                You need an active subscription to list pets. Please subscribe to continue.
+                You need an active subscription to access all features. Please subscribe to continue.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -414,7 +427,7 @@ export default function BreederDashboard() {
         )}
 
         {/* Breeder Listings Section */}
-        {isBreeder && (
+        {isBreeder && subscription && !isBrowser && (
           <>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold">Your Listings ({pets.length})</h2>
@@ -737,9 +750,9 @@ export default function BreederDashboard() {
     )}
 
     {/* Buyer Requests Section */}
-    {isBuyer && (
-      <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-6">Your Requests ({buyerRequests.length})</h2>
+          {isBuyer && subscription && !isBrowser && (
+            <div className="mt-8">
+              <h2 className="text-2xl font-semibold mb-6">Your Requests ({buyerRequests.length})</h2>
         
         {buyerRequests.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

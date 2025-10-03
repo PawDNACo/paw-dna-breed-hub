@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-type AppRole = "admin" | "breeder" | "buyer";
+type AppRole = "admin" | "breeder" | "buyer" | "browser";
 
 interface UserRoleState {
   roles: AppRole[];
@@ -10,6 +10,7 @@ interface UserRoleState {
   isAdmin: boolean;
   isBreeder: boolean;
   isBuyer: boolean;
+  isBrowser: boolean;
 }
 
 export const useUserRole = () => {
@@ -19,6 +20,7 @@ export const useUserRole = () => {
     isAdmin: false,
     isBreeder: false,
     isBuyer: false,
+    isBrowser: false,
   });
   const { toast } = useToast();
 
@@ -37,6 +39,7 @@ export const useUserRole = () => {
           isAdmin: false,
           isBreeder: false,
           isBuyer: false,
+          isBrowser: false,
         });
         return;
       }
@@ -56,6 +59,7 @@ export const useUserRole = () => {
         isAdmin: roles.includes("admin"),
         isBreeder: roles.includes("breeder"),
         isBuyer: roles.includes("buyer"),
+        isBrowser: roles.includes("browser"),
       });
     } catch (error) {
       console.error("Error fetching user roles:", error);
@@ -70,6 +74,7 @@ export const useUserRole = () => {
         isAdmin: false,
         isBreeder: false,
         isBuyer: false,
+        isBrowser: false,
       });
     }
   };

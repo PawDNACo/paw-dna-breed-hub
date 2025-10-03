@@ -144,12 +144,12 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
       if (profileError) throw profileError;
 
       // Assign role(s) based on selection
-      const rolesToInsert = selectedRole === "both" 
-        ? [
-            { user_id: signupData.id, role: "breeder" as const }, 
-            { user_id: signupData.id, role: "buyer" as const }
-          ]
-        : [{ user_id: signupData.id, role: selectedRole as "breeder" | "buyer" }];
+    const rolesToInsert = selectedRole === "both"
+      ? [
+          { user_id: signupData.id, role: "breeder" as const },
+          { user_id: signupData.id, role: "buyer" as const }
+        ]
+      : [{ user_id: signupData.id, role: selectedRole as "breeder" | "buyer" | "browser" }];
 
       // Delete the default 'buyer' role first if needed
       await supabase
@@ -490,23 +490,27 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
                         </p>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label>I am signing up as a</Label>
-                        <RadioGroup value={selectedRole} onValueChange={(value: any) => setSelectedRole(value)}>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="buyer" id="buyer" />
-                            <Label htmlFor="buyer" className="font-normal cursor-pointer">Buyer</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="breeder" id="breeder" />
-                            <Label htmlFor="breeder" className="font-normal cursor-pointer">Breeder</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="both" id="both" />
-                            <Label htmlFor="both" className="font-normal cursor-pointer">Both Buyer & Breeder</Label>
-                          </div>
-                        </RadioGroup>
+                  <div className="space-y-2">
+                    <Label>I am signing up as a</Label>
+                    <RadioGroup value={selectedRole} onValueChange={(value: any) => setSelectedRole(value)}>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="buyer" id="buyer" />
+                        <Label htmlFor="buyer" className="font-normal cursor-pointer">Buyer</Label>
                       </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="breeder" id="breeder" />
+                        <Label htmlFor="breeder" className="font-normal cursor-pointer">Breeder</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="both" id="both" />
+                        <Label htmlFor="both" className="font-normal cursor-pointer">Both Buyer & Breeder</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="browser" id="browser" />
+                        <Label htmlFor="browser" className="font-normal cursor-pointer">Just Browsing</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
 
                       <SecurityDisclaimer />
 

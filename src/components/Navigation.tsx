@@ -63,9 +63,9 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="/#pricing" className="text-sm font-medium hover:text-primary transition-colors">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/pricing")}>
               Pricing
-            </a>
+            </Button>
             <a href="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
               How It Works
             </a>
@@ -117,7 +117,7 @@ export const Navigation = () => {
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-4 mt-8">
-                <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/#pricing")}>
+                <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/pricing")}>
                   Pricing
                 </Button>
                 <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/#how-it-works")}>

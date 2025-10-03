@@ -86,6 +86,41 @@ const buyerPlan = {
   ],
 };
 
+const bothPlans = [
+  {
+    name: "Single",
+    price: "$12.99",
+    period: "/month",
+    description: "Combined breeder & buyer access",
+    features: [
+      "All Single Gender breeder features",
+      "Full buyer access",
+      "List male or female pets",
+      "Access breeding partners",
+      "Earn up to 85% on all sales",
+      "$499.99 refundable deposit",
+    ],
+    popular: false,
+  },
+  {
+    name: "Multi",
+    price: "$19.99",
+    period: "/month",
+    description: "Complete access for serious breeders & buyers",
+    features: [
+      "All Multi-Breed Both features",
+      "Full buyer access",
+      "List multiple breeds",
+      "Both genders",
+      "Access breeding partners",
+      "Earn up to 85% on all sales",
+      "Premium support",
+      "$499.99 refundable deposit",
+    ],
+    popular: true,
+  },
+];
+
 const addOns = [
   { name: "Vaccination Package", price: "$299" },
   { name: "Care Package", price: "Starting at $149", description: "Additional items" },
@@ -187,6 +222,57 @@ export const Pricing = () => {
               </Button>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Both Plans */}
+        <div className="mb-16">
+          <h3 className="text-2xl font-bold text-center mb-4">For Breeders & Buyers (Both)</h3>
+          <p className="text-sm text-muted-foreground max-w-3xl mx-auto text-center mb-8">
+            Get the best of both worlds with combined access
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {bothPlans.map((plan, index) => (
+              <Card 
+                key={index} 
+                className={`relative ${
+                  plan.popular 
+                    ? 'border-primary shadow-glow' 
+                    : 'border-border/50'
+                }`}
+              >
+                {plan.popular && (
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-hero">
+                    Most Popular
+                  </Badge>
+                )}
+                <CardHeader>
+                  <CardTitle className="text-xl">{plan.name}</CardTitle>
+                  <CardDescription className="text-xs">{plan.description}</CardDescription>
+                  <div className="mt-4">
+                    <span className="text-3xl font-bold text-primary">{plan.price}</span>
+                    <span className="text-sm text-muted-foreground">{plan.period}</span>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 mb-6">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                        <span className="text-xs">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button 
+                    className="w-full" 
+                    variant={plan.popular ? "hero" : "default"}
+                    onClick={() => window.location.href = "/breeder-subscription"}
+                  >
+                    Subscribe Now
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
         {/* Add-ons */}

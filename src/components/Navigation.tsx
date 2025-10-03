@@ -63,9 +63,6 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="/#features" className="text-sm font-medium hover:text-primary transition-colors">
-              Services
-            </a>
             <a href="/#pricing" className="text-sm font-medium hover:text-primary transition-colors">
               Pricing
             </a>
@@ -73,32 +70,21 @@ export const Navigation = () => {
               How It Works
             </a>
             <Button variant="ghost" size="sm" onClick={() => navigate("/browse")}>
-              Browse Pets
+              Browse
             </Button>
             {user && (
+              <Button variant="ghost" size="sm" onClick={() => navigate("/breeder-dashboard")}>
+                Profile
+              </Button>
+            )}
+            {isAdmin && (
               <>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/breeder-dashboard")}>
-                  Breeder
+                <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
+                  Admin
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/breeder-payouts")}>
-                  Payouts
+                <Button variant="ghost" size="sm" onClick={() => navigate("/developer")}>
+                  Developer
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/buyer-dashboard")}>
-                  Buyer
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/security-settings")}>
-                  Security
-                </Button>
-                {isAdmin && (
-                  <>
-                    <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
-                      Admin
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => navigate("/developer")}>
-                      Developer
-                    </Button>
-                  </>
-                )}
               </>
             )}
             {user ? (
@@ -131,9 +117,6 @@ export const Navigation = () => {
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-4 mt-8">
-                <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/#features")}>
-                  Services
-                </Button>
                 <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/#pricing")}>
                   Pricing
                 </Button>
@@ -141,11 +124,12 @@ export const Navigation = () => {
                   How It Works
                 </Button>
                 <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/browse")}>
-                  Browse Pets
+                  Browse
                 </Button>
                 {user && (
                   <>
                     <div className="my-2 border-t border-border" />
+                    <div className="font-semibold text-sm text-muted-foreground px-4 mb-2">Profile</div>
                     <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/breeder-dashboard")}>
                       Breeder Dashboard
                     </Button>
@@ -162,10 +146,11 @@ export const Navigation = () => {
                       Accessories
                     </Button>
                     <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/security-settings")}>
-                      Security Settings
+                      Security
                     </Button>
                     {isAdmin && (
                       <>
+                        <div className="my-2 border-t border-border" />
                         <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/admin")}>
                           Admin
                         </Button>

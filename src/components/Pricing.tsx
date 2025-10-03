@@ -14,7 +14,6 @@ const sellerPlans = [
       "List male or female pets",
       "Sell puppies & kittens",
       "Earn up to 85% on all sales",
-      "PawDNA takes a small percentage",
       "Vaccination add-ons",
       "Care packages",
       "$499.99 refundable deposit",
@@ -30,12 +29,43 @@ const sellerPlans = [
       "List males & females",
       "Sell puppies & kittens",
       "Earn up to 85% on all sales",
-      "PawDNA takes a small percentage",
       "All add-on packages",
       "Priority support",
       "$499.99 refundable deposit",
     ],
     popular: true,
+  },
+  {
+    name: "Multi-Breed Single",
+    price: "$12.99",
+    period: "/month",
+    description: "Multiple breeds, one gender",
+    features: [
+      "List multiple breeds",
+      "Single gender listings",
+      "Sell puppies & kittens",
+      "Earn up to 85% on all sales",
+      "All add-on packages",
+      "Priority support",
+      "$499.99 refundable deposit",
+    ],
+    popular: false,
+  },
+  {
+    name: "Multi-Breed Both",
+    price: "$14.99",
+    period: "/month",
+    description: "Full access for multiple breeds",
+    features: [
+      "List multiple breeds",
+      "Both genders",
+      "Sell puppies & kittens",
+      "Earn up to 85% on all sales",
+      "All add-on packages",
+      "Premium support",
+      "$499.99 refundable deposit",
+    ],
+    popular: false,
   },
 ];
 
@@ -82,8 +112,11 @@ export const Pricing = () => {
 
         {/* Seller Plans */}
         <div className="mb-16">
-          <h3 className="text-2xl font-bold text-center mb-8">For Breeders & Sellers</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <h3 className="text-2xl font-bold text-center mb-4">For Breeders & Sellers</h3>
+          <p className="text-sm text-muted-foreground max-w-3xl mx-auto text-center mb-8">
+            Additional animals: $4.99/mo per animal (after first 2)
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             {sellerPlans.map((plan, index) => (
               <Card 
                 key={index} 
@@ -99,28 +132,28 @@ export const Pricing = () => {
                   </Badge>
                 )}
                 <CardHeader>
-                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
+                  <CardTitle className="text-xl">{plan.name}</CardTitle>
+                  <CardDescription className="text-xs">{plan.description}</CardDescription>
                   <div className="mt-4">
-                    <span className="text-4xl font-bold text-primary">{plan.price}</span>
-                    <span className="text-muted-foreground">{plan.period}</span>
+                    <span className="text-3xl font-bold text-primary">{plan.price}</span>
+                    <span className="text-sm text-muted-foreground">{plan.period}</span>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-3 mb-6">
+                  <ul className="space-y-2 mb-6">
                     {plan.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                        <span className="text-sm">{feature}</span>
+                        <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                        <span className="text-xs">{feature}</span>
                       </li>
                     ))}
                   </ul>
                   <Button 
                     className="w-full" 
                     variant={plan.popular ? "hero" : "default"}
-                    onClick={() => window.location.href = "/sign-up"}
+                    onClick={() => window.location.href = "/breeder-subscription"}
                   >
-                    Get Started
+                    Subscribe Now
                   </Button>
                 </CardContent>
               </Card>

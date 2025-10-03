@@ -1,0 +1,480 @@
+import { useState } from "react";
+import { Navigation } from "@/components/Navigation";
+import { Footer } from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Upload, AlertCircle, Info } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const BreederSubscriptionSignup = () => {
+  const { toast } = useToast();
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [parentPhotos, setParentPhotos] = useState<File[]>([]);
+  const [formData, setFormData] = useState({
+    petName: "",
+    species: "",
+    breed: "",
+    gender: "",
+    birthDate: "",
+    expectedDate: "",
+    city: "",
+    state: "",
+    isSpecialBreed: "",
+    size: "",
+    deliveryMethod: "",
+    price: "",
+    description: "",
+    subscriptionType: "",
+    animalCount: "1"
+  });
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, isParent: boolean) => {
+    const files = Array.from(e.target.files || []);
+    if (isParent) {
+      setParentPhotos(prev => [...prev, ...files]);
+    } else {
+      setPhotos(prev => [...prev, ...files]);
+    }
+  };
+
+  const calculateMinPrice = () => {
+    if (formData.isSpecialBreed === "yes") {
+      switch (formData.size) {
+        case "small": return 1500;
+        case "medium": return 2000;
+        case "large": return 3000;
+        case "rare": return 4500;
+        default: return 50;
+      }
+    }
+    return 50;
+  };
+
+  const calculateEarnings = (price: number) => {
+    if (formData.isSpecialBreed === "yes") return 85;
+    if (price >= 751) return 85;
+    if (price >= 301) return 60;
+    if (price >= 50) return 50;
+    return 0;
+  };
+
+  const calculateSubscriptionCost = () => {
+    const basePrice = formData.subscriptionType === "single-gender" ? 4.99 : 
+                      formData.subscriptionType === "both-genders" ? 9.99 :
+                      formData.subscriptionType === "multi-single" ? 12.99 :
+                      formData.subscriptionType === "multi-both" ? 14.99 : 0;
+    
+    const animalCount = parseInt(formData.animalCount) || 1;
+    const additionalCost = animalCount > 2 ? (animalCount - 2) * 4.99 : 0;
+    
+    return basePrice + additionalCost;
+  };
+
+  const needsListingFee = () => {
+    const price = parseFloat(formData.price) || 0;
+    return price < 50;
+  };
+
+  const calculateListingFee = () => {
+    if (!needsListingFee()) return 0;
+    const animalCount = parseInt(formData.animalCount) || 1;
+    return animalCount * 49.99;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validation
+    if (photos.length < 5) {
+      toast({
+        title: "Photos Required",
+        description: "Please upload at least 5 photos of your pet",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (parentPhotos.length < 2) {
+      toast({
+        title: "Parent Photos Required",
+        description: "Please upload at least 2 photos of the parents",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const price = parseFloat(formData.price) || 0;
+    const minPrice = calculateMinPrice();
+    
+    if (price < minPrice && price !== 0 && !needsListingFee()) {
+      toast({
+        title: "Price Too Low",
+        description: `Minimum price for this category is $${minPrice}`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    toast({
+      title: "Subscription Started",
+      description: "Your breeder subscription is being processed"
+    });
+  };
+
+  const totalPhotos = photos.length + parentPhotos.length;
+  const price = parseFloat(formData.price) || 0;
+  const earningsPercent = calculateEarnings(price);
+
+  return (
+    <div className="min-h-screen">
+      <Navigation />
+      <main className="container mx-auto px-4 py-20">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold mb-4">
+              Breeder <span className="bg-gradient-hero bg-clip-text text-transparent">Subscription</span>
+            </h1>
+            <p className="text-muted-foreground">Complete your breeder profile and start listing</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Photo Upload Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Photos</CardTitle>
+                <CardDescription>Upload at least 5 photos (including 2 parent photos)</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Pet Photos ({photos.length} uploaded)</Label>
+                  <div className="mt-2 flex items-center gap-4">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handlePhotoUpload(e, false)}
+                      className="cursor-pointer"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Parent Photos ({parentPhotos.length} uploaded) - Required: 2</Label>
+                  <div className="mt-2 flex items-center gap-4">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handlePhotoUpload(e, true)}
+                      className="cursor-pointer"
+                    />
+                  </div>
+                </div>
+                {totalPhotos > 0 && (
+                  <Badge variant={totalPhotos >= 5 && parentPhotos.length >= 2 ? "default" : "secondary"}>
+                    {totalPhotos} total photos uploaded
+                  </Badge>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Pet Details */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Pet Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Pet Name</Label>
+                    <Input
+                      required
+                      value={formData.petName}
+                      onChange={(e) => setFormData({...formData, petName: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Species</Label>
+                    <Select value={formData.species} onValueChange={(v) => setFormData({...formData, species: v})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select species" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="dog">Dog</SelectItem>
+                        <SelectItem value="cat">Cat</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Breed</Label>
+                    <Input
+                      required
+                      value={formData.breed}
+                      onChange={(e) => setFormData({...formData, breed: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Gender</Label>
+                    <Select value={formData.gender} onValueChange={(v) => setFormData({...formData, gender: v})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Birth Date (if born)</Label>
+                    <Input
+                      type="date"
+                      value={formData.birthDate}
+                      onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Expected Date (if not born)</Label>
+                    <Input
+                      type="date"
+                      value={formData.expectedDate}
+                      onChange={(e) => setFormData({...formData, expectedDate: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Description</Label>
+                  <Textarea
+                    required
+                    placeholder="Describe your pet (do not include personal or sensitive information)"
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    rows={4}
+                  />
+                  <Alert className="mt-2">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Do not add any personal or sensitive information in the details box
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Location */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Location</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>City</Label>
+                    <Input
+                      required
+                      value={formData.city}
+                      onChange={(e) => setFormData({...formData, city: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label>State</Label>
+                    <Input
+                      required
+                      value={formData.state}
+                      onChange={(e) => setFormData({...formData, state: e.target.value})}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Breed Classification */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Breed Classification</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Is this a special breed?</Label>
+                  <RadioGroup value={formData.isSpecialBreed} onValueChange={(v) => setFormData({...formData, isSpecialBreed: v})}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="yes" id="special-yes" />
+                      <Label htmlFor="special-yes">Yes</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="no" id="special-no" />
+                      <Label htmlFor="special-no">No</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                {formData.isSpecialBreed === "yes" && (
+                  <div>
+                    <Label>Size Category</Label>
+                    <Select value={formData.size} onValueChange={(v) => setFormData({...formData, size: v})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="small">Small - Min $1,500</SelectItem>
+                        <SelectItem value="medium">Medium - Min $2,000</SelectItem>
+                        <SelectItem value="large">Large - Min $3,000</SelectItem>
+                        <SelectItem value="rare">Rare - Min $4,500</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Delivery Method */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Delivery Method</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <RadioGroup value={formData.deliveryMethod} onValueChange={(v) => setFormData({...formData, deliveryMethod: v})}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="delivery" id="delivery" />
+                    <Label htmlFor="delivery">Delivery Available</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="pickup" id="pickup" />
+                    <Label htmlFor="pickup">Pickup Only</Label>
+                  </div>
+                </RadioGroup>
+              </CardContent>
+            </Card>
+
+            {/* Pricing */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Pricing</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Price ($)</Label>
+                  <Input
+                    type="number"
+                    required
+                    min="0"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={(e) => setFormData({...formData, price: e.target.value})}
+                    placeholder={`Minimum: $${calculateMinPrice()}`}
+                  />
+                </div>
+
+                {formData.isSpecialBreed === "no" && (
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>Non-Special Breed Earnings:</strong>
+                      <ul className="mt-2 space-y-1">
+                        <li>• $50-$300: Earn 50%</li>
+                        <li>• $301-$750: Earn 60%</li>
+                        <li>• $751 and up: Earn 85%</li>
+                      </ul>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {price > 0 && (
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="font-semibold">Your Earnings: {earningsPercent}%</p>
+                    <p className="text-sm text-muted-foreground">
+                      You earn ${(price * earningsPercent / 100).toFixed(2)} per sale
+                    </p>
+                  </div>
+                )}
+
+                {needsListingFee() && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Prices under $50 require a one-time listing fee of $49.99 per animal
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Subscription Selection */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Subscription Plan</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Select Plan</Label>
+                  <Select value={formData.subscriptionType} onValueChange={(v) => setFormData({...formData, subscriptionType: v})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select subscription" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="single-gender">Single Gender - $4.99/mo</SelectItem>
+                      <SelectItem value="both-genders">Both Genders - $9.99/mo</SelectItem>
+                      <SelectItem value="multi-single">Multi-Breed Single Gender - $12.99/mo</SelectItem>
+                      <SelectItem value="multi-both">Multi-Breed Both Genders - $14.99/mo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Number of Animals</Label>
+                  <Select value={formData.animalCount} onValueChange={(v) => setFormData({...formData, animalCount: v})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                        <SelectItem key={n} value={n.toString()}>
+                          {n} {n === 1 ? "animal" : "animals"}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {parseInt(formData.animalCount) > 2 && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      +${((parseInt(formData.animalCount) - 2) * 4.99).toFixed(2)} for {parseInt(formData.animalCount) - 2} additional animals
+                    </p>
+                  )}
+                </div>
+
+                <div className="p-4 bg-primary/10 rounded-lg space-y-2">
+                  <div className="flex justify-between">
+                    <span>Subscription:</span>
+                    <span className="font-semibold">${calculateSubscriptionCost().toFixed(2)}/mo</span>
+                  </div>
+                  {needsListingFee() && (
+                    <div className="flex justify-between text-destructive">
+                      <span>Listing Fee:</span>
+                      <span className="font-semibold">${calculateListingFee().toFixed(2)} (one-time)</span>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Button type="submit" className="w-full" size="lg" variant="hero">
+              Complete Subscription
+            </Button>
+          </form>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default BreederSubscriptionSignup;

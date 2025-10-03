@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Services from "./pages/Services";
+import BreederSubscriptionSignup from "./pages/BreederSubscriptionSignup";
 import Browse from "./pages/Browse";
 import PetDetail from "./pages/PetDetail";
 import BreederDashboard from "./pages/BreederDashboard";
@@ -44,6 +46,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/breeder-subscription" element={<BreederSubscriptionSignup />} />
           <Route path="/sign-up" element={<AuthPage mode="signup" />} />
           <Route path="/login" element={<AuthPage mode="login" />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

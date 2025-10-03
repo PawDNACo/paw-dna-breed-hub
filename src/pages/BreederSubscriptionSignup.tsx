@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Upload, AlertCircle, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const DOG_BREEDS = [
   "Labrador Retriever", "German Shepherd", "Golden Retriever", "French Bulldog",
@@ -31,9 +34,19 @@ const CAT_BREEDS = [
 
 const BreederSubscriptionSignup = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
   const [parentPhotos, setParentPhotos] = useState<File[]>([]);
   const [formData, setFormData] = useState({
+    fullName: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     petName: "",
     species: "",
     breed: "",
@@ -51,6 +64,16 @@ const BreederSubscriptionSignup = () => {
     subscriptionType: "",
     animalCount: "1"
   });
+
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setCurrentUser(user);
+    setLoading(false);
+  };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, isParent: boolean) => {
     const files = Array.from(e.target.files || []);
@@ -111,8 +134,98 @@ const BreederSubscriptionSignup = () => {
     return animalCount * 49.99;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // If user is not logged in, validate signup fields
+    if (!currentUser) {
+      if (!formData.fullName.trim()) {
+        toast({
+          title: "Full Name Required",
+          description: "Please enter your full name",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!formData.username.trim()) {
+        toast({
+          title: "Username Required",
+          description: "Please enter a username",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!formData.email.trim()) {
+        toast({
+          title: "Email Required",
+          description: "Please enter your email",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!formData.password || formData.password.length < 8) {
+        toast({
+          title: "Password Required",
+          description: "Password must be at least 8 characters",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        toast({
+          title: "Passwords Don't Match",
+          description: "Please make sure both passwords match",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create user account
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/breeder-subscription`,
+          data: {
+            full_name: formData.fullName,
+            username: formData.username
+          }
+        }
+      });
+
+      if (signUpError) {
+        toast({
+          title: "Signup Failed",
+          description: signUpError.message,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!authData.user) {
+        toast({
+          title: "Signup Failed",
+          description: "Could not create user account",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Assign breeder role
+      const { error: roleError } = await supabase
+        .from("user_roles")
+        .insert({ user_id: authData.user.id, role: "breeder" });
+
+      if (roleError) {
+        console.error("Role assignment error:", roleError);
+      }
+
+      setCurrentUser(authData.user);
+    }
     
     // Validation
     if (photos.length < 5) {
@@ -147,13 +260,17 @@ const BreederSubscriptionSignup = () => {
 
     toast({
       title: "Subscription Started",
-      description: "Your breeder subscription is being processed"
+      description: "Your breeder subscription is being processed. You've been assigned the breeder role!"
     });
   };
 
   const totalPhotos = photos.length + parentPhotos.length;
   const price = parseFloat(formData.price) || 0;
   const earningsPercent = calculateEarnings(price);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen">
@@ -164,10 +281,97 @@ const BreederSubscriptionSignup = () => {
             <h1 className="text-4xl font-bold mb-4">
               Breeder <span className="bg-gradient-hero bg-clip-text text-transparent">Subscription</span>
             </h1>
-            <p className="text-muted-foreground">Complete your breeder profile and start listing</p>
+            <p className="text-muted-foreground">
+              {currentUser ? "Complete your breeder profile and start listing" : "Create your account and start your breeder subscription"}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Account Creation Section - Only show if not logged in */}
+            {!currentUser && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Create Your Account</CardTitle>
+                  <CardDescription>Sign up to become a breeder</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      required
+                      value={formData.fullName}
+                      onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      required
+                      value={formData.username}
+                      onChange={(e) => setFormData({...formData, username: e.target.value})}
+                      placeholder="Choose a username"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      placeholder="Enter your email"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={formData.password}
+                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                      placeholder="Create a password (min 8 characters)"
+                    />
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Checkbox
+                        id="show-password"
+                        checked={showPassword}
+                        onCheckedChange={(checked) => setShowPassword(checked === true)}
+                      />
+                      <Label htmlFor="show-password" className="text-sm font-normal">Show password</Label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      required
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                      placeholder="Confirm your password"
+                    />
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Checkbox
+                        id="show-confirm-password"
+                        checked={showConfirmPassword}
+                        onCheckedChange={(checked) => setShowConfirmPassword(checked === true)}
+                      />
+                      <Label htmlFor="show-confirm-password" className="text-sm font-normal">Show password</Label>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Photo Upload Section */}
             <Card>
               <CardHeader>

@@ -5,11 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
+import { useUserRole } from "@/hooks/useUserRole";
 
 export const Navigation = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const { isAdmin } = useUserRole();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -74,9 +76,11 @@ export const Navigation = () => {
                 <Button variant="ghost" size="sm" onClick={() => navigate("/security-settings")}>
                   Security
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
-                  Admin
-                </Button>
+                {isAdmin && (
+                  <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
+                    Admin
+                  </Button>
+                )}
                 <Button variant="ghost" size="sm" onClick={() => navigate("/developer")}>
                   Developer
                 </Button>
@@ -140,9 +144,11 @@ export const Navigation = () => {
                   <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/security-settings")}>
                     Security Settings
                   </Button>
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/admin")}>
-                    Admin
-                  </Button>
+                  {isAdmin && (
+                    <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/admin")}>
+                      Admin
+                    </Button>
+                  )}
                   <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/developer")}>
                     Developer
                   </Button>

@@ -155,8 +155,11 @@ export const Pricing = () => {
   };
 
   const handleSubscribeClick = (planType: string) => {
-    // Always go to breeder subscription page
-    navigate(`/breeder-subscription?plan=${planType}`);
+    if (planType === "buyer") {
+      navigate('/buyer-signup');
+    } else {
+      navigate(`/breeder-subscription?plan=${planType}`);
+    }
   };
 
   const isCurrentSubscription = (planType: string): boolean => {

@@ -15,6 +15,7 @@ import { Upload, AlertCircle, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { SmsOptInDialog } from "@/components/auth/SmsOptInDialog";
 
 const DOG_BREEDS = [
   "Labrador Retriever", "German Shepherd", "Golden Retriever", "French Bulldog",
@@ -43,6 +44,8 @@ const BreederSubscriptionSignup = () => {
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
   const [parentPhotos, setParentPhotos] = useState<File[]>([]);
+  const [showSmsOptIn, setShowSmsOptIn] = useState(false);
+  const [pendingSignupData, setPendingSignupData] = useState<any>(null);
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
@@ -292,47 +295,18 @@ const BreederSubscriptionSignup = () => {
         return;
       }
 
-      // Create user account
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+      // Store signup data temporarily
+      setPendingSignupData({
         email: formData.email,
         password: formData.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/breeder-subscription`,
-          data: {
-            full_name: formData.fullName,
-            username: formData.username
-          }
-        }
+        fullName: formData.fullName,
+        username: formData.username,
+        phone: formData.phone
       });
 
-      if (signUpError) {
-        toast({
-          title: "Signup Failed",
-          description: signUpError.message,
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (!authData.user) {
-        toast({
-          title: "Signup Failed",
-          description: "Could not create user account",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Assign breeder role
-      const { error: roleError } = await supabase
-        .from("user_roles")
-        .insert({ user_id: authData.user.id, role: "breeder" });
-
-      if (roleError) {
-        console.error("Role assignment error:", roleError);
-      }
-
-      setCurrentUser(authData.user);
+      // Show SMS opt-in dialog
+      setShowSmsOptIn(true);
+      return;
     }
     
     // Validate pet details
@@ -454,6 +428,61 @@ const BreederSubscriptionSignup = () => {
     });
   };
 
+  const handleSmsOptIn = async (optedIn: boolean) => {
+    setShowSmsOptIn(false);
+    
+    if (!pendingSignupData) return;
+
+    try {
+      // Create user account
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: pendingSignupData.email,
+        password: pendingSignupData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            full_name: pendingSignupData.fullName,
+            username: pendingSignupData.username,
+            phone: pendingSignupData.phone,
+            sms_opt_in: optedIn
+          }
+        }
+      });
+
+      if (signUpError) {
+        toast({
+          title: "Signup Failed",
+          description: signUpError.message,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!authData.user) {
+        toast({
+          title: "Signup Failed",
+          description: "Could not create user account",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Store user ID for after email verification
+      sessionStorage.setItem('breeder_user_id', authData.user.id);
+
+      toast({
+        title: "Verification Email Sent!",
+        description: "Please check your email to verify your account before continuing."
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
   const totalPhotos = photos.length + parentPhotos.length;
   const price = parseFloat(formData.price) || 0;
   const earningsPercent = calculateEarnings(price);
@@ -465,6 +494,7 @@ const BreederSubscriptionSignup = () => {
   return (
     <div className="min-h-screen">
       <Navigation />
+      <SmsOptInDialog open={showSmsOptIn} onOptIn={handleSmsOptIn} />
       <main className="container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">

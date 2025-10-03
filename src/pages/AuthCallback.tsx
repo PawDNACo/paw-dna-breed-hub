@@ -18,7 +18,7 @@ export default function AuthCallback() {
 
   const handleAuthCallback = async () => {
     try {
-      // Get the session from the URL hash
+      // Get the session from the URL hash or after email verification
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
@@ -34,7 +34,93 @@ export default function AuthCallback() {
         return;
       }
 
-      // Check if user has a profile with username
+      // Check if there are buyer preferences stored (from buyer signup)
+      const preferencesStr = sessionStorage.getItem('buyer_preferences');
+      if (preferencesStr) {
+        const preferences = JSON.parse(preferencesStr);
+        
+        // Assign buyer role
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({ user_id: session.user.id, role: "buyer" });
+
+        if (roleError && !roleError.message.includes('duplicate')) {
+          console.error("Role assignment error:", roleError);
+        }
+
+        // Create buyer request with preferences
+        const { error: requestError } = await supabase
+          .from("buyer_requests")
+          .insert({
+            user_id: session.user.id,
+            species: preferences.species,
+            breed: preferences.breed,
+            gender: preferences.gender,
+            size: preferences.size,
+            max_price: preferences.max_price,
+            status: "active"
+          });
+
+        if (requestError) {
+          console.error("Request creation error:", requestError);
+        }
+
+        // Clear stored preferences
+        sessionStorage.removeItem('buyer_preferences');
+        
+        toast.success("Email verified! Welcome to PawDNA!");
+        navigate("/buyer-dashboard");
+        return;
+      }
+
+      // Check if this is a breeder signup
+      const breederUserId = sessionStorage.getItem('breeder_user_id');
+      if (breederUserId) {
+        // Assign breeder role
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({ user_id: session.user.id, role: "breeder" });
+
+        if (roleError && !roleError.message.includes('duplicate')) {
+          console.error("Role assignment error:", roleError);
+        }
+
+        sessionStorage.removeItem('breeder_user_id');
+        
+        toast.success("Email verified! Please complete your breeder profile.");
+        navigate("/breeder-subscription");
+        return;
+      }
+
+      // Check for pending role from general signup
+      const pendingRole = sessionStorage.getItem('pending_role');
+      if (pendingRole) {
+        const rolesToInsert = pendingRole === "both"
+          ? [
+              { user_id: session.user.id, role: "breeder" as const },
+              { user_id: session.user.id, role: "buyer" as const }
+            ]
+          : [{ user_id: session.user.id, role: pendingRole as "breeder" | "buyer" | "browser" }];
+
+        // Delete the default 'buyer' role first if needed
+        await supabase
+          .from("user_roles")
+          .delete()
+          .eq("user_id", session.user.id);
+
+        // Insert the selected role(s)
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert(rolesToInsert);
+
+        if (roleError) {
+          console.error("Role assignment error:", roleError);
+        }
+
+        sessionStorage.removeItem('pending_role');
+      }
+
+      // Check if user has a profile with username (OAuth flow)
       const { data: profile } = await supabase
         .from("profiles")
         .select("username")

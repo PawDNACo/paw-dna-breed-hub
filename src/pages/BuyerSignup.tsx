@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Copy, Check } from "lucide-react";
+import { SmsOptInDialog } from "@/components/auth/SmsOptInDialog";
 
 const DOG_BREEDS = [
   "Labrador Retriever", "German Shepherd", "Golden Retriever", "French Bulldog",
@@ -34,6 +35,8 @@ export default function BuyerSignup() {
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [availableBreeds, setAvailableBreeds] = useState<string[]>([]);
+  const [showSmsOptIn, setShowSmsOptIn] = useState(false);
+  const [pendingSignupData, setPendingSignupData] = useState<any>(null);
   
   const [formData, setFormData] = useState({
     fullName: "",
@@ -226,16 +229,47 @@ export default function BuyerSignup() {
     }
 
     try {
-      // Create user account
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+      // Store signup data temporarily
+      setPendingSignupData({
         email: formData.email,
         password: formData.password,
+        fullName: formData.fullName,
+        username: formData.username,
+        species: formData.species,
+        selectedBreeds,
+        selectedGenders,
+        selectedSizes,
+        maxPrice: formData.maxPrice
+      });
+
+      // Show SMS opt-in dialog
+      setShowSmsOptIn(true);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSmsOptIn = async (optedIn: boolean) => {
+    setShowSmsOptIn(false);
+    
+    if (!pendingSignupData) return;
+
+    try {
+      // Create user account
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: pendingSignupData.email,
+        password: pendingSignupData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/buyer-dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
-            full_name: formData.fullName,
-            username: formData.username,
-            phone: ""
+            full_name: pendingSignupData.fullName,
+            username: pendingSignupData.username,
+            phone: "",
+            sms_opt_in: optedIn
           }
         }
       });
@@ -250,38 +284,22 @@ export default function BuyerSignup() {
         return;
       }
 
-      // Assign buyer role
-      const { error: roleError } = await supabase
-        .from("user_roles")
-        .insert({ user_id: authData.user.id, role: "buyer" });
-
-      if (roleError) {
-        console.error("Role assignment error:", roleError);
-      }
-
-      // Create buyer request with preferences
-      const { error: requestError } = await supabase
-        .from("buyer_requests")
-        .insert({
-          user_id: authData.user.id,
-          species: formData.species,
-          breed: selectedBreeds.join(", "),
-          gender: selectedGenders,
-          size: selectedSizes,
-          max_price: parseFloat(formData.maxPrice) || null,
-          status: "active"
-        });
-
-      if (requestError) {
-        console.error("Request creation error:", requestError);
-      }
+      // Store preferences to be added after email verification
+      sessionStorage.setItem('buyer_preferences', JSON.stringify({
+        userId: authData.user.id,
+        species: pendingSignupData.species,
+        breed: pendingSignupData.selectedBreeds.join(", "),
+        gender: pendingSignupData.selectedGenders,
+        size: pendingSignupData.selectedSizes,
+        max_price: parseFloat(pendingSignupData.maxPrice) || null
+      }));
 
       toast({
-        title: "Account Created!",
-        description: "Welcome to PawDNA! You've been assigned the buyer role."
+        title: "Verification Email Sent!",
+        description: "Please check your email to verify your account before signing in."
       });
 
-      navigate("/buyer-dashboard");
+      navigate("/login");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -294,6 +312,7 @@ export default function BuyerSignup() {
   return (
     <div className="min-h-screen">
       <Navigation />
+      <SmsOptInDialog open={showSmsOptIn} onOptIn={handleSmsOptIn} />
       <main className="container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">

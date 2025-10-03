@@ -161,9 +161,12 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
 
       if (data?.user) {
         console.log('User created successfully:', data.user.id);
-        setSignupData(data.user);
-        setShowLocationInput(true);
-        toast.success("Account created! Please add your location to continue.");
+        
+        // Store role selection for after email verification
+        sessionStorage.setItem('pending_role', selectedRole);
+        
+        toast.success("Verification email sent! Please check your email to verify your account.");
+        navigate("/login");
       }
     } catch (error: any) {
       console.error('Signup failed:', error);
@@ -177,6 +180,7 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
     if (!signupData) return;
 
     try {
+      // This is now handled in AuthCallback after email verification
       // Update profile with location
       const { error: profileError } = await supabase
         .from("profiles")
@@ -185,28 +189,7 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
 
       if (profileError) throw profileError;
 
-      // Assign role(s) based on selection
-    const rolesToInsert = selectedRole === "both"
-      ? [
-          { user_id: signupData.id, role: "breeder" as const },
-          { user_id: signupData.id, role: "buyer" as const }
-        ]
-      : [{ user_id: signupData.id, role: selectedRole as "breeder" | "buyer" | "browser" }];
-
-      // Delete the default 'buyer' role first if needed
-      await supabase
-        .from("user_roles")
-        .delete()
-        .eq("user_id", signupData.id);
-
-      // Insert the selected role(s)
-      const { error: roleError } = await supabase
-        .from("user_roles")
-        .insert(rolesToInsert);
-
-      if (roleError) throw roleError;
-
-      toast.success("Welcome to PawDNA! Your account is ready.");
+      toast.success("Profile updated successfully!");
       navigate("/browse");
     } catch (error: any) {
       console.error("Profile update error:", error);

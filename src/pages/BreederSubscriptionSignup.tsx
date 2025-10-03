@@ -47,6 +47,7 @@ const BreederSubscriptionSignup = () => {
     fullName: "",
     username: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
     petName: "",
@@ -57,6 +58,7 @@ const BreederSubscriptionSignup = () => {
     expectedDate: "",
     city: "",
     state: "",
+    zipCode: "",
     isSpecialBreed: "",
     petSize: "",
     specialBreedSize: "",
@@ -447,6 +449,18 @@ const BreederSubscriptionSignup = () => {
                   </div>
 
                   <div>
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      required
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+
+                  <div>
                     <Label htmlFor="password">Password</Label>
                     <p className="text-xs text-muted-foreground mb-2">
                       Must be 12-16+ characters with uppercase, lowercase, numbers, and symbols. Cannot match name, username, or email.
@@ -692,6 +706,15 @@ const BreederSubscriptionSignup = () => {
                       required
                       value={formData.state}
                       onChange={(e) => setFormData({...formData, state: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Zip Code</Label>
+                    <Input
+                      required
+                      value={formData.zipCode}
+                      onChange={(e) => setFormData({...formData, zipCode: e.target.value})}
+                      placeholder="Enter zip code"
                     />
                   </div>
                 </div>

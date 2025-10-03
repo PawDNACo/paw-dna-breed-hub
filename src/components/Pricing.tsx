@@ -74,6 +74,26 @@ const sellerPlans = [
 
 const buyerPlans = [
   {
+    name: "Buy Only",
+    price: "$5.99",
+    period: "/month",
+    description: "For buyers who just want puppies or kittens",
+    features: [
+      "Create requests to breeders",
+      "Direct messaging with breeders",
+      "Saved favorites",
+      "Purchase protection",
+      "Access to breeder verification status",
+      "$1,000 refundable deposit (goes towards breed cost)",
+      "Average cost: $150+",
+      "Specialty breeds: $1,500+",
+      "Up to 250 miles delivery/pickup included",
+      "Beyond 250 miles: $299.99 refundable deposit",
+      "Vaccination & care packages",
+    ],
+    role: "buy_pup_kit"
+  },
+  {
     name: "Find Breeding Partner",
     price: "$9.99",
     period: "/month",
@@ -87,20 +107,6 @@ const buyerPlans = [
       "Vaccination & care packages",
     ],
     role: "buyer"
-  },
-  {
-    name: "Buy Only",
-    price: "$5.99",
-    period: "/month",
-    description: "For buyers who just want puppies or kittens",
-    features: [
-      "Browse buyer requests",
-      "Direct messaging with breeders",
-      "Saved favorites",
-      "Purchase protection",
-      "Access to breeder verification status",
-    ],
-    role: "buy_pup_kit"
   },
 ];
 

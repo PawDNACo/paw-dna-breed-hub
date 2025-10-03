@@ -43,41 +43,60 @@ const BreedingServices = () => {
 
   const packages = [
     {
-      title: "Single Breed Breeder",
-      price: "$20/month",
+      title: "Single Gender",
+      price: "$4.99/month",
+      description: "Perfect for breeders with males or females",
       features: [
-        "List up to 15 puppies/kittens",
-        "One breed category",
-        "Professional listings",
-        "Secure payments",
-        "Direct messaging",
-        "Earn 85% on sales"
+        "List male or female pets",
+        "Sell puppies & kittens",
+        "Earn up to 85% on all sales",
+        "Vaccination add-ons",
+        "Care packages",
+        "$499.99 refundable deposit"
       ],
       popular: false
     },
     {
-      title: "Multiple Breed Breeder",
-      price: "$40/month",
+      title: "Both Genders",
+      price: "$9.99/month",
+      description: "For serious breeders managing both",
       features: [
-        "Unlimited listings",
-        "Multiple breed categories",
-        "Priority placement",
-        "Advanced analytics",
-        "Featured breeder badge",
-        "Earn 85% on sales"
+        "List males & females",
+        "Sell puppies & kittens",
+        "Earn up to 85% on all sales",
+        "All add-on packages",
+        "Priority support",
+        "$499.99 refundable deposit"
       ],
       popular: true
     },
     {
-      title: "Special Breeds",
-      price: "$65/month",
+      title: "Multi-Breed Single",
+      price: "$12.99/month",
+      description: "Multiple breeds, one gender",
       features: [
-        "List specialized breeds",
-        "Premium positioning",
-        "Custom breed categories",
-        "Dedicated support",
-        "Marketing assistance",
-        "Earn 85% on sales"
+        "List multiple breeds",
+        "Single gender listings",
+        "Sell puppies & kittens",
+        "Earn up to 85% on all sales",
+        "All add-on packages",
+        "Priority support",
+        "$499.99 refundable deposit"
+      ],
+      popular: false
+    },
+    {
+      title: "Multi-Breed Both",
+      price: "$14.99/month",
+      description: "Full access for multiple breeds",
+      features: [
+        "List multiple breeds",
+        "Both genders",
+        "Sell puppies & kittens",
+        "Earn up to 85% on all sales",
+        "All add-on packages",
+        "Premium support",
+        "$499.99 refundable deposit"
       ],
       popular: false
     }
@@ -158,12 +177,15 @@ const BreedingServices = () => {
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
               Choose Your <span className="bg-gradient-hero bg-clip-text text-transparent">Plan</span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-2">
               Flexible pricing options to match your breeding business needs
+            </p>
+            <p className="text-sm text-muted-foreground max-w-3xl mx-auto">
+              Additional animals: $4.99/mo per animal (after first 2)
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
             {packages.map((pkg, index) => (
               <Card 
                 key={index} 
@@ -177,17 +199,18 @@ const BreedingServices = () => {
                   </div>
                 )}
                 <CardHeader>
-                  <CardTitle className="text-2xl">{pkg.title}</CardTitle>
-                  <CardDescription className="text-3xl font-bold text-foreground mt-2">
-                    {pkg.price}
-                  </CardDescription>
+                  <CardTitle className="text-xl">{pkg.title}</CardTitle>
+                  <CardDescription className="text-xs">{pkg.description}</CardDescription>
+                  <div className="mt-4">
+                    <span className="text-3xl font-bold text-primary">{pkg.price}</span>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-3 mb-6">
+                  <ul className="space-y-2 mb-6">
                     {pkg.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                        <span className="text-sm">{feature}</span>
+                        <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                        <span className="text-xs">{feature}</span>
                       </li>
                     ))}
                   </ul>

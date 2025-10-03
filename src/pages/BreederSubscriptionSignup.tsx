@@ -1028,6 +1028,69 @@ const BreederSubscriptionSignup = () => {
                   </Select>
                 </div>
 
+                {/* Plan Description */}
+                {formData.subscriptionType && (
+                  <Alert className="border-primary/50 bg-primary/5">
+                    <Info className="h-4 w-4 text-primary" />
+                    <AlertDescription>
+                      {formData.subscriptionType === "single-gender" && (
+                        <div>
+                          <p className="font-semibold mb-2">Perfect for breeders with males or females</p>
+                          <ul className="space-y-1 text-sm">
+                            <li>• List male or female pets</li>
+                            <li>• Sell puppies & kittens</li>
+                            <li>• Earn up to 85% on all sales</li>
+                            <li>• Vaccination add-ons</li>
+                            <li>• Care packages</li>
+                            <li>• $499.99 refundable deposit</li>
+                          </ul>
+                        </div>
+                      )}
+                      {formData.subscriptionType === "both-genders" && (
+                        <div>
+                          <p className="font-semibold mb-2">For serious breeders managing both</p>
+                          <ul className="space-y-1 text-sm">
+                            <li>• List males & females</li>
+                            <li>• Sell puppies & kittens</li>
+                            <li>• Earn up to 85% on all sales</li>
+                            <li>• All add-on packages</li>
+                            <li>• Priority support</li>
+                            <li>• $499.99 refundable deposit</li>
+                          </ul>
+                        </div>
+                      )}
+                      {formData.subscriptionType === "multi-single" && (
+                        <div>
+                          <p className="font-semibold mb-2">Multiple breeds, one gender</p>
+                          <ul className="space-y-1 text-sm">
+                            <li>• List multiple breeds</li>
+                            <li>• Single gender listings</li>
+                            <li>• Sell puppies & kittens</li>
+                            <li>• Earn up to 85% on all sales</li>
+                            <li>• All add-on packages</li>
+                            <li>• Priority support</li>
+                            <li>• $499.99 refundable deposit</li>
+                          </ul>
+                        </div>
+                      )}
+                      {formData.subscriptionType === "multi-both" && (
+                        <div>
+                          <p className="font-semibold mb-2">Full access for multiple breeds</p>
+                          <ul className="space-y-1 text-sm">
+                            <li>• List multiple breeds</li>
+                            <li>• Both genders</li>
+                            <li>• Sell puppies & kittens</li>
+                            <li>• Earn up to 85% on all sales</li>
+                            <li>• All add-on packages</li>
+                            <li>• Premium support</li>
+                            <li>• $499.99 refundable deposit</li>
+                          </ul>
+                        </div>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 <div>
                   <Label>Number of Animals</Label>
                   <Select value={formData.animalCount} onValueChange={(v) => setFormData({...formData, animalCount: v})}>

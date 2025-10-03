@@ -11,7 +11,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Upload, AlertCircle, Info } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Upload, AlertCircle, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -73,24 +74,42 @@ const BreederSubscriptionSignup = () => {
     phone: "",
     password: "",
     confirmPassword: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    subscriptionType: "",
+    animalCount: "1"
+  });
+
+  const [animalDetails, setAnimalDetails] = useState<Array<{
+    petName: string;
+    species: string;
+    breed: string;
+    gender: string;
+    birthDate: string;
+    expectedDate: string;
+    isSpecialBreed: string;
+    petSize: string;
+    specialBreedSize: string;
+    deliveryMethod: string;
+    price: string;
+    description: string;
+  }>>([{
     petName: "",
     species: "",
     breed: "",
     gender: "",
     birthDate: "",
     expectedDate: "",
-    city: "",
-    state: "",
-    zipCode: "",
     isSpecialBreed: "",
     petSize: "",
     specialBreedSize: "",
     deliveryMethod: "",
     price: "",
-    description: "",
-    subscriptionType: "",
-    animalCount: "1"
-  });
+    description: ""
+  }]);
+
+  const [openSections, setOpenSections] = useState<number[]>([0]);
 
   useEffect(() => {
     checkUser();
@@ -101,6 +120,38 @@ const BreederSubscriptionSignup = () => {
       handleGeocodeZip();
     }
   }, [formData.zipCode]);
+
+  useEffect(() => {
+    const count = parseInt(formData.animalCount) || 1;
+    setAnimalDetails(prev => {
+      const newDetails = [...prev];
+      while (newDetails.length < count) {
+        newDetails.push({
+          petName: "",
+          species: "",
+          breed: "",
+          gender: "",
+          birthDate: "",
+          expectedDate: "",
+          isSpecialBreed: "",
+          petSize: "",
+          specialBreedSize: "",
+          deliveryMethod: "",
+          price: "",
+          description: ""
+        });
+      }
+      while (newDetails.length > count) {
+        newDetails.pop();
+      }
+      return newDetails;
+    });
+    
+    // Open all sections when animal count changes
+    if (count > 1) {
+      setOpenSections(Array.from({ length: count }, (_, i) => i));
+    }
+  }, [formData.animalCount]);
 
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -218,9 +269,26 @@ const BreederSubscriptionSignup = () => {
     }
   };
 
-  const calculateMinPrice = () => {
-    if (formData.isSpecialBreed === "yes") {
-      switch (formData.specialBreedSize) {
+  const updateAnimalDetail = (index: number, field: string, value: string) => {
+    setAnimalDetails(prev => {
+      const newDetails = [...prev];
+      newDetails[index] = { ...newDetails[index], [field]: value };
+      return newDetails;
+    });
+  };
+
+  const toggleSection = (index: number) => {
+    setOpenSections(prev => 
+      prev.includes(index) 
+        ? prev.filter(i => i !== index)
+        : [...prev, index]
+    );
+  };
+
+  const calculateMinPrice = (animalIndex: number) => {
+    const animal = animalDetails[animalIndex];
+    if (animal.isSpecialBreed === "yes") {
+      switch (animal.specialBreedSize) {
         case "small": return 1500;
         case "medium": return 2000;
         case "large": return 3000;
@@ -231,14 +299,14 @@ const BreederSubscriptionSignup = () => {
     return 50;
   };
 
-  const getAvailableBreeds = () => {
-    if (formData.species === "dog") return DOG_BREEDS;
-    if (formData.species === "cat") return CAT_BREEDS;
+  const getAvailableBreeds = (species: string) => {
+    if (species === "dog") return DOG_BREEDS;
+    if (species === "cat") return CAT_BREEDS;
     return [];
   };
 
-  const calculateEarnings = (price: number) => {
-    if (formData.isSpecialBreed === "yes") return 85;
+  const calculateEarnings = (price: number, isSpecial: string) => {
+    if (isSpecial === "yes") return 85;
     if (price >= 751) return 85;
     if (price >= 301) return 60;
     if (price >= 50) return 50;
@@ -257,15 +325,19 @@ const BreederSubscriptionSignup = () => {
     return basePrice + additionalCost;
   };
 
-  const needsListingFee = () => {
-    const price = parseFloat(formData.price) || 0;
+  const needsListingFee = (animalIndex: number) => {
+    const price = parseFloat(animalDetails[animalIndex]?.price || "0");
     return price < 50;
   };
 
   const calculateListingFee = () => {
-    if (!needsListingFee()) return 0;
-    const animalCount = parseInt(formData.animalCount) || 1;
-    return animalCount * 49.99;
+    let totalFee = 0;
+    animalDetails.forEach((_, index) => {
+      if (needsListingFee(index)) {
+        totalFee += 49.99;
+      }
+    });
+    return totalFee;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -352,77 +424,93 @@ const BreederSubscriptionSignup = () => {
       return;
     }
     
-    // Validate pet details
-    if (!formData.species) {
-      toast({
-        title: "Species Required",
-        description: "Please select a species",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Validate all animal details
+    for (let i = 0; i < animalDetails.length; i++) {
+      const animal = animalDetails[i];
+      
+      if (!animal.species) {
+        toast({
+          title: `Animal ${i + 1}: Species Required`,
+          description: "Please select a species",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    if (!formData.breed) {
-      toast({
-        title: "Breed Required",
-        description: "Please select a breed",
-        variant: "destructive"
-      });
-      return;
-    }
+      if (!animal.breed) {
+        toast({
+          title: `Animal ${i + 1}: Breed Required`,
+          description: "Please select a breed",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    if (!formData.gender) {
-      toast({
-        title: "Gender Required",
-        description: "Please select a gender",
-        variant: "destructive"
-      });
-      return;
-    }
+      if (!animal.gender) {
+        toast({
+          title: `Animal ${i + 1}: Gender Required`,
+          description: "Please select a gender",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    if (!formData.petSize) {
-      toast({
-        title: "Pet Size Required",
-        description: "Please select a pet size",
-        variant: "destructive"
-      });
-      return;
-    }
+      if (!animal.petSize) {
+        toast({
+          title: `Animal ${i + 1}: Pet Size Required`,
+          description: "Please select a pet size",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    if (!formData.birthDate && !formData.expectedDate) {
-      toast({
-        title: "Date Required",
-        description: "Please provide either a birth date or expected date",
-        variant: "destructive"
-      });
-      return;
-    }
+      if (!animal.birthDate && !animal.expectedDate) {
+        toast({
+          title: `Animal ${i + 1}: Date Required`,
+          description: "Please provide either a birth date or expected date",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    if (!formData.isSpecialBreed) {
-      toast({
-        title: "Breed Classification Required",
-        description: "Please indicate if this is a special breed",
-        variant: "destructive"
-      });
-      return;
-    }
+      if (!animal.isSpecialBreed) {
+        toast({
+          title: `Animal ${i + 1}: Breed Classification Required`,
+          description: "Please indicate if this is a special breed",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    if (formData.isSpecialBreed === "yes" && !formData.specialBreedSize) {
-      toast({
-        title: "Special Breed Size Required",
-        description: "Please select a special breed size category",
-        variant: "destructive"
-      });
-      return;
-    }
+      if (animal.isSpecialBreed === "yes" && !animal.specialBreedSize) {
+        toast({
+          title: `Animal ${i + 1}: Special Breed Size Required`,
+          description: "Please select a special breed size category",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    if (!formData.deliveryMethod) {
-      toast({
-        title: "Delivery Method Required",
-        description: "Please select a delivery method",
-        variant: "destructive"
-      });
-      return;
+      if (!animal.deliveryMethod) {
+        toast({
+          title: `Animal ${i + 1}: Delivery Method Required`,
+          description: "Please select a delivery method",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const price = parseFloat(animal.price) || 0;
+      const minPrice = calculateMinPrice(i);
+      
+      if (price < minPrice && price !== 0 && !needsListingFee(i)) {
+        toast({
+          title: `Animal ${i + 1}: Price Too Low`,
+          description: `Minimum price for this category is $${minPrice}`,
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     if (!formData.subscriptionType) {
@@ -448,18 +536,6 @@ const BreederSubscriptionSignup = () => {
       toast({
         title: "Parent Photos Required",
         description: "Please upload at least 2 photos of the parents",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const price = parseFloat(formData.price) || 0;
-    const minPrice = calculateMinPrice();
-    
-    if (price < minPrice && price !== 0 && !needsListingFee()) {
-      toast({
-        title: "Price Too Low",
-        description: `Minimum price for this category is $${minPrice}`,
         variant: "destructive"
       });
       return;
@@ -527,8 +603,7 @@ const BreederSubscriptionSignup = () => {
   };
 
   const totalPhotos = photos.length + parentPhotos.length;
-  const price = parseFloat(formData.price) || 0;
-  const earningsPercent = calculateEarnings(price);
+  const animalCount = parseInt(formData.animalCount) || 1;
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -737,119 +812,245 @@ const BreederSubscriptionSignup = () => {
               </CardContent>
             </Card>
 
-            {/* Pet Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Pet Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label>Pet Name</Label>
-                    <Input
-                      required
-                      value={formData.petName}
-                      onChange={(e) => setFormData({...formData, petName: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <Label>Species</Label>
-                    <Select value={formData.species} onValueChange={(v) => setFormData({...formData, species: v, breed: ""})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select species" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="dog">Dog</SelectItem>
-                        <SelectItem value="cat">Cat</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Breed</Label>
-                    <Select 
-                      value={formData.breed} 
-                      onValueChange={(v) => setFormData({...formData, breed: v})}
-                      disabled={!formData.species}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={formData.species ? "Select breed" : "Select species first"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getAvailableBreeds().map((breed) => (
-                          <SelectItem key={breed} value={breed}>
-                            {breed}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Gender</Label>
-                    <Select value={formData.gender} onValueChange={(v) => setFormData({...formData, gender: v})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+            {/* Pet Details - Multiple Animals */}
+            {animalDetails.map((animal, index) => (
+              <Collapsible
+                key={index}
+                open={animalCount === 1 || openSections.includes(index)}
+                onOpenChange={() => animalCount > 1 && toggleSection(index)}
+              >
+                <Card>
+                  <CardHeader>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full">
+                      <CardTitle>
+                        Pet Details {animalCount > 1 && `(Animal ${index + 1})`}
+                      </CardTitle>
+                      {animalCount > 1 && (
+                        <div>
+                          {openSections.includes(index) ? (
+                            <ChevronUp className="h-5 w-5" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5" />
+                          )}
+                        </div>
+                      )}
+                    </CollapsibleTrigger>
+                  </CardHeader>
+                  <CollapsibleContent>
+                    <CardContent className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label>Pet Name</Label>
+                          <Input
+                            required
+                            value={animal.petName}
+                            onChange={(e) => updateAnimalDetail(index, 'petName', e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <Label>Species</Label>
+                          <Select 
+                            value={animal.species} 
+                            onValueChange={(v) => {
+                              updateAnimalDetail(index, 'species', v);
+                              updateAnimalDetail(index, 'breed', '');
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select species" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="dog">Dog</SelectItem>
+                              <SelectItem value="cat">Cat</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Breed</Label>
+                          <Select 
+                            value={animal.breed} 
+                            onValueChange={(v) => updateAnimalDetail(index, 'breed', v)}
+                            disabled={!animal.species}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={animal.species ? "Select breed" : "Select species first"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getAvailableBreeds(animal.species).map((breed) => (
+                                <SelectItem key={breed} value={breed}>
+                                  {breed}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Gender</Label>
+                          <Select value={animal.gender} onValueChange={(v) => updateAnimalDetail(index, 'gender', v)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select gender" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="male">Male</SelectItem>
+                              <SelectItem value="female">Female</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
 
-                <div>
-                  <Label>Pet Size</Label>
-                  <Select value={formData.petSize} onValueChange={(v) => setFormData({...formData, petSize: v})}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select pet size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="small">Small Breed</SelectItem>
-                      <SelectItem value="medium">Medium Breed</SelectItem>
-                      <SelectItem value="large">Large Breed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                      <div>
+                        <Label>Pet Size</Label>
+                        <Select value={animal.petSize} onValueChange={(v) => updateAnimalDetail(index, 'petSize', v)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select pet size" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="small">Small Breed</SelectItem>
+                            <SelectItem value="medium">Medium Breed</SelectItem>
+                            <SelectItem value="large">Large Breed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label>Birth Date (if born)</Label>
-                    <Input
-                      type="date"
-                      value={formData.birthDate}
-                      onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <Label>Expected Date (if not born)</Label>
-                    <Input
-                      type="date"
-                      value={formData.expectedDate}
-                      onChange={(e) => setFormData({...formData, expectedDate: e.target.value})}
-                    />
-                  </div>
-                </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label>Birth Date (if born)</Label>
+                          <Input
+                            type="date"
+                            value={animal.birthDate}
+                            onChange={(e) => updateAnimalDetail(index, 'birthDate', e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <Label>Expected Date (if not born)</Label>
+                          <Input
+                            type="date"
+                            value={animal.expectedDate}
+                            onChange={(e) => updateAnimalDetail(index, 'expectedDate', e.target.value)}
+                          />
+                        </div>
+                      </div>
 
-                <div>
-                  <Label>Description</Label>
-                  <Textarea
-                    required
-                    placeholder="Describe your pet (do not include personal or sensitive information)"
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    rows={4}
-                  />
-                  <Alert className="mt-2">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      Do not add any personal or sensitive information in the details box
-                    </AlertDescription>
-                  </Alert>
-                </div>
-              </CardContent>
-            </Card>
+                      <div>
+                        <Label>Description</Label>
+                        <Textarea
+                          required
+                          placeholder="Describe your pet (do not include personal or sensitive information)"
+                          value={animal.description}
+                          onChange={(e) => updateAnimalDetail(index, 'description', e.target.value)}
+                          rows={4}
+                        />
+                        <Alert className="mt-2">
+                          <AlertCircle className="h-4 w-4" />
+                          <AlertDescription>
+                            Do not add any personal or sensitive information in the details box
+                          </AlertDescription>
+                        </Alert>
+                      </div>
 
-            {/* Location */}
+                      {/* Breed Classification */}
+                      <div className="pt-4 border-t">
+                        <h4 className="font-semibold mb-3">Breed Classification</h4>
+                        <div>
+                          <Label>Is this a special breed?</Label>
+                          <RadioGroup value={animal.isSpecialBreed} onValueChange={(v) => updateAnimalDetail(index, 'isSpecialBreed', v)}>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="yes" id={`special-yes-${index}`} />
+                              <Label htmlFor={`special-yes-${index}`}>Yes</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="no" id={`special-no-${index}`} />
+                              <Label htmlFor={`special-no-${index}`}>No</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+
+                        {animal.isSpecialBreed === "yes" && (
+                          <div className="mt-4">
+                            <Label>Special Breed Size Category</Label>
+                            <Select value={animal.specialBreedSize} onValueChange={(v) => updateAnimalDetail(index, 'specialBreedSize', v)}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select size" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="small">Small - Min $1,500</SelectItem>
+                                <SelectItem value="medium">Medium - Min $2,000</SelectItem>
+                                <SelectItem value="large">Large - Min $3,000</SelectItem>
+                                <SelectItem value="rare">Rare - Min $4,500</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Delivery Method */}
+                      <div className="pt-4 border-t">
+                        <h4 className="font-semibold mb-3">Delivery Method</h4>
+                        <RadioGroup value={animal.deliveryMethod} onValueChange={(v) => updateAnimalDetail(index, 'deliveryMethod', v)}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="delivery" id={`delivery-${index}`} />
+                            <Label htmlFor={`delivery-${index}`}>Delivery Available</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="pickup" id={`pickup-${index}`} />
+                            <Label htmlFor={`pickup-${index}`}>Pickup Only</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+
+                      {/* Pricing */}
+                      <div className="pt-4 border-t">
+                        <h4 className="font-semibold mb-3">Pricing {animalCount > 1 && `- Animal ${index + 1}`}</h4>
+                        <div>
+                          <Label>Price ($)</Label>
+                          <Input
+                            type="number"
+                            required
+                            min="0"
+                            step="0.01"
+                            value={animal.price}
+                            onChange={(e) => updateAnimalDetail(index, 'price', e.target.value)}
+                            placeholder={`Minimum: $${calculateMinPrice(index)}`}
+                          />
+                        </div>
+
+                        {animal.isSpecialBreed === "no" && (
+                          <Alert className="mt-4">
+                            <Info className="h-4 w-4" />
+                            <AlertDescription>
+                              <strong>Non-Special Breed Earnings:</strong>
+                              <ul className="mt-2 space-y-1">
+                                <li>• $50-$300: Earn 50%</li>
+                                <li>• $301-$750: Earn 60%</li>
+                                <li>• $751 and up: Earn 85%</li>
+                              </ul>
+                            </AlertDescription>
+                          </Alert>
+                        )}
+
+                        {parseFloat(animal.price) > 0 && (
+                          <div className="p-4 bg-muted rounded-lg mt-4">
+                            <p className="font-semibold">Your Earnings: {calculateEarnings(parseFloat(animal.price), animal.isSpecialBreed)}%</p>
+                            <p className="text-sm text-muted-foreground">
+                              You earn ${(parseFloat(animal.price) * calculateEarnings(parseFloat(animal.price), animal.isSpecialBreed) / 100).toFixed(2)} per sale
+                            </p>
+                          </div>
+                        )}
+
+                        {needsListingFee(index) && (
+                          <Alert variant="destructive" className="mt-4">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription>
+                              Prices under $50 require a one-time listing fee of $49.99
+                            </AlertDescription>
+                          </Alert>
+                        )}
+                      </div>
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+            ))}
             <Card>
               <CardHeader>
                 <CardTitle>Location</CardTitle>
@@ -893,117 +1094,6 @@ const BreederSubscriptionSignup = () => {
                     </Select>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Breed Classification */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Breed Classification</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label>Is this a special breed?</Label>
-                  <RadioGroup value={formData.isSpecialBreed} onValueChange={(v) => setFormData({...formData, isSpecialBreed: v})}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="yes" id="special-yes" />
-                      <Label htmlFor="special-yes">Yes</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="no" id="special-no" />
-                      <Label htmlFor="special-no">No</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-
-                {formData.isSpecialBreed === "yes" && (
-                  <div>
-                    <Label>Special Breed Size Category</Label>
-                    <Select value={formData.specialBreedSize} onValueChange={(v) => setFormData({...formData, specialBreedSize: v})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="small">Small - Min $1,500</SelectItem>
-                        <SelectItem value="medium">Medium - Min $2,000</SelectItem>
-                        <SelectItem value="large">Large - Min $3,000</SelectItem>
-                        <SelectItem value="rare">Rare - Min $4,500</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Delivery Method */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Delivery Method</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup value={formData.deliveryMethod} onValueChange={(v) => setFormData({...formData, deliveryMethod: v})}>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="delivery" id="delivery" />
-                    <Label htmlFor="delivery">Delivery Available</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="pickup" id="pickup" />
-                    <Label htmlFor="pickup">Pickup Only</Label>
-                  </div>
-                </RadioGroup>
-              </CardContent>
-            </Card>
-
-            {/* Pricing */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Pricing</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label>Price ($)</Label>
-                  <Input
-                    type="number"
-                    required
-                    min="0"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({...formData, price: e.target.value})}
-                    placeholder={`Minimum: $${calculateMinPrice()}`}
-                  />
-                </div>
-
-                {formData.isSpecialBreed === "no" && (
-                  <Alert>
-                    <Info className="h-4 w-4" />
-                    <AlertDescription>
-                      <strong>Non-Special Breed Earnings:</strong>
-                      <ul className="mt-2 space-y-1">
-                        <li>• $50-$300: Earn 50%</li>
-                        <li>• $301-$750: Earn 60%</li>
-                        <li>• $751 and up: Earn 85%</li>
-                      </ul>
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {price > 0 && (
-                  <div className="p-4 bg-muted rounded-lg">
-                    <p className="font-semibold">Your Earnings: {earningsPercent}%</p>
-                    <p className="text-sm text-muted-foreground">
-                      You earn ${(price * earningsPercent / 100).toFixed(2)} per sale
-                    </p>
-                  </div>
-                )}
-
-                {needsListingFee() && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      Prices under $50 require a one-time listing fee of $49.99 per animal
-                    </AlertDescription>
-                  </Alert>
-                )}
               </CardContent>
             </Card>
 
@@ -1117,7 +1207,7 @@ const BreederSubscriptionSignup = () => {
                     <span>Subscription:</span>
                     <span className="font-semibold">${calculateSubscriptionCost().toFixed(2)}/mo</span>
                   </div>
-                  {needsListingFee() && (
+                  {calculateListingFee() > 0 && (
                     <div className="flex justify-between text-destructive">
                       <span>Listing Fee:</span>
                       <span className="font-semibold">${calculateListingFee().toFixed(2)} (one-time)</span>

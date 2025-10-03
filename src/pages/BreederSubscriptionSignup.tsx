@@ -39,6 +39,8 @@ const BreederSubscriptionSignup = () => {
   const [loading, setLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
   const [parentPhotos, setParentPhotos] = useState<File[]>([]);
   const [formData, setFormData] = useState({
@@ -73,6 +75,90 @@ const BreederSubscriptionSignup = () => {
     const { data: { user } } = await supabase.auth.getUser();
     setCurrentUser(user);
     setLoading(false);
+  };
+
+  const generateRandomPassword = () => {
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+    const allChars = uppercase + lowercase + numbers + symbols;
+    
+    const length = Math.floor(Math.random() * 5) + 12; // 12-16 characters
+    let password = "";
+    
+    // Ensure at least one of each type
+    password += uppercase[Math.floor(Math.random() * uppercase.length)];
+    password += lowercase[Math.floor(Math.random() * lowercase.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    password += symbols[Math.floor(Math.random() * symbols.length)];
+    
+    // Fill the rest randomly
+    for (let i = password.length; i < length; i++) {
+      password += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+    
+    // Shuffle the password
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+    
+    setGeneratedPassword(password);
+    setFormData({...formData, password: password, confirmPassword: password});
+    toast({
+      title: "Password Generated",
+      description: "A secure password has been generated for you"
+    });
+  };
+
+  const copyPasswordToClipboard = () => {
+    if (generatedPassword) {
+      navigator.clipboard.writeText(generatedPassword);
+      toast({
+        title: "Password Copied",
+        description: "The password has been copied to your clipboard"
+      });
+    }
+  };
+
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 12) {
+      return "Password must be at least 12 characters long";
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+      return "Password must contain at least one uppercase letter";
+    }
+    
+    if (!/[a-z]/.test(password)) {
+      return "Password must contain at least one lowercase letter";
+    }
+    
+    if (!/[0-9]/.test(password)) {
+      return "Password must contain at least one number";
+    }
+    
+    if (!/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) {
+      return "Password must contain at least one symbol";
+    }
+    
+    // Check if password contains name, username, or email
+    const lowerPassword = password.toLowerCase();
+    const lowerName = formData.fullName.toLowerCase();
+    const lowerUsername = formData.username.toLowerCase();
+    const lowerEmail = formData.email.toLowerCase().split('@')[0];
+    
+    if (lowerName && lowerPassword.includes(lowerName)) {
+      return "Password cannot contain your name";
+    }
+    
+    if (lowerUsername && lowerPassword.includes(lowerUsername)) {
+      return "Password cannot contain your username";
+    }
+    
+    if (lowerEmail && lowerPassword.includes(lowerEmail)) {
+      return "Password cannot contain your email";
+    }
+    
+    return null;
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, isParent: boolean) => {
@@ -166,10 +252,21 @@ const BreederSubscriptionSignup = () => {
         return;
       }
 
-      if (!formData.password || formData.password.length < 8) {
+      if (!profilePhoto) {
         toast({
-          title: "Password Required",
-          description: "Password must be at least 8 characters",
+          title: "Profile Photo Required",
+          description: "Please upload a profile photo",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Validate password
+      const passwordError = validatePassword(formData.password);
+      if (passwordError) {
+        toast({
+          title: "Invalid Password",
+          description: passwordError,
           variant: "destructive"
         });
         return;
@@ -296,6 +393,26 @@ const BreederSubscriptionSignup = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
+                    <Label htmlFor="profilePhoto">Profile Photo *</Label>
+                    <Input
+                      id="profilePhoto"
+                      type="file"
+                      accept="image/*"
+                      required
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setProfilePhoto(file);
+                      }}
+                      className="cursor-pointer"
+                    />
+                    {profilePhoto && (
+                      <Badge variant="default" className="mt-2">
+                        Photo selected: {profilePhoto.name}
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div>
                     <Label htmlFor="fullName">Full Name</Label>
                     <Input
                       id="fullName"
@@ -331,21 +448,44 @@ const BreederSubscriptionSignup = () => {
 
                   <div>
                     <Label htmlFor="password">Password</Label>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Must be 12-16+ characters with uppercase, lowercase, numbers, and symbols. Cannot match name, username, or email.
+                    </p>
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       required
                       value={formData.password}
                       onChange={(e) => setFormData({...formData, password: e.target.value})}
-                      placeholder="Create a password (min 8 characters)"
+                      placeholder="Create a secure password"
                     />
-                    <div className="flex items-center space-x-2 mt-2">
+                    <div className="flex items-center gap-2 mt-2">
                       <Checkbox
                         id="show-password"
                         checked={showPassword}
                         onCheckedChange={(checked) => setShowPassword(checked === true)}
                       />
                       <Label htmlFor="show-password" className="text-sm font-normal">Show password</Label>
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={generateRandomPassword}
+                      >
+                        Generate Random Password
+                      </Button>
+                      {generatedPassword && (
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm"
+                          onClick={copyPasswordToClipboard}
+                        >
+                          Copy Password
+                        </Button>
+                      )}
                     </div>
                   </div>
 
@@ -367,6 +507,14 @@ const BreederSubscriptionSignup = () => {
                       />
                       <Label htmlFor="show-confirm-password" className="text-sm font-normal">Show password</Label>
                     </div>
+                    {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                      <Alert variant="destructive" className="mt-2">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>
+                          Passwords do not match
+                        </AlertDescription>
+                      </Alert>
+                    )}
                   </div>
                 </CardContent>
               </Card>

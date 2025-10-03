@@ -29,9 +29,9 @@ export default function FAQ() {
               <AccordionItem value="item-1">
                 <AccordionTrigger>What is PawDNA?</AccordionTrigger>
                 <AccordionContent>
-                  PawDNA is a premier pet breeding marketplace that connects responsible breeders with 
-                  loving pet owners. We provide a secure, transparent platform for buying puppies and 
-                  kittens, as well as accessing breeding services.
+                  PawDNA is like Tinder or Bumble, but for pets! We're a premier pet breeding marketplace that 
+                  connects verified breeders with loving pet owners. We provide a secure, transparent platform for 
+                  finding your perfect puppy or kitten, as well as accessing quality breeding services.
                 </AccordionContent>
               </AccordionItem>
 

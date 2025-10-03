@@ -24,7 +24,7 @@ export const Footer = () => {
               </span>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs">
-              The premier pet breeding marketplace connecting responsible breeders with loving pet owners.
+              Like Tinder or Bumble, but for pets! The premier marketplace connecting verified breeders with loving pet owners.
             </p>
           </div>
 

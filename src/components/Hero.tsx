@@ -26,9 +26,10 @@ export const Hero = () => {
               Marketplace
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground mb-8 leading-relaxed">
-              Connect with verified breeders, hire quality breeding partners, and find your perfect 
-              puppy or kitten. PawDNA is the trusted platform where responsible breeding meets 
-              exceptional pet ownership. <strong className="text-primary">Sign up free - no payment required upfront.</strong>
+              Like Tinder or Bumble, but for pets! Swipe, match, and connect with verified breeders 
+              and quality breeding partners to find your perfect puppy or kitten. PawDNA is the trusted 
+              platform where responsible breeding meets exceptional pet ownership. 
+              <strong className="text-primary">Sign up free - no payment required upfront.</strong>
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <Button variant="hero" size="xl" onClick={() => window.location.href = "/breeder-subscription"}>

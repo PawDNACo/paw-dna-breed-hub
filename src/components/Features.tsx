@@ -43,7 +43,7 @@ export const Features = () => {
             Why Choose <span className="bg-gradient-hero bg-clip-text text-transparent">PawDNA</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            The most trusted platform for responsible pet breeding and adoption
+            Like Tinder or Bumble for pets - the most trusted platform for responsible breeding and matchmaking
           </p>
         </div>
 

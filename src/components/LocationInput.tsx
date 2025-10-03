@@ -1,8 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+
+const US_STATES = [
+  { code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" }, { code: "AZ", name: "Arizona" },
+  { code: "AR", name: "Arkansas" }, { code: "CA", name: "California" }, { code: "CO", name: "Colorado" },
+  { code: "CT", name: "Connecticut" }, { code: "DE", name: "Delaware" }, { code: "FL", name: "Florida" },
+  { code: "GA", name: "Georgia" }, { code: "HI", name: "Hawaii" }, { code: "ID", name: "Idaho" },
+  { code: "IL", name: "Illinois" }, { code: "IN", name: "Indiana" }, { code: "IA", name: "Iowa" },
+  { code: "KS", name: "Kansas" }, { code: "KY", name: "Kentucky" }, { code: "LA", name: "Louisiana" },
+  { code: "ME", name: "Maine" }, { code: "MD", name: "Maryland" }, { code: "MA", name: "Massachusetts" },
+  { code: "MI", name: "Michigan" }, { code: "MN", name: "Minnesota" }, { code: "MS", name: "Mississippi" },
+  { code: "MO", name: "Missouri" }, { code: "MT", name: "Montana" }, { code: "NE", name: "Nebraska" },
+  { code: "NV", name: "Nevada" }, { code: "NH", name: "New Hampshire" }, { code: "NJ", name: "New Jersey" },
+  { code: "NM", name: "New Mexico" }, { code: "NY", name: "New York" }, { code: "NC", name: "North Carolina" },
+  { code: "ND", name: "North Dakota" }, { code: "OH", name: "Ohio" }, { code: "OK", name: "Oklahoma" },
+  { code: "OR", name: "Oregon" }, { code: "PA", name: "Pennsylvania" }, { code: "RI", name: "Rhode Island" },
+  { code: "SC", name: "South Carolina" }, { code: "SD", name: "South Dakota" }, { code: "TN", name: "Tennessee" },
+  { code: "TX", name: "Texas" }, { code: "UT", name: "Utah" }, { code: "VT", name: "Vermont" },
+  { code: "VA", name: "Virginia" }, { code: "WA", name: "Washington" }, { code: "WV", name: "West Virginia" },
+  { code: "WI", name: "Wisconsin" }, { code: "WY", name: "Wyoming" }
+];
 
 interface LocationInputProps {
   onLocationUpdate: (location: {
@@ -24,24 +45,25 @@ export const LocationInput = ({ onLocationUpdate }: LocationInputProps) => {
     county: "",
   });
 
+  // Auto-generate state from ZIP code as user types
+  useEffect(() => {
+    if (location.zip_code.length === 5) {
+      handleGeocodeZip();
+    }
+  }, [location.zip_code]);
+
   const handleGeocodeZip = async () => {
     if (!location.zip_code || location.zip_code.length !== 5) {
-      toast({
-        title: "Invalid ZIP Code",
-        description: "Please enter a valid 5-digit ZIP code",
-        variant: "destructive",
-      });
       return;
     }
 
     try {
-      // Using a free geocoding API (you can replace with your preferred service)
       const response = await fetch(
         `https://api.zippopotam.us/us/${location.zip_code}`
       );
 
       if (!response.ok) {
-        throw new Error("ZIP code not found");
+        return;
       }
 
       const data = await response.json();
@@ -64,11 +86,7 @@ export const LocationInput = ({ onLocationUpdate }: LocationInputProps) => {
         description: `${updatedLocation.city}, ${updatedLocation.state}`,
       });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Could not find location for this ZIP code",
-        variant: "destructive",
-      });
+      // Silently fail - user can manually select state
     }
   };
 
@@ -93,20 +111,15 @@ export const LocationInput = ({ onLocationUpdate }: LocationInputProps) => {
     <div className="space-y-4">
       <div>
         <Label htmlFor="zip_code">ZIP Code</Label>
-        <div className="flex gap-2">
-          <Input
-            id="zip_code"
-            placeholder="12345"
-            maxLength={5}
-            value={location.zip_code}
-            onChange={(e) =>
-              setLocation({ ...location, zip_code: e.target.value })
-            }
-          />
-          <Button type="button" onClick={handleGeocodeZip}>
-            Lookup
-          </Button>
-        </div>
+        <Input
+          id="zip_code"
+          placeholder="12345"
+          maxLength={5}
+          value={location.zip_code}
+          onChange={(e) =>
+            setLocation({ ...location, zip_code: e.target.value })
+          }
+        />
       </div>
       <div>
         <Label htmlFor="city">City</Label>
@@ -120,15 +133,21 @@ export const LocationInput = ({ onLocationUpdate }: LocationInputProps) => {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="state">State</Label>
-          <Input
-            id="state"
-            placeholder="CA"
-            maxLength={2}
+          <Select
             value={location.state}
-            onChange={(e) =>
-              setLocation({ ...location, state: e.target.value.toUpperCase() })
-            }
-          />
+            onValueChange={(value) => setLocation({ ...location, state: value })}
+          >
+            <SelectTrigger id="state">
+              <SelectValue placeholder="Select state" />
+            </SelectTrigger>
+            <SelectContent>
+              {US_STATES.map((state) => (
+                <SelectItem key={state.code} value={state.code}>
+                  {state.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label htmlFor="county">County (optional)</Label>
@@ -142,7 +161,7 @@ export const LocationInput = ({ onLocationUpdate }: LocationInputProps) => {
           />
         </div>
       </div>
-      <Button type="button" onClick={handleManualSubmit} variant="outline" className="w-full">
+      <Button type="button" onClick={handleManualSubmit} className="w-full">
         Save Location
       </Button>
     </div>

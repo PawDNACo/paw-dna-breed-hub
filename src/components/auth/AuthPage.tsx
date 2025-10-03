@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { PawPrint } from "lucide-react";
+import { PawPrint, RefreshCw } from "lucide-react";
 import { LocationInput } from "@/components/LocationInput";
 import { SecurityDisclaimer } from "./SecurityDisclaimer";
 import { TrustBadgesCompact } from "@/components/TrustBadges";
@@ -45,6 +45,29 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
     if (user) {
       navigate("/");
     }
+  };
+
+  const generatePassword = () => {
+    const length = 16;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let password = "";
+    
+    // Ensure at least one of each type
+    password += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)];
+    password += "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)];
+    password += "0123456789"[Math.floor(Math.random() * 10)];
+    password += "!@#$%^&*"[Math.floor(Math.random() * 8)];
+    
+    // Fill the rest
+    for (let i = password.length; i < length; i++) {
+      password += charset[Math.floor(Math.random() * charset.length)];
+    }
+    
+    // Shuffle the password
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+    
+    setPassword(password);
+    toast.success("Strong password generated!");
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -417,16 +440,28 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="signup-password">Password</Label>
-                        <Input
-                          id="signup-password"
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          required
-                          minLength={8}
-                        />
+                        <div className="relative">
+                          <Input
+                            id="signup-password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            minLength={8}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-1 top-1 h-8"
+                            onClick={generatePassword}
+                            title="Generate strong password"
+                          >
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                        </div>
                         <p className="text-xs text-muted-foreground">
-                          Must be at least 8 characters with uppercase, lowercase, and number.
+                          Must be at least 8 characters with uppercase, lowercase, and number. Click the refresh icon to generate a strong password.
                         </p>
                       </div>
 

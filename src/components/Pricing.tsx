@@ -75,7 +75,7 @@ const sellerPlans = [
 const buyerPlan = {
   name: "Breeding Services",
   price: "$9.99",
-  period: "/month per gender",
+  period: "/month",
   description: "Access premium breeding partners",
   features: [
     "$1,000 refundable deposit (goes towards breed cost)",
@@ -156,7 +156,7 @@ export const Pricing = () => {
 
   const handleSubscribeClick = (planType: string) => {
     if (planType === "buyer") {
-      navigate('/buyer-signup');
+      navigate('/buyer-subscription');
     } else {
       navigate(`/breeder-subscription?plan=${planType}`);
     }

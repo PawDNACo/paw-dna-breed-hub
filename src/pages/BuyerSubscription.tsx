@@ -23,7 +23,7 @@ const CAT_BREEDS = [
   "Bengal", "Birman", "American Shorthair", "Scottish Fold", "Sphynx"
 ];
 
-export default function BuyerSignup() {
+export default function BuyerSubscription() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +45,8 @@ export default function BuyerSignup() {
     password: "",
     confirmPassword: "",
     species: "",
-    maxPrice: ""
+    maxPrice: "",
+    subscriptionPlan: ""
   });
 
   useEffect(() => {
@@ -207,6 +208,12 @@ export default function BuyerSignup() {
       return;
     }
 
+    // Validate subscription plan
+    if (!formData.subscriptionPlan) {
+      toast({ title: "Subscription Plan Required", variant: "destructive" });
+      return;
+    }
+
     // Validate pet details
     if (!formData.species) {
       toast({ title: "Species Required", variant: "destructive" });
@@ -317,10 +324,10 @@ export default function BuyerSignup() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-4">
-              Buyer <span className="bg-gradient-hero bg-clip-text text-transparent">Signup</span>
+              Buyer <span className="bg-gradient-hero bg-clip-text text-transparent">Subscription</span>
             </h1>
             <p className="text-muted-foreground">
-              Create your account and find your perfect pet
+              Subscribe to access premium breeding partners
             </p>
           </div>
 
@@ -442,10 +449,57 @@ export default function BuyerSignup() {
             {/* Pet Details Section */}
             <Card>
               <CardHeader>
-                <CardTitle>Pet Details</CardTitle>
-                <CardDescription>Tell us what you're looking for</CardDescription>
+                <CardTitle>Subscription & Pet Details</CardTitle>
+                <CardDescription>Select your plan and tell us what you're looking for</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="subscriptionPlan">Subscription Plan *</Label>
+                  <Select
+                    value={formData.subscriptionPlan}
+                    onValueChange={(value) => setFormData({...formData, subscriptionPlan: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select plan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="breeding-services">Breeding Services - $9.99/month</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {formData.subscriptionPlan === "breeding-services" && (
+                  <div className="bg-muted p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2">Access premium breeding partners</h4>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>$1,000 refundable deposit (goes towards breed cost)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>Average cost: $150+</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>Specialty breeds: $1,500+</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>Up to 250 miles delivery/pickup included</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>Beyond 250 miles: $299.99 refundable deposit</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>Vaccination & care packages</span>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+
                 <div>
                   <Label htmlFor="species">Species *</Label>
                   <Select

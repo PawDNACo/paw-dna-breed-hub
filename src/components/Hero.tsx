@@ -21,15 +21,18 @@ export const Hero = () => {
         <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0">
           <div className="animate-fade-in">
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold mb-6 leading-tight">
-              The Premier
-              <span className="bg-gradient-hero bg-clip-text text-transparent"> Pet Breeding </span>
-              Marketplace
+              PawDNA —
+              <span className="bg-gradient-hero bg-clip-text text-transparent"> Where Pets Swipe Right</span>
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground mb-8 leading-relaxed">
-              Like Tinder or Bumble, but for pets! Swipe, match, and connect with verified breeders 
-              and quality breeding partners to find your perfect puppy or kitten. PawDNA is the trusted 
-              platform where responsible breeding meets exceptional pet ownership. 
-              <strong className="text-primary">Sign up free - no payment required upfront.</strong>
+              Welcome to the future of pet matchmaking.
+              Just like Tinder, Bumble, or Plenty of Fish, but for your furry companions.
+              Breeders can create profiles for their dogs or cats, browse potential mates, and connect with other verified breeders.
+              Buyers can explore litters of puppies and kittens, complete with photos, breed info, and care packages—ready to be loved.
+              Whether you're breeding responsibly or looking to adopt your next best friend, PawDNA makes it easy, safe, and fun.
+              Add-ons like vaccinations, cleaning, and accessories ensure every match is clean, healthy, and happy.
+              Because love isn't just for humans—it's in their genes. 🐾
+              {" "}<strong className="text-primary">Sign Up Is FREE - No payment required upfront.</strong>
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <Button variant="hero" size="xl" onClick={() => window.location.href = "/breeder-subscription"}>

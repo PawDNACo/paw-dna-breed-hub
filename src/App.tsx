@@ -15,6 +15,7 @@ import Browse from "./pages/Browse";
 import PetDetail from "./pages/PetDetail";
 import BreederDashboard from "./pages/BreederDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
+import Dashboard from "./pages/Dashboard";
 import CarePackageManager from "./pages/CarePackageManager";
 import AccessoriesManager from "./pages/AccessoriesManager";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -76,6 +77,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <PetDetail />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
               </ProtectedRoute>
             } 
           />

@@ -73,7 +73,7 @@ export const Navigation = () => {
               Browse
             </Button>
             {hasAnyRole(["breeder", "buyer"]) && (
-              <Button variant="ghost" size="sm" onClick={() => navigate(isBreeder ? "/breeder-dashboard" : "/buyer-dashboard")}>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
                 Dashboard
               </Button>
             )}
@@ -127,7 +127,7 @@ export const Navigation = () => {
                   Browse
                 </Button>
                 {hasAnyRole(["breeder", "buyer"]) && (
-                  <Button variant="ghost" className="justify-start" onClick={() => handleNavigation(isBreeder ? "/breeder-dashboard" : "/buyer-dashboard")}>
+                  <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/dashboard")}>
                     Dashboard
                   </Button>
                 )}

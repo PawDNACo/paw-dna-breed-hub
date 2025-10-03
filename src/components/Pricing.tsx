@@ -76,10 +76,8 @@ const buyerPlan = {
   description: "Access premium breeding partners",
   features: [
     "$1,000 refundable deposit (goes towards breed cost)",
-    "Small breeds from $1,500",
-    "Medium breeds from $2,000",
-    "Large breeds from $3,000",
-    "Rare breeds from $4,500",
+    "Average cost: $150+",
+    "Specialty breeds: $1,500+",
     "Up to 250 miles delivery/pickup included",
     "Beyond 250 miles: $299.99 refundable deposit",
     "Vaccination & care packages",

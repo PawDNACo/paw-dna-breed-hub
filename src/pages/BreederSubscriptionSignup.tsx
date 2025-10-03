@@ -254,6 +254,15 @@ const BreederSubscriptionSignup = () => {
         return;
       }
 
+      if (!formData.phone.trim()) {
+        toast({
+          title: "Phone Number Required",
+          description: "Please enter your phone number",
+          variant: "destructive"
+        });
+        return;
+      }
+
       if (!profilePhoto) {
         toast({
           title: "Profile Photo Required",
@@ -324,6 +333,88 @@ const BreederSubscriptionSignup = () => {
       }
 
       setCurrentUser(authData.user);
+    }
+    
+    // Validate pet details
+    if (!formData.species) {
+      toast({
+        title: "Species Required",
+        description: "Please select a species",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.breed) {
+      toast({
+        title: "Breed Required",
+        description: "Please select a breed",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.gender) {
+      toast({
+        title: "Gender Required",
+        description: "Please select a gender",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.petSize) {
+      toast({
+        title: "Pet Size Required",
+        description: "Please select a pet size",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.birthDate && !formData.expectedDate) {
+      toast({
+        title: "Date Required",
+        description: "Please provide either a birth date or expected date",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.isSpecialBreed) {
+      toast({
+        title: "Breed Classification Required",
+        description: "Please indicate if this is a special breed",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (formData.isSpecialBreed === "yes" && !formData.specialBreedSize) {
+      toast({
+        title: "Special Breed Size Required",
+        description: "Please select a special breed size category",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.deliveryMethod) {
+      toast({
+        title: "Delivery Method Required",
+        description: "Please select a delivery method",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.subscriptionType) {
+      toast({
+        title: "Subscription Plan Required",
+        description: "Please select a subscription plan",
+        variant: "destructive"
+      });
+      return;
     }
     
     // Validation

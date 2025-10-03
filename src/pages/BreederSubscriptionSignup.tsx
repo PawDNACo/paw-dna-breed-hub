@@ -33,6 +33,26 @@ const CAT_BREEDS = [
   "Oriental", "Siberian", "Burmese", "Tonkinese", "Cornish Rex"
 ];
 
+const US_STATES = [
+  { code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" }, { code: "AZ", name: "Arizona" },
+  { code: "AR", name: "Arkansas" }, { code: "CA", name: "California" }, { code: "CO", name: "Colorado" },
+  { code: "CT", name: "Connecticut" }, { code: "DE", name: "Delaware" }, { code: "FL", name: "Florida" },
+  { code: "GA", name: "Georgia" }, { code: "HI", name: "Hawaii" }, { code: "ID", name: "Idaho" },
+  { code: "IL", name: "Illinois" }, { code: "IN", name: "Indiana" }, { code: "IA", name: "Iowa" },
+  { code: "KS", name: "Kansas" }, { code: "KY", name: "Kentucky" }, { code: "LA", name: "Louisiana" },
+  { code: "ME", name: "Maine" }, { code: "MD", name: "Maryland" }, { code: "MA", name: "Massachusetts" },
+  { code: "MI", name: "Michigan" }, { code: "MN", name: "Minnesota" }, { code: "MS", name: "Mississippi" },
+  { code: "MO", name: "Missouri" }, { code: "MT", name: "Montana" }, { code: "NE", name: "Nebraska" },
+  { code: "NV", name: "Nevada" }, { code: "NH", name: "New Hampshire" }, { code: "NJ", name: "New Jersey" },
+  { code: "NM", name: "New Mexico" }, { code: "NY", name: "New York" }, { code: "NC", name: "North Carolina" },
+  { code: "ND", name: "North Dakota" }, { code: "OH", name: "Ohio" }, { code: "OK", name: "Oklahoma" },
+  { code: "OR", name: "Oregon" }, { code: "PA", name: "Pennsylvania" }, { code: "RI", name: "Rhode Island" },
+  { code: "SC", name: "South Carolina" }, { code: "SD", name: "South Dakota" }, { code: "TN", name: "Tennessee" },
+  { code: "TX", name: "Texas" }, { code: "UT", name: "Utah" }, { code: "VT", name: "Vermont" },
+  { code: "VA", name: "Virginia" }, { code: "WA", name: "Washington" }, { code: "WV", name: "West Virginia" },
+  { code: "WI", name: "Wisconsin" }, { code: "WY", name: "Wyoming" }
+];
+
 const BreederSubscriptionSignup = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -76,10 +96,33 @@ const BreederSubscriptionSignup = () => {
     checkUser();
   }, []);
 
+  useEffect(() => {
+    if (formData.zipCode.length === 5) {
+      handleGeocodeZip();
+    }
+  }, [formData.zipCode]);
+
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setCurrentUser(user);
     setLoading(false);
+  };
+
+  const handleGeocodeZip = async () => {
+    try {
+      const response = await fetch(`https://api.zippopotam.us/us/${formData.zipCode}`);
+      if (response.ok) {
+        const data = await response.json();
+        const place = data.places[0];
+        setFormData({
+          ...formData,
+          city: place["place name"],
+          state: place["state abbreviation"]
+        });
+      }
+    } catch (error) {
+      console.error("Error geocoding ZIP code:", error);
+    }
   };
 
   const generateRandomPassword = () => {
@@ -812,7 +855,17 @@ const BreederSubscriptionSignup = () => {
                 <CardTitle>Location</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>Zip Code</Label>
+                    <Input
+                      required
+                      value={formData.zipCode}
+                      onChange={(e) => setFormData({...formData, zipCode: e.target.value})}
+                      placeholder="Enter zip code"
+                      maxLength={5}
+                    />
+                  </div>
                   <div>
                     <Label>City</Label>
                     <Input
@@ -823,20 +876,21 @@ const BreederSubscriptionSignup = () => {
                   </div>
                   <div>
                     <Label>State</Label>
-                    <Input
-                      required
-                      value={formData.state}
-                      onChange={(e) => setFormData({...formData, state: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <Label>Zip Code</Label>
-                    <Input
-                      required
-                      value={formData.zipCode}
-                      onChange={(e) => setFormData({...formData, zipCode: e.target.value})}
-                      placeholder="Enter zip code"
-                    />
+                    <Select 
+                      value={formData.state} 
+                      onValueChange={(v) => setFormData({...formData, state: v})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {US_STATES.map((state) => (
+                          <SelectItem key={state.code} value={state.code}>
+                            {state.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </CardContent>

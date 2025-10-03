@@ -1,11 +1,18 @@
 import { Button } from "@/components/ui/button";
-import { Menu, PawPrint, LogOut } from "lucide-react";
+import { Menu, PawPrint, LogOut, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
 import { useUserRole } from "@/hooks/useUserRole";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export const Navigation = () => {
   const navigate = useNavigate();
@@ -29,8 +36,14 @@ export const Navigation = () => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    setMobileMenuOpen(false);
     toast.success("Signed out successfully");
     navigate("/");
+  };
+
+  const handleNavigation = (path: string) => {
+    setMobileMenuOpen(false);
+    navigate(path);
   };
 
   return (
@@ -102,76 +115,87 @@ export const Navigation = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
-            <div className="flex flex-col gap-4 text-center">
-              <a href="/#features" className="text-sm font-medium hover:text-primary transition-colors">
-                Services
-              </a>
-              <a href="/#pricing" className="text-sm font-medium hover:text-primary transition-colors">
-                Pricing
-              </a>
-              <a href="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
-                How It Works
-              </a>
-              <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/browse")}>
-                Browse Pets
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-6 w-6" />
               </Button>
-              {user && (
-                <>
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/breeder-dashboard")}>
-                    Breeder Dashboard
-                  </Button>
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/breeder-payouts")}>
-                    Breeder Payouts
-                  </Button>
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/buyer-dashboard")}>
-                    Buyer Dashboard
-                  </Button>
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/care-packages")}>
-                    Care Packages
-                  </Button>
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/accessories")}>
-                    Accessories
-                  </Button>
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/security-settings")}>
-                    Security Settings
-                  </Button>
-                  {isAdmin && (
-                    <>
-                      <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/admin")}>
-                        Admin
-                      </Button>
-                      <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/developer")}>
-                        Developer
-                      </Button>
-                    </>
-                  )}
-                </>
-              )}
-              {user ? (
-                <Button variant="ghost" size="sm" className="w-full" onClick={handleSignOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetHeader>
+                <SheetTitle className="flex items-center gap-2">
+                  <PawPrint className="h-6 w-6 text-primary" />
+                  <span className="bg-gradient-hero bg-clip-text text-transparent">
+                    PawDNA
+                  </span>
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col gap-4 mt-8">
+                <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/#features")}>
+                  Services
                 </Button>
-              ) : (
-                <>
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => navigate("/login")}>Sign In</Button>
-                  <Button variant="hero" size="sm" className="w-full" onClick={() => navigate("/sign-up")}>Get Started</Button>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+                <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/#pricing")}>
+                  Pricing
+                </Button>
+                <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/#how-it-works")}>
+                  How It Works
+                </Button>
+                <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/browse")}>
+                  Browse Pets
+                </Button>
+                {user && (
+                  <>
+                    <div className="my-2 border-t border-border" />
+                    <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/breeder-dashboard")}>
+                      Breeder Dashboard
+                    </Button>
+                    <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/breeder-payouts")}>
+                      Breeder Payouts
+                    </Button>
+                    <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/buyer-dashboard")}>
+                      Buyer Dashboard
+                    </Button>
+                    <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/care-packages")}>
+                      Care Packages
+                    </Button>
+                    <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/accessories")}>
+                      Accessories
+                    </Button>
+                    <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/security-settings")}>
+                      Security Settings
+                    </Button>
+                    {isAdmin && (
+                      <>
+                        <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/admin")}>
+                          Admin
+                        </Button>
+                        <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/developer")}>
+                          Developer
+                        </Button>
+                      </>
+                    )}
+                    <div className="my-2 border-t border-border" />
+                  </>
+                )}
+                {user ? (
+                  <Button variant="ghost" className="justify-start" onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="ghost" className="justify-start" onClick={() => handleNavigation("/login")}>
+                      Sign In
+                    </Button>
+                    <Button variant="hero" onClick={() => handleNavigation("/sign-up")}>
+                      Get Started
+                    </Button>
+                  </>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </nav>
   );

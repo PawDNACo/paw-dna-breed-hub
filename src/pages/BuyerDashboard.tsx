@@ -12,6 +12,7 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const DOG_BREEDS = [
   "Labrador Retriever", "German Shepherd", "Golden Retriever", "French Bulldog", 
@@ -67,6 +68,7 @@ export default function BuyerDashboard() {
   const [formData, setFormData] = useState({
     species: "",
     breed: "",
+    breeds: [] as string[], // For multi-select when "both" is selected
     description: "",
     max_price: "",
   });
@@ -209,6 +211,7 @@ export default function BuyerDashboard() {
       setFormData({
         species: "",
         breed: "",
+        breeds: [],
         description: "",
         max_price: "",
       });
@@ -227,6 +230,7 @@ export default function BuyerDashboard() {
     setFormData({
       species: request.species,
       breed: request.breed,
+      breeds: [],
       description: request.description || "",
       max_price: request.max_price.toString(),
     });
@@ -355,6 +359,7 @@ export default function BuyerDashboard() {
                       <SelectContent>
                         <SelectItem value="dog">Dog</SelectItem>
                         <SelectItem value="cat">Cat</SelectItem>
+                        <SelectItem value="both">Both</SelectItem>
                         <SelectItem value="bird">Bird</SelectItem>
                         <SelectItem value="reptile">Reptile</SelectItem>
                         <SelectItem value="other">Other</SelectItem>
@@ -362,30 +367,93 @@ export default function BuyerDashboard() {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="breed">Breed</Label>
-                    <Select
-                      value={formData.breed}
-                      onValueChange={(value) => setFormData({ ...formData, breed: value })}
-                      disabled={!formData.species || !["dog", "cat"].includes(formData.species)}
-                    >
-                      <SelectTrigger className="bg-background">
-                        <SelectValue placeholder={
-                          !formData.species 
-                            ? "Select a species first" 
-                            : !["dog", "cat"].includes(formData.species)
-                            ? "Breed list available for dogs and cats only"
-                            : "Select breed"
-                        } />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover z-50 max-h-[300px]">
-                        {formData.species === "dog" && DOG_BREEDS.map((breed) => (
-                          <SelectItem key={breed} value={breed}>{breed}</SelectItem>
-                        ))}
-                        {formData.species === "cat" && CAT_BREEDS.map((breed) => (
-                          <SelectItem key={breed} value={breed}>{breed}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="breed">Breed{formData.species === "both" ? "s" : ""}</Label>
+                    {formData.species === "both" ? (
+                      <div className="border rounded-md p-4 max-h-[300px] overflow-y-auto bg-background">
+                        <div className="space-y-3">
+                          <div className="font-medium text-sm text-muted-foreground mb-2">Dogs</div>
+                          {DOG_BREEDS.map((breed) => (
+                            <div key={breed} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`dog-${breed}`}
+                                checked={formData.breeds.includes(breed)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setFormData({
+                                      ...formData,
+                                      breeds: [...formData.breeds, breed]
+                                    });
+                                  } else {
+                                    setFormData({
+                                      ...formData,
+                                      breeds: formData.breeds.filter(b => b !== breed)
+                                    });
+                                  }
+                                }}
+                              />
+                              <label
+                                htmlFor={`dog-${breed}`}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              >
+                                {breed}
+                              </label>
+                            </div>
+                          ))}
+                          <div className="font-medium text-sm text-muted-foreground mb-2 mt-4">Cats</div>
+                          {CAT_BREEDS.map((breed) => (
+                            <div key={breed} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`cat-${breed}`}
+                                checked={formData.breeds.includes(breed)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setFormData({
+                                      ...formData,
+                                      breeds: [...formData.breeds, breed]
+                                    });
+                                  } else {
+                                    setFormData({
+                                      ...formData,
+                                      breeds: formData.breeds.filter(b => b !== breed)
+                                    });
+                                  }
+                                }}
+                              />
+                              <label
+                                htmlFor={`cat-${breed}`}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              >
+                                {breed}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <Select
+                        value={formData.breed}
+                        onValueChange={(value) => setFormData({ ...formData, breed: value })}
+                        disabled={!formData.species || !["dog", "cat"].includes(formData.species)}
+                      >
+                        <SelectTrigger className="bg-background">
+                          <SelectValue placeholder={
+                            !formData.species 
+                              ? "Select a species first" 
+                              : !["dog", "cat"].includes(formData.species)
+                              ? "Breed list available for dogs and cats only"
+                              : "Select breed"
+                          } />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50 max-h-[300px]">
+                          {formData.species === "dog" && DOG_BREEDS.map((breed) => (
+                            <SelectItem key={breed} value={breed}>{breed}</SelectItem>
+                          ))}
+                          {formData.species === "cat" && CAT_BREEDS.map((breed) => (
+                            <SelectItem key={breed} value={breed}>{breed}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                 </div>
                 <div>

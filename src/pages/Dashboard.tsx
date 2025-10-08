@@ -20,6 +20,7 @@ import {
   Pencil,
   Trash2
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -104,6 +105,7 @@ export default function Dashboard() {
   const [requestFormData, setRequestFormData] = useState({
     species: "",
     breed: "",
+    breeds: [] as string[], // For multi-select when "both" is selected
     description: "",
     max_price: "",
   });
@@ -345,30 +347,91 @@ export default function Dashboard() {
                           </Select>
                         </div>
                         <div>
-                          <Label htmlFor="breed">Breed</Label>
-                          <Select
-                            value={requestFormData.breed}
-                            onValueChange={(value) => setRequestFormData({ ...requestFormData, breed: value })}
-                            disabled={!requestFormData.species || requestFormData.species === "both"}
-                          >
-                            <SelectTrigger className="bg-background">
-                              <SelectValue placeholder={
-                                !requestFormData.species 
-                                  ? "Select a species first" 
-                                  : requestFormData.species === "both"
-                                  ? "Select a specific species"
-                                  : "Select breed"
-                              } />
-                            </SelectTrigger>
-                            <SelectContent className="bg-popover z-50 max-h-[300px]">
-                              {requestFormData.species === "dog" && DOG_BREEDS.map((breed) => (
-                                <SelectItem key={breed} value={breed}>{breed}</SelectItem>
-                              ))}
-                              {requestFormData.species === "cat" && CAT_BREEDS.map((breed) => (
-                                <SelectItem key={breed} value={breed}>{breed}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <Label htmlFor="breed">Breed{requestFormData.species === "both" ? "s" : ""}</Label>
+                          {requestFormData.species === "both" ? (
+                            <div className="border rounded-md p-4 max-h-[300px] overflow-y-auto bg-background">
+                              <div className="space-y-3">
+                                <div className="font-medium text-sm text-muted-foreground mb-2">Dogs</div>
+                                {DOG_BREEDS.map((breed) => (
+                                  <div key={breed} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`dog-${breed}`}
+                                      checked={requestFormData.breeds.includes(breed)}
+                                      onCheckedChange={(checked) => {
+                                        if (checked) {
+                                          setRequestFormData({
+                                            ...requestFormData,
+                                            breeds: [...requestFormData.breeds, breed]
+                                          });
+                                        } else {
+                                          setRequestFormData({
+                                            ...requestFormData,
+                                            breeds: requestFormData.breeds.filter(b => b !== breed)
+                                          });
+                                        }
+                                      }}
+                                    />
+                                    <label
+                                      htmlFor={`dog-${breed}`}
+                                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                    >
+                                      {breed}
+                                    </label>
+                                  </div>
+                                ))}
+                                <div className="font-medium text-sm text-muted-foreground mb-2 mt-4">Cats</div>
+                                {CAT_BREEDS.map((breed) => (
+                                  <div key={breed} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`cat-${breed}`}
+                                      checked={requestFormData.breeds.includes(breed)}
+                                      onCheckedChange={(checked) => {
+                                        if (checked) {
+                                          setRequestFormData({
+                                            ...requestFormData,
+                                            breeds: [...requestFormData.breeds, breed]
+                                          });
+                                        } else {
+                                          setRequestFormData({
+                                            ...requestFormData,
+                                            breeds: requestFormData.breeds.filter(b => b !== breed)
+                                          });
+                                        }
+                                      }}
+                                    />
+                                    <label
+                                      htmlFor={`cat-${breed}`}
+                                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                    >
+                                      {breed}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <Select
+                              value={requestFormData.breed}
+                              onValueChange={(value) => setRequestFormData({ ...requestFormData, breed: value })}
+                              disabled={!requestFormData.species}
+                            >
+                              <SelectTrigger className="bg-background">
+                                <SelectValue placeholder={
+                                  !requestFormData.species 
+                                    ? "Select a species first" 
+                                    : "Select breed"
+                                } />
+                              </SelectTrigger>
+                              <SelectContent className="bg-popover z-50 max-h-[300px]">
+                                {requestFormData.species === "dog" && DOG_BREEDS.map((breed) => (
+                                  <SelectItem key={breed} value={breed}>{breed}</SelectItem>
+                                ))}
+                                {requestFormData.species === "cat" && CAT_BREEDS.map((breed) => (
+                                  <SelectItem key={breed} value={breed}>{breed}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
                         </div>
                         <div>
                           <Label htmlFor="max_price">Maximum Price ($)</Label>

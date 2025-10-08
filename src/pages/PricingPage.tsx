@@ -448,6 +448,54 @@ const PricingPage = () => {
               </div>
             </TabsContent>
           </Tabs>
+
+          {/* Premium Add-Ons */}
+          <div className="mt-20">
+            <h2 className="text-3xl font-bold text-center mb-4">Premium Add-Ons</h2>
+            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+              Enhance your listings and services with our premium add-on packages
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+              <Card className="text-center border-accent/50 hover:shadow-glow transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">Vaccination Package</CardTitle>
+                  <div className="text-3xl font-bold text-accent mt-2">
+                    $299
+                  </div>
+                </CardHeader>
+              </Card>
+              <Card className="text-center border-accent/50 hover:shadow-glow transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">Care Package</CardTitle>
+                  <div className="text-3xl font-bold text-accent mt-2">
+                    Starting at $149
+                  </div>
+                  <CardDescription className="mt-2">
+                    Additional items
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              <Card className="text-center border-accent/50 hover:shadow-glow transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">Cleaning Service</CardTitle>
+                  <div className="text-3xl font-bold text-accent mt-2">
+                    $19.99
+                  </div>
+                </CardHeader>
+              </Card>
+              <Card className="text-center border-accent/50 hover:shadow-glow transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">Accessories Bundle</CardTitle>
+                  <div className="text-3xl font-bold text-accent mt-2">
+                    $2.99 each
+                  </div>
+                  <CardDescription className="mt-2">
+                    Select multiple items
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </div>
+          </div>
         </div>
       </main>
 

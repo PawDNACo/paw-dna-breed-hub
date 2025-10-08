@@ -65,20 +65,39 @@ export default function DeveloperDashboard() {
 
   const loadDashboardData = async () => {
     try {
-      // Load users with roles
+      // Load users
       const { data: usersData, error: usersError } = await supabase
         .from("profiles")
-        .select(`
-          *,
-          user_roles (
-            role
-          )
-        `)
+        .select("*")
         .order("created_at", { ascending: false })
         .limit(50);
 
-      if (usersError) throw usersError;
-      setUsers(usersData || []);
+      if (usersError) {
+        console.error("Error loading users:", usersError);
+        throw usersError;
+      }
+
+      // Load user roles separately
+      if (usersData && usersData.length > 0) {
+        const userIds = usersData.map(u => u.id);
+        const { data: rolesData, error: rolesError } = await supabase
+          .from("user_roles")
+          .select("user_id, role")
+          .in("user_id", userIds);
+
+        if (rolesError) {
+          console.error("Error loading roles:", rolesError);
+        } else {
+          // Attach roles to users
+          const usersWithRoles = usersData.map(user => ({
+            ...user,
+            user_roles: rolesData?.filter(r => r.user_id === user.id) || []
+          }));
+          setUsers(usersWithRoles);
+        }
+      } else {
+        setUsers(usersData || []);
+      }
 
       // Load recent pets
       const { data: petsData, error: petsError } = await supabase
@@ -87,7 +106,10 @@ export default function DeveloperDashboard() {
         .order("created_at", { ascending: false })
         .limit(20);
 
-      if (petsError) throw petsError;
+      if (petsError) {
+        console.error("Error loading pets:", petsError);
+        throw petsError;
+      }
       setPets(petsData || []);
 
       // Calculate stats
@@ -101,7 +123,7 @@ export default function DeveloperDashboard() {
       console.error("Error loading dashboard data:", error);
       toast({
         title: "Error",
-        description: "Failed to load dashboard data",
+        description: "Failed to load dashboard data. Please check the console for details.",
         variant: "destructive",
       });
     }

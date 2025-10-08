@@ -41,6 +41,9 @@ export async function getPublicProfile(userId: string) {
  * Get conversation partner profile information (requires active conversation or transaction)
  * This only includes: id, full_name, city, state, is_verified, verification_status
  * SECURITY: Automatically filtered to only show partners with active relationships
+ * 
+ * Note: This view now requires authentication and logs all access for security monitoring.
+ * For enhanced security with automatic audit logging, use getConversationPartnerProfileSecure()
  */
 export async function getConversationPartnerProfile(partnerId: string) {
   const { data, error } = await supabase
@@ -55,6 +58,26 @@ export async function getConversationPartnerProfile(partnerId: string) {
   }
 
   return data;
+}
+
+/**
+ * Get conversation partner profile with enhanced security and audit logging
+ * RECOMMENDED: Use this version for sensitive operations as it automatically logs access
+ * 
+ * @param partnerId - The ID of the partner profile to retrieve
+ * @returns Profile data or null if not authorized or error occurs
+ */
+export async function getConversationPartnerProfileSecure(partnerId: string) {
+  const { data, error } = await supabase.rpc("get_conversation_partner_profile", {
+    _partner_id: partnerId,
+  });
+
+  if (error) {
+    console.error("Error fetching conversation partner profile (secure):", error);
+    return null;
+  }
+
+  return data?.[0] || null;
 }
 
 /**
@@ -161,33 +184,41 @@ export async function getOwnProfile() {
  * - Use getApproximateDistance() for distance calculations
  * - Store exact coordinates only in profiles table (for owner)
  * - Copy coordinates to pets/requests for matchmaking (owner's data)
+ * - Use getConversationPartnerProfileSecure() for audit-logged access
  * 
  * ❌ DON'T:
  * - Query profiles.latitude or profiles.longitude for other users
  * - Display exact addresses or coordinates to other users
  * - Create APIs that expose bulk profile data
  * - Share zip codes outside of active transactions
+ * - Query profiles table directly - always use secure views or functions
+ * - Allow anonymous access to conversation_partner_profiles view
  * 
  * 🔒 Security Features:
  * - RLS policies enforce owner-only access to sensitive fields
- * - Conversation partners can view city/state only
+ * - Conversation partners can view city/state only (via secure view)
+ * - conversation_partner_profiles requires authentication and active relationship
  * - Distance rounded to 5-mile increments
  * - Profile access logged for audit purposes
  * - Admins can view audit logs for suspicious activity
+ * - Anonymous users cannot enumerate user profiles
  */
 
 export const LOCATION_SECURITY_GUIDELINES = {
   publicFields: ["id", "full_name", "city", "state", "is_verified", "verification_status"],
-  sensitiveFields: ["latitude", "longitude", "zip_code", "county", "email", "stripe_identity_verification_token", "stripe_identity_session_id"],
+  sensitiveFields: ["latitude", "longitude", "zip_code", "county", "email", "phone", "stripe_identity_verification_token", "stripe_identity_session_id"],
   conversationFields: ["city", "state"], // What conversation partners can see
   transactionFields: ["city", "state"], // What transaction partners can see (zip removed for privacy)
   
   notes: {
     paymentTokens: "Stripe verification tokens are NEVER exposed to anyone except the profile owner",
     emailAddresses: "Email addresses are NEVER exposed to other users under any circumstances",
+    phoneNumbers: "Phone numbers are NEVER exposed to other users - all access is logged",
     distanceCalculations: "Use get_approximate_distance() which rounds to 5-mile increments",
     profileQueries: "Always query public_profiles or conversation_partner_profiles views, never profiles table directly",
     auditLogging: "All profile accesses by other users are logged for security monitoring",
     partnerLocation: "Use get_partner_location() function to safely get partner city/state only",
+    conversationPartners: "conversation_partner_profiles view requires authentication and active conversation/transaction",
+    anonymousAccess: "Anonymous users are explicitly blocked from accessing user profile data",
   }
 } as const;

@@ -1,41 +1,50 @@
 # PawDNA Security Guide
 
-**Last Updated: 2025-10-02**  
+**Last Updated: 2025-10-03**  
 **Status: ✅ All Critical Security Issues Resolved**
 
 ## Overview
 
 PawDNA implements comprehensive security measures to protect user data, prevent fraud, and ensure safe transactions between breeders and buyers.
 
-## 🔒 Recent Security Fixes (2025-10-02)
+## 🔒 Recent Security Fixes (2025-10-03)
 
 ### Critical Issues Resolved:
 
-1. ✅ **Financial Transaction History Protection**
+1. ✅ **Customer Email & Phone Protection** (2025-10-03)
+   - Added comprehensive audit logging for all email/phone access attempts
+   - Enhanced `get_email_from_username` function with access logging
+   - Implemented "Prevent bulk profile enumeration" RLS policy
+   - Added database comments marking email/phone as SENSITIVE PII
+   - Updated edge functions to log security events when accessing profiles
+
+2. ✅ **Conversation Partner Profile Security** (2025-10-03)
+   - Recreated `conversation_partner_profiles` view with `security_invoker = true`
+   - Added explicit `auth.uid() IS NOT NULL` check to prevent anonymous access
+   - Revoked ALL permissions from anonymous and public roles
+   - Granted SELECT only to authenticated users
+   - Created secure `get_conversation_partner_profile()` function with audit logging
+   - View now requires both authentication AND active conversation/transaction
+
+3. ✅ **Financial Transaction History Protection** (2025-10-02)
    - Added explicit RLS denial for anonymous users on `sales` table
    - Recreated `my_transactions` view with `security_invoker = true`
    - Strengthened participant-only access validation
 
-2. ✅ **Sales Record Creation Security**
+4. ✅ **Sales Record Creation Security** (2025-10-02)
    - Confirmed only `complete-purchase` edge function can create sales
    - Service role key bypasses RLS for authorized creation
    - All client-side INSERT attempts blocked: `WITH CHECK (false)`
 
-3. ✅ **Bot Scraping Prevention**
+5. ✅ **Bot Scraping Prevention** (2025-10-02)
    - Strengthened profile RLS with explicit anonymous denial
    - Added system-managed field protection (is_verified, account_status, etc.)
    - Enhanced audit logging for profile access
 
-4. ✅ **PII Exposure Prevention**
+6. ✅ **PII Exposure Prevention** (2025-10-02)
    - Added database comments marking sensitive fields
    - Implemented UPDATE policy preventing modification of system-managed fields
    - Ensured all views use `security_invoker = true`
-
-5. ✅ **Conversation Partner Profile Security**
-   - Recreated `conversation_partner_profiles` view with `security_invoker = true`
-   - View is self-securing through WHERE clause filtering with auth.uid()
-   - Only shows profiles of users with approved conversations or completed transactions
-   - No separate RLS policies needed - security enforced at view definition level
 
 ## Critical Data Protection
 
@@ -59,18 +68,23 @@ COMMENT ON COLUMN profiles.stripe_identity_verification_token IS
 ### Email Address Privacy
 
 #### Problem
-User email addresses could be harvested by spammers, competitors, or used for phishing attacks.
+User email addresses could be harvested by spammers, competitors, or used for phishing attacks. Phone numbers could be used for unsolicited contact or harassment.
 
 #### Solution
-- **Complete Isolation**: Email addresses NEVER exposed to other users under any circumstances
-- **RLS Policy**: Emails only visible to profile owner
-- **Secure Views**: `public_profiles` and `conversation_partner_profiles` explicitly exclude email column
-- **No Bulk Access**: Impossible to query multiple user emails
+- **Complete Isolation**: Email addresses and phone numbers NEVER exposed to other users
+- **RLS Policy**: Emails/phones only visible to profile owner via "Prevent bulk profile enumeration" policy
+- **Secure Views**: `public_profiles` and `conversation_partner_profiles` explicitly exclude email/phone columns
+- **Audit Logging**: All access to email/phone fields logged in `email_access_log` table
+- **Function Logging**: `get_email_from_username` logs every email lookup attempt
+- **No Bulk Access**: Impossible to query multiple user emails or phone numbers
 
 ```sql
--- Email never exposed to other users
+-- Email & Phone never exposed to other users - Access is logged
 COMMENT ON COLUMN profiles.email IS 
-  'SECURITY CRITICAL: Only visible to profile owner. NEVER expose to other users.';
+  'SENSITIVE PII - Access is logged in email_access_log. Only access via security definer functions or with proper authorization.';
+  
+COMMENT ON COLUMN profiles.phone IS 
+  'SENSITIVE PII - Access is logged. Only access via security definer functions or with proper authorization.';
 ```
 
 ### Location Data Protection
@@ -101,32 +115,44 @@ USING (auth.uid() = id);
 CREATE VIEW public_profiles WITH (security_invoker=true) AS
 SELECT id, full_name, city, state, is_verified, verification_status, created_at
 FROM profiles;
--- ❌ Excluded: email, zip_code, county, GPS coordinates, payment tokens
+-- ❌ Excluded: email, phone, zip_code, county, GPS coordinates, payment tokens
 
--- Conversation partner profiles: Requires active relationship
+-- Conversation partner profiles: Requires active relationship AND authentication
 CREATE VIEW conversation_partner_profiles WITH (security_invoker=true) AS
 SELECT id, full_name, city, state, is_verified, verification_status
 FROM profiles p
 WHERE 
-  -- Only show profiles with approved conversations
-  EXISTS (
-    SELECT 1 FROM conversations c
-    WHERE c.status = 'approved'
-      AND ((c.buyer_id = auth.uid() AND c.breeder_id = p.id) OR
-           (c.breeder_id = auth.uid() AND c.buyer_id = p.id))
-  )
-  OR
-  -- Or completed transactions
-  EXISTS (
-    SELECT 1 FROM sales s
-    WHERE (s.buyer_id = auth.uid() AND s.breeder_id = p.id) OR
-          (s.breeder_id = auth.uid() AND s.buyer_id = p.id)
+  -- SECURITY: Require authentication first
+  auth.uid() IS NOT NULL
+  AND (
+    -- Only show profiles with approved conversations
+    EXISTS (
+      SELECT 1 FROM conversations c
+      WHERE c.status = 'approved'
+        AND ((c.buyer_id = auth.uid() AND c.breeder_id = p.id) OR
+             (c.breeder_id = auth.uid() AND c.buyer_id = p.id))
+    )
+    OR
+    -- Or completed transactions
+    EXISTS (
+      SELECT 1 FROM sales s
+      WHERE (s.buyer_id = auth.uid() AND s.breeder_id = p.id) OR
+            (s.breeder_id = auth.uid() AND s.buyer_id = p.id)
+    )
   );
 
--- SECURITY NOTE: Views don't need RLS policies - they're secured by:
+-- CRITICAL SECURITY MEASURES for conversation_partner_profiles:
 -- 1. security_invoker = true (uses querying user's permissions)
--- 2. WHERE clause filtering with auth.uid()
--- 3. Underlying table RLS policies
+-- 2. auth.uid() IS NOT NULL check (blocks all anonymous queries)
+-- 3. WHERE clause filtering with auth.uid()
+-- 4. Anonymous access explicitly REVOKED:
+REVOKE ALL ON conversation_partner_profiles FROM anon;
+REVOKE ALL ON conversation_partner_profiles FROM public;
+GRANT SELECT ON conversation_partner_profiles TO authenticated;
+
+-- 5. Audit logging function available for sensitive operations:
+SELECT * FROM get_conversation_partner_profile('user-id');
+-- This function logs all access attempts to profile_access_logs
 ```
 
 ##### 3. Approximate Distance Function

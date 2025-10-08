@@ -1572,6 +1572,17 @@ export type Database = {
         Args: { _user1_id: string; _user2_id: string }
         Returns: number
       }
+      get_conversation_partner_profile: {
+        Args: { _partner_id: string }
+        Returns: {
+          city: string
+          full_name: string
+          id: string
+          is_verified: boolean
+          state: string
+          verification_status: string
+        }[]
+      }
       get_email_from_username: {
         Args: { _username: string }
         Returns: string

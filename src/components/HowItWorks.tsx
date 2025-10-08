@@ -4,27 +4,27 @@ const steps = [
   {
     number: "01",
     title: "Create Your Account",
-    description: "Sign up as a breeder or hirer. Choose your subscription plan and complete verification with a refundable deposit.",
+    description: "Sign up as a breeder, buyer, or rehomer. Choose your subscription plan and complete verification with a refundable deposit (breeders only).",
   },
   {
     number: "02",
     title: "List or Browse",
-    description: "Breeders list their pets with detailed profiles. Hirers browse verified breeding partners by breed, size, and location.",
+    description: "Breeders and rehomers list their pets with detailed profiles. Buyers browse verified breeding partners and rehoming options by breed, size, and location.",
   },
   {
     number: "03",
     title: "Secure Transaction",
-    description: "Connect through our platform. All payments are securely held and include breeding agreements and health guarantees.",
+    description: "Connect through our platform. All payments are securely held and include breeding agreements, health guarantees, and rehoming documentation.",
   },
   {
     number: "04",
-    title: "Breeding & Care",
-    description: "Professional breeding services with optional care packages, vaccinations, and cleaning services included.",
+    title: "Breeding, Care & Rehoming",
+    description: "Professional breeding services, rehoming support, and optional care packages, vaccinations, and cleaning services included.",
   },
   {
     number: "05",
     title: "Sale & Delivery",
-    description: "List and sell puppies or kittens. Earn up to 85% on sales. Funds released after confirmed delivery.",
+    description: "List and sell puppies, kittens, or rehome pets responsibly. Breeders earn up to 85% on sales. Funds released after confirmed delivery.",
   },
 ];
 
@@ -37,7 +37,7 @@ export const HowItWorks = () => {
             How <span className="bg-gradient-hero bg-clip-text text-transparent">It Works</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Simple, secure, and transparent breeding process from start to finish
+            Simple, secure, and transparent breeding and rehoming process from start to finish
           </p>
         </div>
 

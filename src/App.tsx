@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import BreedingServices from "./pages/BreedingServices";
+import RehomingServices from "./pages/RehomingServices";
 import BreederStandards from "./pages/BreederStandards";
 import PricingPage from "./pages/PricingPage";
 import BreederSubscriptionSignup from "./pages/BreederSubscriptionSignup";
@@ -55,6 +56,7 @@ const App = () => (
           <Route path="/home" element={<Index />} />
           <Route path="/services" element={<Services />} />
           <Route path="/breeding-services" element={<BreedingServices />} />
+          <Route path="/rehoming-services" element={<RehomingServices />} />
           <Route path="/breeder-standards" element={<BreederStandards />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/breeder-subscription" element={<BreederSubscriptionSignup />} />

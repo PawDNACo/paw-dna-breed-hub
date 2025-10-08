@@ -85,7 +85,7 @@ const buyerPlans = [
       "Purchase protection",
       "Access to breeder verification status",
       "Refundable Deposit (Goes towards the final payment)",
-      "Average cost: $150+",
+      "Average cost: $50+",
       "Specialty breeds: $1,500+",
       "Up to 250 miles delivery/pickup included",
       "Beyond 250 miles: $299.99 refundable deposit",
@@ -110,17 +110,83 @@ const buyerPlans = [
   },
 ];
 
+const rehomingPlans = [
+  {
+    name: "Single Gender",
+    price: "$2.99",
+    period: "/month",
+    description: "Perfect for rehomers with males or females",
+    features: [
+      "List male or female pets",
+      "Rehome puppies & kittens",
+      "Direct buyer connections",
+      "Profile verification",
+      "Support center access",
+      "No deposit required",
+    ],
+    popular: false,
+  },
+  {
+    name: "Both Genders",
+    price: "$5.99",
+    period: "/month",
+    description: "For rehomers managing both genders",
+    features: [
+      "List males & females",
+      "Rehome puppies & kittens",
+      "Direct buyer connections",
+      "Profile verification",
+      "Priority support",
+      "No deposit required",
+    ],
+    popular: true,
+  },
+  {
+    name: "Multi-Breed Single",
+    price: "$8.99",
+    period: "/month",
+    description: "Multiple breeds, one gender",
+    features: [
+      "List multiple breeds",
+      "Single gender listings",
+      "Rehome puppies & kittens",
+      "Direct buyer connections",
+      "Profile verification",
+      "Priority support",
+      "No deposit required",
+    ],
+    popular: false,
+  },
+  {
+    name: "Multi-Breed Both",
+    price: "$11.99",
+    period: "/month",
+    description: "Full rehoming access",
+    features: [
+      "List multiple breeds",
+      "Both genders",
+      "Rehome puppies & kittens",
+      "Direct buyer connections",
+      "Profile verification",
+      "Premium support",
+      "No deposit required",
+    ],
+    popular: false,
+  },
+];
+
 const bothPlans = [
   {
     name: "Single",
-    price: "$12.99",
+    price: "$14.99",
     period: "/month",
-    description: "Combined breeder & buyer access",
+    description: "Combined breeder, buyer & rehomer access",
     features: [
       "All Single Gender breeder features",
-      "Full buyer access",
+      "Full buyer & rehomer access",
       "List male or female pets",
       "Access breeding partners",
+      "Rehome pets",
       "Earn up to 85% on all sales",
       "All add-on packages",
       "$499.99 refundable deposit",
@@ -131,13 +197,14 @@ const bothPlans = [
     name: "Multi",
     price: "$19.99",
     period: "/month",
-    description: "Complete access for serious breeders & buyers",
+    description: "Complete access for breeders, buyers & rehomers",
     features: [
       "All Multi-Breed Both features",
-      "Full buyer access",
+      "Full buyer & rehomer access",
       "List multiple breeds",
       "Both genders",
       "Access breeding partners",
+      "Rehome pets",
       "Earn up to 85% on all sales",
       "Premium support",
       "$499.99 refundable deposit",
@@ -169,10 +236,11 @@ const PricingPage = () => {
           </div>
 
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="max-w-7xl mx-auto">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-12">
+            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4 mb-12">
               <TabsTrigger value="breeder">Breeder</TabsTrigger>
               <TabsTrigger value="buyer">Buyer</TabsTrigger>
-              <TabsTrigger value="both">Both</TabsTrigger>
+              <TabsTrigger value="rehoming">Rehoming</TabsTrigger>
+              <TabsTrigger value="both">Multi-Plan</TabsTrigger>
             </TabsList>
 
             <TabsContent value="breeder" className="mt-0">
@@ -260,11 +328,63 @@ const PricingPage = () => {
               </div>
             </TabsContent>
 
+            <TabsContent value="rehoming" className="mt-0">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-center mb-4">For Rehomers</h2>
+                <p className="text-sm text-muted-foreground max-w-3xl mx-auto text-center">
+                  Affordable rehoming plans to find loving homes for pets
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {rehomingPlans.map((plan, index) => (
+                  <Card 
+                    key={index} 
+                    className={`relative ${
+                      plan.popular 
+                        ? 'border-primary shadow-glow' 
+                        : 'border-border/50'
+                    }`}
+                  >
+                    {plan.popular && (
+                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-hero">
+                        Most Popular
+                      </Badge>
+                    )}
+                    <CardHeader>
+                      <CardTitle className="text-xl">{plan.name}</CardTitle>
+                      <CardDescription className="text-xs">{plan.description}</CardDescription>
+                      <div className="mt-4">
+                        <span className="text-3xl font-bold text-primary">{plan.price}</span>
+                        <span className="text-sm text-muted-foreground">{plan.period}</span>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2 mb-6">
+                        {plan.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                            <span className="text-xs">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Button 
+                        className="w-full" 
+                        variant={plan.popular ? "hero" : "default"}
+                        onClick={() => window.location.href = "/breeder-subscription"}
+                      >
+                        Subscribe Now
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
             <TabsContent value="both" className="mt-0">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-center mb-4">For Breeders & Buyers</h2>
+                <h2 className="text-2xl font-bold text-center mb-4">For Buyers, Breeders, and Rehomers</h2>
                 <p className="text-sm text-muted-foreground max-w-3xl mx-auto text-center">
-                  Get the best of both worlds with combined access
+                  Get complete access across all platform features
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">

@@ -32,7 +32,6 @@ export const Footer = () => {
           <div className="flex flex-col items-center md:items-start">
             <h3 className="font-semibold mb-4">Services</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="/how-it-works" className="hover:text-primary transition-colors">How It Works</a></li>
               <li><a href="/breeding-services" className="hover:text-primary transition-colors">Breeding Services</a></li>
               <li><a href="/rehoming-services" className="hover:text-primary transition-colors">Rehoming Services</a></li>
               <li><a href="/browse" className="hover:text-primary transition-colors">Buy Puppies</a></li>
@@ -44,6 +43,7 @@ export const Footer = () => {
           <div className="flex flex-col items-center md:items-start">
             <h3 className="font-semibold mb-4">Company</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><a href="/how-it-works" className="hover:text-primary transition-colors">How It Works</a></li>
               <li><a href="/about" className="hover:text-primary transition-colors">About Us</a></li>
               <li><a href="/breeder-standards" className="hover:text-primary transition-colors">Breeder Standards</a></li>
               <li><a href="/contact" className="hover:text-primary transition-colors">Contact</a></li>

@@ -6,27 +6,27 @@ const steps = [
   {
     number: "01",
     title: "Create Your Account",
-    description: "Sign up as a breeder or hirer. Choose your subscription plan and complete verification with a refundable deposit.",
+    description: "Sign up as a breeder, buyer, or rehomer. Choose your subscription plan and complete verification with a refundable deposit (breeders only).",
   },
   {
     number: "02",
     title: "List or Browse",
-    description: "Breeders list their pets with detailed profiles. Hirers browse verified breeding partners by breed, size, and location.",
+    description: "Breeders and rehomers list their pets with detailed profiles. Buyers browse verified breeding partners and rehoming options by breed, size, and location.",
   },
   {
     number: "03",
     title: "Secure Transaction",
-    description: "Connect through our platform. All payments are securely held and include breeding agreements and health guarantees.",
+    description: "Connect through our platform. All payments are securely held and include breeding agreements, health guarantees, and rehoming documentation.",
   },
   {
     number: "04",
-    title: "Breeding & Care",
-    description: "Professional breeding services with optional care packages, vaccinations, and cleaning services included.",
+    title: "Breeding, Care & Rehoming",
+    description: "Professional breeding services, rehoming support, and optional care packages, vaccinations, and cleaning services included.",
   },
   {
     number: "05",
     title: "Sale & Delivery",
-    description: "List and sell puppies or kittens. Earn up to 85% on sales. Funds released after confirmed delivery.",
+    description: "List and sell puppies, kittens, or rehome pets responsibly. Breeders earn up to 85% on sales. Funds released after confirmed delivery.",
   },
 ];
 
@@ -41,7 +41,7 @@ export default function HowItWorksPage() {
               How <span className="bg-gradient-hero bg-clip-text text-transparent">It Works</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Simple, secure, and transparent breeding process from start to finish
+              Simple, secure, and transparent breeding and rehoming process from start to finish
             </p>
           </div>
 
@@ -68,7 +68,7 @@ export default function HowItWorksPage() {
 
           <div className="mt-16 text-center">
             <p className="text-lg text-muted-foreground mb-6">
-              Ready to get started? Join thousands of responsible breeders and buyers.
+              Ready to get started? Join thousands of responsible breeders, buyers, and rehomers.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 
@@ -82,6 +82,12 @@ export default function HowItWorksPage() {
                 className="inline-flex items-center justify-center px-8 py-3 text-base font-medium border-2 border-primary rounded-lg hover:bg-primary/10 transition-colors"
               >
                 Start as Buyer
+              </a>
+              <a 
+                href="/breeder-subscription" 
+                className="inline-flex items-center justify-center px-8 py-3 text-base font-medium border-2 border-secondary rounded-lg hover:bg-secondary/10 transition-colors"
+              >
+                Start as Rehomer
               </a>
             </div>
           </div>

@@ -39,8 +39,13 @@ export const Hero = () => {
                 Start Breeding
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button variant="outline" size="xl" onClick={() => window.location.href = "/browse"}>
-                Browse Pets
+              <Button variant="hero" size="xl" onClick={() => window.location.href = "/buyer-subscription"}>
+                Become a Buyer
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button variant="hero" size="xl" onClick={() => window.location.href = "/rehoming-subscription"}>
+                Start Rehoming
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
             <div className="mt-8 flex flex-wrap gap-8 text-sm justify-center md:justify-start">

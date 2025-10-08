@@ -82,7 +82,13 @@ export default function SubscriptionPayment({
         <DialogHeader>
           <DialogTitle>Subscribe to {subscriptionType}</DialogTitle>
           <DialogDescription>
-            Complete your payment to activate your subscription. Amount: ${amount.toFixed(2)}/month
+            <div className="space-y-2">
+              <p>Start your 7-day free trial. Amount: ${amount.toFixed(2)}/month after trial</p>
+              <p className="text-xs text-muted-foreground">
+                You'll receive reminders at 48hrs, 24hrs, and on the day before billing. 
+                Subscription fees are non-refundable once charged.
+              </p>
+            </div>
           </DialogDescription>
         </DialogHeader>
 

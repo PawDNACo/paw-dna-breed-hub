@@ -76,10 +76,22 @@ export default function TermsOfService() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">8. Subscription Plans</h2>
+              <h2 className="text-2xl font-semibold mb-4">8. Subscription Plans & Trial Period</h2>
+              <p className="mb-4">
+                All subscription plans include a 7-day free trial period. During the trial, you will receive 
+                three reminder notifications (at 48 hours, 24 hours, and on the day of billing) via email 
+                and/or text message to alert you before your subscription is charged.
+              </p>
+              <p className="font-semibold text-primary mb-4">
+                Subscription fees are non-refundable once charged. By accepting the subscription, you acknowledge 
+                that you will receive three advance reminders before being charged, providing ample opportunity 
+                to cancel if you do not wish to continue. No refunds will be issued after the trial period ends 
+                and payment is processed.
+              </p>
               <p>
-                Subscription fees are non-refundable. Cancellation of subscriptions will result in loss of 
-                listing privileges but will not affect ongoing transactions initiated before cancellation.
+                Cancellation of subscriptions will result in loss of listing privileges but will not affect 
+                ongoing transactions initiated before cancellation. You may cancel at any time during the trial 
+                period to avoid being charged.
               </p>
             </section>
 

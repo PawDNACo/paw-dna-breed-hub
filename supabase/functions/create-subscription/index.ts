@@ -36,26 +36,37 @@ serve(async (req) => {
       });
     }
 
-    // Create subscription
+    // Create subscription with 7-day trial
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
       items: [{ price: priceId }],
       payment_behavior: 'default_incomplete',
       expand: ['latest_invoice.payment_intent'],
+      trial_period_days: 7,
     });
 
     const invoice = subscription.latest_invoice as Stripe.Invoice;
     const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
 
+    // Calculate trial period
+    const trialStart = new Date();
+    const trialEnd = new Date(trialStart);
+    trialEnd.setDate(trialEnd.getDate() + 7);
+
     // Store subscription in database
-    const { error: dbError } = await supabaseClient
+    const { data: subscriptionData, error: dbError } = await supabaseClient
       .from('subscriptions')
       .insert({
         user_id: userId,
         subscription_type: subscriptionType,
         status: 'active',
-        started_at: new Date().toISOString(),
-      });
+        started_at: trialStart.toISOString(),
+        is_trial: true,
+        trial_start: trialStart.toISOString(),
+        trial_end: trialEnd.toISOString(),
+      })
+      .select()
+      .single();
 
     if (dbError) {
       console.error('Error storing subscription:', dbError);

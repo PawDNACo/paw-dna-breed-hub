@@ -310,6 +310,10 @@ export const Pricing = () => {
                 <CardHeader>
                   <CardTitle className="text-xl">{plan.name}</CardTitle>
                   <CardDescription className="text-xs">{plan.description}</CardDescription>
+                  <div className="text-xs text-muted-foreground mt-2 space-y-1">
+                    <p className="font-semibold text-primary">✓ 7-day free trial</p>
+                    <p>3 reminders before billing</p>
+                  </div>
                   <div className="mt-4">
                     <span className="text-3xl font-bold text-primary">{plan.price}</span>
                     <span className="text-sm text-muted-foreground">{plan.period}</span>
@@ -347,6 +351,10 @@ export const Pricing = () => {
                 <CardHeader>
                   <CardTitle className="text-2xl">{plan.name}</CardTitle>
                   <CardDescription>{plan.description}</CardDescription>
+                  <div className="text-sm text-muted-foreground mt-2 space-y-1">
+                    <p className="font-semibold text-secondary">✓ 7-day free trial</p>
+                    <p className="text-xs">3 reminders before billing</p>
+                  </div>
                   <div className="mt-4">
                     <span className="text-4xl font-bold text-secondary">{plan.price}</span>
                     <span className="text-muted-foreground">{plan.period}</span>
@@ -399,6 +407,10 @@ export const Pricing = () => {
                 <CardHeader>
                   <CardTitle className="text-xl">{plan.name}</CardTitle>
                   <CardDescription className="text-xs">{plan.description}</CardDescription>
+                  <div className="text-xs text-muted-foreground mt-2 space-y-1">
+                    <p className="font-semibold text-primary">✓ 7-day free trial</p>
+                    <p>3 reminders before billing</p>
+                  </div>
                   <div className="mt-4">
                     <span className="text-3xl font-bold text-primary">{plan.price}</span>
                     <span className="text-sm text-muted-foreground">{plan.period}</span>
@@ -451,6 +463,10 @@ export const Pricing = () => {
                 <CardHeader>
                   <CardTitle className="text-xl">{plan.name}</CardTitle>
                   <CardDescription className="text-xs">{plan.description}</CardDescription>
+                  <div className="text-xs text-muted-foreground mt-2 space-y-1">
+                    <p className="font-semibold text-primary">✓ 7-day free trial</p>
+                    <p>3 reminders before billing</p>
+                  </div>
                   <div className="mt-4">
                     <span className="text-3xl font-bold text-primary">{plan.price}</span>
                     <span className="text-sm text-muted-foreground">{plan.period}</span>

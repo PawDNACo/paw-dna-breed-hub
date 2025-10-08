@@ -1117,27 +1117,36 @@ export type Database = {
           created_at: string
           expires_at: string | null
           id: string
+          is_trial: boolean | null
           started_at: string
           status: string
           subscription_type: string
+          trial_end: string | null
+          trial_start: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           expires_at?: string | null
           id?: string
+          is_trial?: boolean | null
           started_at?: string
           status?: string
           subscription_type: string
+          trial_end?: string | null
+          trial_start?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
           expires_at?: string | null
           id?: string
+          is_trial?: boolean | null
           started_at?: string
           status?: string
           subscription_type?: string
+          trial_end?: string | null
+          trial_start?: string | null
           user_id?: string
         }
         Relationships: [
@@ -1160,6 +1169,44 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: true
             referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trial_reminders: {
+        Row: {
+          created_at: string | null
+          id: string
+          reminder_type: string
+          sent_at: string | null
+          sent_via: string
+          subscription_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          reminder_type: string
+          sent_at?: string | null
+          sent_via: string
+          subscription_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          reminder_type?: string
+          sent_at?: string | null
+          sent_via?: string
+          subscription_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trial_reminders_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
             referencedColumns: ["id"]
           },
         ]

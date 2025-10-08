@@ -36,6 +36,20 @@ serve(async (req) => {
     console.log(`Freezing account for user: ${reportedUserId}`);
     console.log(`Reason: ${reportReason}`);
 
+    // Log security event for account freeze
+    await supabaseClient
+      .from("security_audit_log")
+      .insert({
+        user_id: reportedUserId,
+        action: "account_frozen",
+        table_name: "profiles",
+        ip_address: clientIp,
+        details: {
+          reason: reportReason,
+          timestamp: new Date().toISOString()
+        }
+      });
+
     // Freeze the reported user's account
     const { error: profileError } = await supabaseClient
       .from("profiles")

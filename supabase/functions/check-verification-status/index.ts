@@ -84,7 +84,7 @@ serve(async (req) => {
 
     console.log(`Verification status: ${stripeSession.status}`);
 
-    // Get current profile status
+    // Get current profile status (only non-sensitive fields)
     const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("is_verified")
@@ -93,6 +93,20 @@ serve(async (req) => {
 
     // Update profile if verified
     if (stripeSession.status === "verified" && !profile?.is_verified) {
+      // Log security event for verification completion
+      await supabaseAdmin
+        .from("security_audit_log")
+        .insert({
+          user_id: user.id,
+          action: "identity_verification_completed",
+          table_name: "profiles",
+          details: {
+            verification_type: "stripe_identity",
+            session_id: verificationSession.stripe_session_id,
+            timestamp: new Date().toISOString()
+          }
+        });
+
       const { error: updateError } = await supabaseAdmin
         .from("profiles")
         .update({

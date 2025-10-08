@@ -87,6 +87,20 @@ serve(async (req) => {
       throw new Error("Failed to store verification details");
     }
     
+    // Log security event for verification initiation
+    await supabaseAdmin
+      .from("security_audit_log")
+      .insert({
+        user_id: user.id,
+        action: "identity_verification_initiated",
+        table_name: "profiles",
+        details: {
+          verification_type: userType,
+          stripe_session_id: verificationSession.id,
+          timestamp: new Date().toISOString()
+        }
+      });
+
     // Update profiles table with verification type only (no tokens)
     const { error: updateError } = await supabaseAdmin
       .from("profiles")

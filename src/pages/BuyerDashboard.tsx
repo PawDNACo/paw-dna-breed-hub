@@ -13,6 +13,25 @@ import { Footer } from "@/components/Footer";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
+const DOG_BREEDS = [
+  "Labrador Retriever", "German Shepherd", "Golden Retriever", "French Bulldog", 
+  "Bulldog", "Poodle", "Beagle", "Rottweiler", "German Shorthaired Pointer",
+  "Yorkshire Terrier", "Boxer", "Dachshund", "Siberian Husky", "Great Dane",
+  "Doberman Pinscher", "Australian Shepherd", "Miniature Schnauzer", "Cavalier King Charles Spaniel",
+  "Shih Tzu", "Boston Terrier", "Pomeranian", "Havanese", "Shetland Sheepdog",
+  "Brittany", "Pembroke Welsh Corgi", "Australian Cattle Dog", "English Springer Spaniel",
+  "Cocker Spaniel", "Border Collie", "Vizsla"
+];
+
+const CAT_BREEDS = [
+  "Persian", "Maine Coon", "Ragdoll", "British Shorthair", "Siamese",
+  "Abyssinian", "Birman", "Oriental Shorthair", "Sphynx", "Devon Rex",
+  "American Shorthair", "Scottish Fold", "Exotic Shorthair", "Burmese",
+  "Himalayan", "Bengal", "Russian Blue", "Norwegian Forest Cat", "Manx",
+  "Cornish Rex", "Selkirk Rex", "Turkish Angora", "Somali", "Tonkinese",
+  "Chartreux", "Balinese", "Siberian", "American Curl", "Ragamuffin", "Munchkin"
+];
+
 interface BuyerRequest {
   id: string;
   species: string;
@@ -344,13 +363,29 @@ export default function BuyerDashboard() {
                   </div>
                   <div>
                     <Label htmlFor="breed">Breed</Label>
-                    <Input
-                      id="breed"
-                      required
+                    <Select
                       value={formData.breed}
-                      onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
-                      placeholder="e.g., Golden Retriever"
-                    />
+                      onValueChange={(value) => setFormData({ ...formData, breed: value })}
+                      disabled={!formData.species || !["dog", "cat"].includes(formData.species)}
+                    >
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder={
+                          !formData.species 
+                            ? "Select a species first" 
+                            : !["dog", "cat"].includes(formData.species)
+                            ? "Breed list available for dogs and cats only"
+                            : "Select breed"
+                        } />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover z-50 max-h-[300px]">
+                        {formData.species === "dog" && DOG_BREEDS.map((breed) => (
+                          <SelectItem key={breed} value={breed}>{breed}</SelectItem>
+                        ))}
+                        {formData.species === "cat" && CAT_BREEDS.map((breed) => (
+                          <SelectItem key={breed} value={breed}>{breed}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div>

@@ -26,6 +26,25 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+const DOG_BREEDS = [
+  "Labrador Retriever", "German Shepherd", "Golden Retriever", "French Bulldog", 
+  "Bulldog", "Poodle", "Beagle", "Rottweiler", "German Shorthaired Pointer",
+  "Yorkshire Terrier", "Boxer", "Dachshund", "Siberian Husky", "Great Dane",
+  "Doberman Pinscher", "Australian Shepherd", "Miniature Schnauzer", "Cavalier King Charles Spaniel",
+  "Shih Tzu", "Boston Terrier", "Pomeranian", "Havanese", "Shetland Sheepdog",
+  "Brittany", "Pembroke Welsh Corgi", "Australian Cattle Dog", "English Springer Spaniel",
+  "Cocker Spaniel", "Border Collie", "Vizsla"
+];
+
+const CAT_BREEDS = [
+  "Persian", "Maine Coon", "Ragdoll", "British Shorthair", "Siamese",
+  "Abyssinian", "Birman", "Oriental Shorthair", "Sphynx", "Devon Rex",
+  "American Shorthair", "Scottish Fold", "Exotic Shorthair", "Burmese",
+  "Himalayan", "Bengal", "Russian Blue", "Norwegian Forest Cat", "Manx",
+  "Cornish Rex", "Selkirk Rex", "Turkish Angora", "Somali", "Tonkinese",
+  "Chartreux", "Balinese", "Siberian", "American Curl", "Ragamuffin", "Munchkin"
+];
+
 interface Profile {
   id: string;
   full_name: string;
@@ -327,12 +346,29 @@ export default function Dashboard() {
                         </div>
                         <div>
                           <Label htmlFor="breed">Breed</Label>
-                          <Input
-                            id="breed"
+                          <Select
                             value={requestFormData.breed}
-                            onChange={(e) => setRequestFormData({ ...requestFormData, breed: e.target.value })}
-                            placeholder="e.g., Golden Retriever"
-                          />
+                            onValueChange={(value) => setRequestFormData({ ...requestFormData, breed: value })}
+                            disabled={!requestFormData.species || requestFormData.species === "both"}
+                          >
+                            <SelectTrigger className="bg-background">
+                              <SelectValue placeholder={
+                                !requestFormData.species 
+                                  ? "Select a species first" 
+                                  : requestFormData.species === "both"
+                                  ? "Select a specific species"
+                                  : "Select breed"
+                              } />
+                            </SelectTrigger>
+                            <SelectContent className="bg-popover z-50 max-h-[300px]">
+                              {requestFormData.species === "dog" && DOG_BREEDS.map((breed) => (
+                                <SelectItem key={breed} value={breed}>{breed}</SelectItem>
+                              ))}
+                              {requestFormData.species === "cat" && CAT_BREEDS.map((breed) => (
+                                <SelectItem key={breed} value={breed}>{breed}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
                           <Label htmlFor="max_price">Maximum Price ($)</Label>

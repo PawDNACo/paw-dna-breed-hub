@@ -517,8 +517,7 @@ const RehomingSubscription = () => {
       <Navigation />
       <SmsOptInDialog 
         open={showSmsOptIn}
-        onClose={() => setShowSmsOptIn(false)}
-        onConfirm={handleSmsOptIn}
+        onOptIn={handleSmsOptIn}
       />
       <main className="container mx-auto px-4 py-24">
         <div className="max-w-4xl mx-auto">
@@ -653,44 +652,6 @@ const RehomingSubscription = () => {
                 </CardContent>
               </Card>
             )}
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Upload Photos</CardTitle>
-                <CardDescription>Add photos of your pet</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label>Pet Photos (up to 10)</Label>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handlePhotoUpload}
-                  />
-                  {photos.length > 0 && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {photos.length} photo(s) selected
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <Label>Parent Photos (optional)</Label>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleParentPhotoUpload}
-                  />
-                  {parentPhotos.length > 0 && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {parentPhotos.length} parent photo(s) selected
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
 
             {animalDetails.map((animal, index) => (
               <Collapsible key={index} open={openSections[index]} onOpenChange={() => toggleSection(index)}>
@@ -896,6 +857,44 @@ const RehomingSubscription = () => {
                 </Card>
               </Collapsible>
             ))}
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Upload Photos</CardTitle>
+                <CardDescription>Add photos of your pet</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Pet Photos (up to 10)</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handlePhotoUpload}
+                  />
+                  {photos.length > 0 && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {photos.length} photo(s) selected
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <Label>Parent Photos (optional)</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleParentPhotoUpload}
+                  />
+                  {parentPhotos.length > 0 && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {parentPhotos.length} parent photo(s) selected
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
             <Card>
               <CardHeader>

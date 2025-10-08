@@ -773,45 +773,6 @@ const BreederSubscriptionSignup = () => {
               </Card>
             )}
 
-            {/* Photo Upload Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Photos</CardTitle>
-                <CardDescription>Upload at least 5 photos (including 2 parent photos)</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label>Pet Photos ({photos.length} uploaded)</Label>
-                  <div className="mt-2 flex items-center gap-4">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => handlePhotoUpload(e, false)}
-                      className="cursor-pointer"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label>Parent Photos ({parentPhotos.length} uploaded) - Required: 2</Label>
-                  <div className="mt-2 flex items-center gap-4">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => handlePhotoUpload(e, true)}
-                      className="cursor-pointer"
-                    />
-                  </div>
-                </div>
-                {totalPhotos > 0 && (
-                  <Badge variant={totalPhotos >= 5 && parentPhotos.length >= 2 ? "default" : "secondary"}>
-                    {totalPhotos} total photos uploaded
-                  </Badge>
-                )}
-              </CardContent>
-            </Card>
-
             {/* Pet Details - Multiple Animals */}
             {animalDetails.map((animal, index) => (
               <Collapsible
@@ -1051,6 +1012,46 @@ const BreederSubscriptionSignup = () => {
                 </Card>
               </Collapsible>
             ))}
+
+            {/* Photo Upload Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Photos</CardTitle>
+                <CardDescription>Upload at least 5 photos (including 2 parent photos)</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Pet Photos ({photos.length} uploaded)</Label>
+                  <div className="mt-2 flex items-center gap-4">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handlePhotoUpload(e, false)}
+                      className="cursor-pointer"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Parent Photos ({parentPhotos.length} uploaded) - Required: 2</Label>
+                  <div className="mt-2 flex items-center gap-4">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handlePhotoUpload(e, true)}
+                      className="cursor-pointer"
+                    />
+                  </div>
+                </div>
+                {totalPhotos > 0 && (
+                  <Badge variant={totalPhotos >= 5 && parentPhotos.length >= 2 ? "default" : "secondary"}>
+                    {totalPhotos} total photos uploaded
+                  </Badge>
+                )}
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle>Location</CardTitle>

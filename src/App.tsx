@@ -37,6 +37,7 @@ import CompleteProfile from "./pages/CompleteProfile";
 import Contact from "./pages/Contact";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import GeneratePetListings from "./pages/GeneratePetListings";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -181,6 +182,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <SecuritySettings />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/generate-pets" 
+            element={
+              <ProtectedRoute>
+                <GeneratePetListings />
               </ProtectedRoute>
             } 
           />

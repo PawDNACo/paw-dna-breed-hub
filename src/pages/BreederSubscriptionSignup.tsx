@@ -625,153 +625,161 @@ const BreederSubscriptionSignup = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Account Creation Section - Only show if not logged in */}
-            {!currentUser && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Create Your Account</CardTitle>
-                  <CardDescription>Sign up to become a breeder</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="profilePhoto">Profile Photo *</Label>
-                    <Input
-                      id="profilePhoto"
-                      type="file"
-                      accept="image/*"
-                      required
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setProfilePhoto(file);
-                      }}
-                      className="cursor-pointer"
-                    />
-                    {profilePhoto && (
-                      <Badge variant="default" className="mt-2">
-                        Photo selected: {profilePhoto.name}
-                      </Badge>
-                    )}
-                  </div>
+            {/* Account Creation Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Create Your Account</CardTitle>
+                <CardDescription>Sign up to become a breeder</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="profilePhoto">Profile Photo *</Label>
+                  <Input
+                    id="profilePhoto"
+                    type="file"
+                    accept="image/*"
+                    required
+                    disabled={!!currentUser}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setProfilePhoto(file);
+                    }}
+                    className="cursor-pointer"
+                  />
+                  {profilePhoto && (
+                    <Badge variant="default" className="mt-2">
+                      Photo selected: {profilePhoto.name}
+                    </Badge>
+                  )}
+                </div>
 
-                  <div>
-                    <Label htmlFor="fullName">Full Name</Label>
-                    <Input
-                      id="fullName"
-                      required
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                      placeholder="Enter your full name"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    required
+                    disabled={!!currentUser}
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                    placeholder="Enter your full name"
+                  />
+                </div>
 
-                  <div>
-                    <Label htmlFor="username">Username</Label>
-                    <Input
-                      id="username"
-                      required
-                      value={formData.username}
-                      onChange={(e) => setFormData({...formData, username: e.target.value})}
-                      placeholder="Choose a username"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    required
+                    disabled={!!currentUser}
+                    value={formData.username}
+                    onChange={(e) => setFormData({...formData, username: e.target.value})}
+                    placeholder="Choose a username"
+                  />
+                </div>
 
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      placeholder="Enter your email"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    disabled={!!currentUser}
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    placeholder="Enter your email"
+                  />
+                </div>
 
-                  <div>
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      placeholder="Enter your phone number"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    required
+                    disabled={!!currentUser}
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    placeholder="Enter your phone number"
+                  />
+                </div>
 
-                  <div>
-                    <Label htmlFor="password">Password</Label>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      Must be 12-16+ characters with uppercase, lowercase, numbers, and symbols. Cannot match name, username, or email.
-                    </p>
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      required
-                      value={formData.password}
-                      onChange={(e) => setFormData({...formData, password: e.target.value})}
-                      placeholder="Create a secure password"
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Must be 12-16+ characters with uppercase, lowercase, numbers, and symbols. Cannot match name, username, or email.
+                  </p>
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    disabled={!!currentUser}
+                    value={formData.password}
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    placeholder="Create a secure password"
+                  />
+                  <div className="flex items-center gap-2 mt-2">
+                    <Checkbox
+                      id="show-password"
+                      checked={showPassword}
+                      disabled={!!currentUser}
+                      onCheckedChange={(checked) => setShowPassword(checked === true)}
                     />
-                    <div className="flex items-center gap-2 mt-2">
-                      <Checkbox
-                        id="show-password"
-                        checked={showPassword}
-                        onCheckedChange={(checked) => setShowPassword(checked === true)}
-                      />
-                      <Label htmlFor="show-password" className="text-sm font-normal">Show password</Label>
-                    </div>
-                    <div className="flex gap-2 mt-2">
+                    <Label htmlFor="show-password" className="text-sm font-normal">Show password</Label>
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      disabled={!!currentUser}
+                      onClick={generateRandomPassword}
+                    >
+                      Generate Random Password
+                    </Button>
+                    {generatedPassword && (
                       <Button 
                         type="button" 
                         variant="outline" 
                         size="sm"
-                        onClick={generateRandomPassword}
+                        onClick={copyPasswordToClipboard}
                       >
-                        Generate Random Password
+                        Copy Password
                       </Button>
-                      {generatedPassword && (
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          size="sm"
-                          onClick={copyPasswordToClipboard}
-                        >
-                          Copy Password
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      required
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                      placeholder="Confirm your password"
-                    />
-                    <div className="flex items-center space-x-2 mt-2">
-                      <Checkbox
-                        id="show-confirm-password"
-                        checked={showConfirmPassword}
-                        onCheckedChange={(checked) => setShowConfirmPassword(checked === true)}
-                      />
-                      <Label htmlFor="show-confirm-password" className="text-sm font-normal">Show password</Label>
-                    </div>
-                    {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                      <Alert variant="destructive" className="mt-2">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription>
-                          Passwords do not match
-                        </AlertDescription>
-                      </Alert>
                     )}
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+
+                <div>
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    required
+                    disabled={!!currentUser}
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                    placeholder="Confirm your password"
+                  />
+                  <div className="flex items-center space-x-2 mt-2">
+                    <Checkbox
+                      id="show-confirm-password"
+                      checked={showConfirmPassword}
+                      disabled={!!currentUser}
+                      onCheckedChange={(checked) => setShowConfirmPassword(checked === true)}
+                    />
+                    <Label htmlFor="show-confirm-password" className="text-sm font-normal">Show password</Label>
+                  </div>
+                  {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        Passwords do not match
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Pet Details - Multiple Animals */}
             {animalDetails.map((animal, index) => (

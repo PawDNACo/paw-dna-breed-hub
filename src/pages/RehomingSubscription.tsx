@@ -531,127 +531,135 @@ const RehomingSubscription = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {!currentUser && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Create Account</CardTitle>
-                  <CardDescription>Sign up to start rehoming pets</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label>Full Name</Label>
-                    <Input
-                      required
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                    />
-                  </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Create Your Account</CardTitle>
+                <CardDescription>Sign up to start rehoming pets</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Full Name</Label>
+                  <Input
+                    required
+                    disabled={!!currentUser}
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                  />
+                </div>
 
-                  <div>
-                    <Label>Username</Label>
-                    <Input
-                      required
-                      value={formData.username}
-                      onChange={(e) => setFormData({...formData, username: e.target.value})}
-                    />
-                  </div>
+                <div>
+                  <Label>Username</Label>
+                  <Input
+                    required
+                    disabled={!!currentUser}
+                    value={formData.username}
+                    onChange={(e) => setFormData({...formData, username: e.target.value})}
+                  />
+                </div>
 
-                  <div>
-                    <Label>Email</Label>
-                    <Input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    />
-                  </div>
+                <div>
+                  <Label>Email</Label>
+                  <Input
+                    type="email"
+                    required
+                    disabled={!!currentUser}
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  />
+                </div>
 
-                  <div>
-                    <Label>Phone Number</Label>
-                    <Input
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    />
-                  </div>
+                <div>
+                  <Label>Phone Number</Label>
+                  <Input
+                    type="tel"
+                    required
+                    disabled={!!currentUser}
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  />
+                </div>
 
-                  <div>
-                    <Label>Profile Photo</Label>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfilePhotoUpload}
-                    />
-                  </div>
+                <div>
+                  <Label>Profile Photo</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    disabled={!!currentUser}
+                    onChange={handleProfilePhotoUpload}
+                  />
+                </div>
 
-                  <div>
-                    <Label>Password</Label>
-                    <div className="space-y-2">
-                      <div className="flex gap-2">
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          required
-                          value={formData.password}
-                          onChange={(e) => setFormData({...formData, password: e.target.value})}
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? "Hide" : "Show"}
-                        </Button>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const pwd = generateStrongPassword();
-                          setGeneratedPassword(pwd);
-                          setFormData({...formData, password: pwd, confirmPassword: pwd});
-                        }}
-                      >
-                        Generate Strong Password
-                      </Button>
-                      {generatedPassword && (
-                        <div className="flex gap-2 items-center">
-                          <code className="text-xs bg-muted p-2 rounded flex-1">{generatedPassword}</code>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => copyToClipboard(generatedPassword)}
-                          >
-                            Copy
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label>Confirm Password</Label>
+                <div>
+                  <Label>Password</Label>
+                  <div className="space-y-2">
                     <div className="flex gap-2">
                       <Input
-                        type={showConfirmPassword ? "text" : "password"}
+                        type={showPassword ? "text" : "password"}
                         required
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                        disabled={!!currentUser}
+                        value={formData.password}
+                        onChange={(e) => setFormData({...formData, password: e.target.value})}
                       />
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        disabled={!!currentUser}
+                        onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showConfirmPassword ? "Hide" : "Show"}
+                        {showPassword ? "Hide" : "Show"}
                       </Button>
                     </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={!!currentUser}
+                      onClick={() => {
+                        const pwd = generateStrongPassword();
+                        setGeneratedPassword(pwd);
+                        setFormData({...formData, password: pwd, confirmPassword: pwd});
+                      }}
+                    >
+                      Generate Strong Password
+                    </Button>
+                    {generatedPassword && (
+                      <div className="flex gap-2 items-center">
+                        <code className="text-xs bg-muted p-2 rounded flex-1">{generatedPassword}</code>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(generatedPassword)}
+                        >
+                          Copy
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+
+                <div>
+                  <Label>Confirm Password</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type={showConfirmPassword ? "text" : "password"}
+                      required
+                      disabled={!!currentUser}
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={!!currentUser}
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? "Hide" : "Show"}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {animalDetails.map((animal, index) => (
               <Collapsible key={index} open={openSections[index]} onOpenChange={() => toggleSection(index)}>

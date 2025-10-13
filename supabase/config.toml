@@ -2,3 +2,42 @@ project_id = "mzvotmzztruvllbdbqdy"
 
 [functions.generate-pet-listings]
 verify_jwt = true
+
+[functions.assign-role]
+verify_jwt = true
+
+[functions.process-pet-purchase]
+verify_jwt = true
+
+[functions.create-subscription]
+verify_jwt = true
+
+[functions.create-payment]
+verify_jwt = true
+
+[functions.complete-purchase]
+verify_jwt = true
+
+[functions.freeze-reported-account]
+verify_jwt = true
+
+[functions.get-admin-stats]
+verify_jwt = true
+
+[functions.create-identity-verification]
+verify_jwt = true
+
+[functions.create-match]
+verify_jwt = true
+
+[functions.check-verification-status]
+verify_jwt = true
+
+[functions.add-watermark]
+verify_jwt = true
+
+[functions.sign-in-with-username]
+verify_jwt = false
+
+[functions.submit-contact]
+verify_jwt = false

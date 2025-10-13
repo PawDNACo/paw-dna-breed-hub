@@ -1,5 +1,5 @@
-import { PawPrint } from "lucide-react";
 import { TrustBadges } from "@/components/TrustBadges";
+import logo from "@/assets/PawDNALogo.png";
 
 export const Footer = () => {
   return (
@@ -15,13 +15,10 @@ export const Footer = () => {
           {/* Brand */}
           <div className="flex flex-col items-center md:items-start">
             <div 
-              className="flex items-center gap-2 mb-4 cursor-pointer" 
+              className="mb-4 cursor-pointer" 
               onClick={() => window.location.href = "/"}
             >
-              <PawPrint className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold bg-gradient-hero bg-clip-text text-transparent">
-                PawDNA
-              </span>
+              <img src={logo} alt="PawDNA" className="h-8" />
             </div>
             <p className="text-sm text-muted-foreground max-w-xs">
               Like Tinder or Bumble, but for pets! The premier marketplace connecting verified breeders with loving pet owners.

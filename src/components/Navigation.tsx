@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Menu, PawPrint, LogOut, X } from "lucide-react";
+import { Menu, LogOut, X } from "lucide-react";
+import logo from "@/assets/PawDNALogo.png";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,13 +53,10 @@ export const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div 
-            className="flex items-center gap-2 cursor-pointer" 
+            className="cursor-pointer" 
             onClick={() => navigate("/")}
           >
-            <PawPrint className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-              PawDNA
-            </span>
+            <img src={logo} alt="PawDNA" className="h-10" />
           </div>
 
           {/* Desktop Navigation */}
@@ -109,11 +107,8 @@ export const Navigation = () => {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <SheetHeader>
-                <SheetTitle className="flex items-center gap-2">
-                  <PawPrint className="h-6 w-6 text-primary" />
-                  <span className="bg-gradient-hero bg-clip-text text-transparent">
-                    PawDNA
-                  </span>
+                <SheetTitle className="flex items-center">
+                  <img src={logo} alt="PawDNA" className="h-8" />
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-4 mt-8">

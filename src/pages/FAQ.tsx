@@ -187,6 +187,66 @@ export default function FAQ() {
             </Accordion>
           </section>
 
+          {/* For Rehomers */}
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold mb-6">For Rehomers</h2>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="rehomer-1">
+                <AccordionTrigger>What is the rehoming service?</AccordionTrigger>
+                <AccordionContent>
+                  Our rehoming service helps responsible pet owners find loving new homes for their pets 
+                  when circumstances change. Whether it's a move, lifestyle change, or other reason, we 
+                  provide a safe, vetted platform to connect with qualified adopters.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="rehomer-2">
+                <AccordionTrigger>How much does rehoming cost?</AccordionTrigger>
+                <AccordionContent>
+                  Rehoming subscriptions are $9.99/month per gender. You can list male or female pets, 
+                  or subscribe to both genders separately. A refundable deposit may be required depending 
+                  on your location and the pet being rehomed.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="rehomer-3">
+                <AccordionTrigger>What information do I need to provide?</AccordionTrigger>
+                <AccordionContent>
+                  You'll need to provide your pet's breed, age, health status, vaccination records, 
+                  temperament details, and clear photos. Honest and complete information helps ensure 
+                  the best match and protects both you and potential adopters.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="rehomer-4">
+                <AccordionTrigger>How are adopters vetted?</AccordionTrigger>
+                <AccordionContent>
+                  All adopters go through our verification process and must provide valid identification. 
+                  We facilitate secure messaging so you can communicate, ask questions, and ensure a good 
+                  fit before finalizing the adoption. You maintain control over who adopts your pet.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="rehomer-5">
+                <AccordionTrigger>Can I set an adoption fee?</AccordionTrigger>
+                <AccordionContent>
+                  Yes, you can set a reasonable adoption fee to help ensure serious adopters and cover 
+                  costs like vaccinations or supplies. All transactions are processed securely through 
+                  the platform for your protection.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="rehomer-6">
+                <AccordionTrigger>What if I change my mind about rehoming?</AccordionTrigger>
+                <AccordionContent>
+                  You can remove your pet's listing at any time before finalizing an adoption. Monthly 
+                  subscription fees are non-refundable, but you're not obligated to complete a rehoming 
+                  if circumstances change or you don't find the right adopter.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </section>
+
           {/* Payments & Deposits */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6">Payments & Deposits</h2>

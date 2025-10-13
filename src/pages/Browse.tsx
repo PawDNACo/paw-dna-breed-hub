@@ -363,10 +363,24 @@ const Browse = () => {
                   )}
                 </div>
 
-                {/* Apply Filters Button */}
+                {/* Search Button */}
                 <div className="flex justify-end">
-                  <Button onClick={fetchPets} size="lg">
-                    Apply Filters
+                  <Button 
+                    onClick={() => {
+                      const params = new URLSearchParams();
+                      if (searchSpecies !== "all") params.set("species", searchSpecies);
+                      if (searchCity) params.set("city", searchCity);
+                      if (searchState && searchState !== "all") params.set("state", searchState);
+                      if (selectedBreeds.length > 0) params.set("breeds", selectedBreeds.join(","));
+                      if (showSpecialBreeds) params.set("special", "true");
+                      if (showSmallBreeds) params.set("small", "true");
+                      if (showMediumBreeds) params.set("medium", "true");
+                      if (showLargeBreeds) params.set("large", "true");
+                      navigate(`/swipe?${params.toString()}`);
+                    }} 
+                    size="lg"
+                  >
+                    Search
                   </Button>
                 </div>
               </div>

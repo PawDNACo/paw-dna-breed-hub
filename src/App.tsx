@@ -15,6 +15,8 @@ import BreederSubscriptionSignup from "./pages/BreederSubscriptionSignup";
 import BuyerSubscription from "./pages/BuyerSubscription";
 import RehomingSubscription from "./pages/RehomingSubscription";
 import Browse from "./pages/Browse";
+import SwipeMatch from "./pages/SwipeMatch";
+import Favorites from "./pages/Favorites";
 import PetDetail from "./pages/PetDetail";
 import BreederDashboard from "./pages/BreederDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
@@ -79,6 +81,22 @@ const App = () => (
             } 
           />
           <Route path="/browse" element={<Browse />} />
+          <Route 
+            path="/swipe" 
+            element={
+              <ProtectedRoute>
+                <SwipeMatch />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/favorites" 
+            element={
+              <ProtectedRoute>
+                <Favorites />
+              </ProtectedRoute>
+            } 
+          />
           <Route 
             path="/pet/:id" 
             element={

@@ -512,6 +512,30 @@ export type Database = {
           },
         ]
       }
+      favorites: {
+        Row: {
+          created_at: string | null
+          favorited_id: string
+          favorited_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          favorited_id: string
+          favorited_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          favorited_id?: string
+          favorited_type?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       frozen_funds: {
         Row: {
           amount: number
@@ -593,6 +617,84 @@ export type Database = {
           verification_type?: string
         }
         Relationships: []
+      }
+      match_preferences: {
+        Row: {
+          breed_preferences: string[] | null
+          created_at: string | null
+          genetic_health_data: Json | null
+          id: string
+          lifestyle_compatibility: Json | null
+          personality_traits: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          breed_preferences?: string[] | null
+          created_at?: string | null
+          genetic_health_data?: Json | null
+          id?: string
+          lifestyle_compatibility?: Json | null
+          personality_traits?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          breed_preferences?: string[] | null
+          created_at?: string | null
+          genetic_health_data?: Json | null
+          id?: string
+          lifestyle_compatibility?: Json | null
+          personality_traits?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          id: string
+          match_type: string
+          matched_at: string | null
+          notification_sent: boolean | null
+          pet_id: string | null
+          user1_id: string
+          user2_id: string | null
+        }
+        Insert: {
+          id?: string
+          match_type: string
+          matched_at?: string | null
+          notification_sent?: boolean | null
+          pet_id?: string | null
+          user1_id: string
+          user2_id?: string | null
+        }
+        Update: {
+          id?: string
+          match_type?: string
+          matched_at?: string | null
+          notification_sent?: boolean | null
+          pet_id?: string | null
+          user1_id?: string
+          user2_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "public_pet_listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
@@ -1172,6 +1274,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      swipes: {
+        Row: {
+          created_at: string | null
+          id: string
+          swipe_direction: string
+          swiped_id: string
+          swiped_type: string
+          swiper_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          swipe_direction: string
+          swiped_id: string
+          swiped_type: string
+          swiper_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          swipe_direction?: string
+          swiped_id?: string
+          swiped_type?: string
+          swiper_id?: string
+        }
+        Relationships: []
       }
       trial_reminders: {
         Row: {

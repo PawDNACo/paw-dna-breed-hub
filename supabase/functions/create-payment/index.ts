@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { rateLimitMiddleware } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
@@ -13,11 +14,48 @@ serve(async (req) => {
   }
 
   try {
-    // Rate limiting: 20 payment creation attempts per 5 minutes per IP
-    const clientIp = req.headers.get("x-forwarded-for") || "unknown";
+    // SECURITY: Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Missing authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401,
+        }
+      );
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: authHeader },
+        },
+      }
+    );
+
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error('Authentication failed:', authError?.message);
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401,
+        }
+      );
+    }
+
+    console.log('Authenticated user:', user.id);
+
+    // Rate limiting: 10 payment creation attempts per 5 minutes per user
     const rateLimitResponse = rateLimitMiddleware(
-      clientIp,
-      { maxRequests: 20, windowMs: 5 * 60 * 1000, keyPrefix: "create-payment" },
+      user.id,
+      { maxRequests: 10, windowMs: 5 * 60 * 1000, keyPrefix: "create-payment" },
       corsHeaders
     );
     if (rateLimitResponse) return rateLimitResponse;
@@ -52,6 +90,25 @@ serve(async (req) => {
     });
 
     console.log('Payment intent created:', paymentIntent.id);
+
+    // Audit log: Payment creation
+    const serviceClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+    
+    await serviceClient.from('security_audit_log').insert({
+      user_id: user.id,
+      action: 'payment_created',
+      table_name: 'payment_intents',
+      details: {
+        payment_intent_id: paymentIntent.id,
+        amount: amount,
+        type: type,
+        description: description
+      },
+      ip_address: req.headers.get('x-forwarded-for') || 'unknown'
+    });
 
     return new Response(
       JSON.stringify({

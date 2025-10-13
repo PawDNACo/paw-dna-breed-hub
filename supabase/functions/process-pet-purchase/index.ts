@@ -13,21 +13,39 @@ serve(async (req) => {
   }
 
   try {
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2023-10-16',
-    });
+    // SECURITY: Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Missing authorization header');
+      throw new Error('Authentication required');
+    }
 
+    // Initialize authenticated Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+          headers: { Authorization: authHeader },
         },
       }
     );
 
-    const { petId, buyerId } = await req.json();
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error('Authentication failed:', authError?.message);
+      throw new Error('Invalid authentication');
+    }
+
+    console.log('Authenticated user:', user.id);
+
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2023-10-16',
+    });
+
+    const { petId } = await req.json();
+    const buyerId = user.id; // Use authenticated user ID
 
     console.log('Processing pet purchase:', { petId, buyerId });
 
@@ -70,6 +88,25 @@ serve(async (req) => {
     });
 
     console.log('Payment intent created:', paymentIntent.id);
+
+    // Audit log: Payment intent creation
+    const serviceClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+    
+    await serviceClient.from('security_audit_log').insert({
+      user_id: user.id,
+      action: 'payment_intent_created',
+      table_name: 'payment_intents',
+      details: {
+        payment_intent_id: paymentIntent.id,
+        pet_id: petId,
+        amount: paymentIntent.amount,
+        breeder_id: pet.owner_id
+      },
+      ip_address: req.headers.get('x-forwarded-for') || 'unknown'
+    });
 
     return new Response(
       JSON.stringify({

@@ -145,6 +145,22 @@ serve(async (req) => {
 
     console.log('Purchase completed successfully for user:', user.id);
 
+    // Audit log: Purchase completion
+    await serviceClient.from('security_audit_log').insert({
+      user_id: user.id,
+      action: 'purchase_completed',
+      table_name: 'sales',
+      details: {
+        payment_intent_id: paymentIntentId,
+        pet_id: petId,
+        breeder_id: breederId,
+        sale_price: pet.price,
+        platform_fee: expectedPlatformFee,
+        breeder_earnings: expectedBreederEarnings
+      },
+      ip_address: req.headers.get('x-forwarded-for') || 'unknown'
+    });
+
     return new Response(
       JSON.stringify({
         success: true,

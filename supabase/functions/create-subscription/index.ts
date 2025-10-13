@@ -13,16 +13,50 @@ serve(async (req) => {
   }
 
   try {
+    // SECURITY: Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Missing authorization header');
+      throw new Error('Authentication required');
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: authHeader },
+        },
+      }
+    );
+
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error('Authentication failed:', authError?.message);
+      throw new Error('Invalid authentication');
+    }
+
+    console.log('Authenticated user:', user.id);
+
+    // Check for existing active subscription
+    const { data: existingSub } = await supabaseClient
+      .from('subscriptions')
+      .select('id, status')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .maybeSingle();
+
+    if (existingSub) {
+      throw new Error('User already has an active subscription');
+    }
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     });
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
-
-    const { priceId, customerId, subscriptionType, userId } = await req.json();
+    const { priceId, customerId, subscriptionType } = await req.json();
+    const userId = user.id; // Use authenticated user ID
 
     console.log('Creating subscription:', { priceId, customerId, subscriptionType, userId });
 
@@ -73,6 +107,26 @@ serve(async (req) => {
     }
 
     console.log('Subscription created:', subscription.id);
+
+    // Audit log: Subscription creation
+    const serviceClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+    
+    await serviceClient.from('security_audit_log').insert({
+      user_id: userId,
+      action: 'subscription_created',
+      table_name: 'subscriptions',
+      details: {
+        subscription_id: subscription.id,
+        subscription_type: subscriptionType,
+        price_id: priceId,
+        customer_id: customer.id,
+        trial_days: 7
+      },
+      ip_address: req.headers.get('x-forwarded-for') || 'unknown'
+    });
 
     return new Response(
       JSON.stringify({

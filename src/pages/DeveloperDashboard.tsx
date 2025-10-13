@@ -131,15 +131,23 @@ export default function DeveloperDashboard() {
 
   const assignRole = async (userId: string, role: "admin" | "breeder" | "buyer") => {
     try {
-      const { error } = await supabase
-        .from("user_roles")
-        .insert({ user_id: userId, role });
+      // SECURITY: Use server-side edge function for role assignment
+      const { data, error } = await supabase.functions.invoke('assign-role', {
+        body: {
+          targetUserId: userId,
+          role: role
+        }
+      });
 
       if (error) throw error;
 
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
       toast({
         title: "Success",
-        description: `Role ${role} assigned successfully`,
+        description: data?.message || `Role ${role} assigned successfully`,
       });
       
       await loadDashboardData();

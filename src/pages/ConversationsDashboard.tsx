@@ -142,7 +142,7 @@ export default function ConversationsDashboard() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-8 pt-24">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Conversations</h1>
           <p className="text-muted-foreground">

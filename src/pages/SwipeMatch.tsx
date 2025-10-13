@@ -21,6 +21,11 @@ interface Pet {
   image_url?: string;
   city?: string;
   state?: string;
+  size?: string;
+  gender?: string;
+  compatibility_score?: number;
+  match_reasons?: string[];
+  potential_concerns?: string[];
 }
 
 const SwipeMatch = () => {
@@ -56,7 +61,7 @@ const SwipeMatch = () => {
       // Build query based on search params
       let query = supabase
         .from("public_pet_listings")
-        .select("id, name, species, breed, age_months, price, image_url, city, state");
+        .select("id, name, species, breed, age_months, price, image_url, city, state, size, gender");
 
       // SECURITY: Validate and sanitize all user inputs to prevent SQL injection
       const speciesParam = searchParams.get("species");
@@ -103,7 +108,59 @@ const SwipeMatch = () => {
 
       if (error) throw error;
 
-      setPets(data || []);
+      // Get science-based breed recommendations using AI
+      if (data && data.length > 0) {
+        try {
+          const { data: matchPreferences } = await supabase
+            .from("match_preferences")
+            .select("*")
+            .eq("user_id", user.id)
+            .single();
+
+          const userPreferences = {
+            species: validatedSpecies || "any",
+            preferredBreeds: breeds?.split(",") || [],
+            lifestyle: matchPreferences?.lifestyle_compatibility || {},
+            livingSpace: "not specified",
+            experienceLevel: "not specified",
+            activityLevel: "moderate"
+          };
+
+          const { data: recommendations } = await supabase.functions.invoke('get-breed-recommendations', {
+            body: {
+              userPreferences,
+              availablePets: data
+            }
+          });
+
+          if (recommendations?.recommendations) {
+            // Merge AI compatibility scores with pet data
+            const petsWithScores = data.map(pet => {
+              const aiScore = recommendations.recommendations.find((r: any) => r.pet_id === pet.id);
+              return {
+                ...pet,
+                compatibility_score: aiScore?.compatibility_score || 50,
+                match_reasons: aiScore?.match_reasons || [],
+                potential_concerns: aiScore?.potential_concerns || []
+              };
+            });
+
+            // Sort by compatibility score (science-based) while respecting user filters
+            const sortedPets = petsWithScores.sort((a, b) => 
+              (b.compatibility_score || 0) - (a.compatibility_score || 0)
+            );
+
+            setPets(sortedPets);
+          } else {
+            setPets(data || []);
+          }
+        } catch (aiError) {
+          console.error("AI matching error, falling back to standard matching:", aiError);
+          setPets(data || []);
+        }
+      } else {
+        setPets(data || []);
+      }
     } catch (error) {
       console.error("Error fetching pets:", error);
       toast.error("Failed to load pets");
@@ -284,6 +341,26 @@ const SwipeMatch = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3 mb-6">
+                        {currentPet.compatibility_score && (
+                          <div className="mb-4 p-3 bg-primary/10 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium">Compatibility Match</span>
+                              <Badge variant={currentPet.compatibility_score >= 80 ? "default" : "secondary"}>
+                                {currentPet.compatibility_score}% Match
+                              </Badge>
+                            </div>
+                            {currentPet.match_reasons && currentPet.match_reasons.length > 0 && (
+                              <div className="text-xs text-muted-foreground mt-2">
+                                <p className="font-medium mb-1">Why this is a great match:</p>
+                                <ul className="list-disc list-inside space-y-1">
+                                  {currentPet.match_reasons.slice(0, 3).map((reason, idx) => (
+                                    <li key={idx}>{reason}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        )}
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Age:</span>
                           <span className="font-medium">

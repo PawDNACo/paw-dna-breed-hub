@@ -6,6 +6,9 @@ verify_jwt = true
 [functions.assign-role]
 verify_jwt = true
 
+[functions.get-breed-recommendations]
+verify_jwt = true
+
 [functions.process-pet-purchase]
 verify_jwt = true
 

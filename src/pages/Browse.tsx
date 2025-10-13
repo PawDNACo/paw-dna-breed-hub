@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { validateCity, validateState, validateSpecies } from "@/utils/inputValidation";
 
 const US_STATES = [
   { code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" }, { code: "AZ", name: "Arizona" },
@@ -125,16 +126,20 @@ const Browse = () => {
         .from("public_pet_listings")
         .select("id, name, species, breed, gender, size, age_months, price, listing_type, vaccinated, city, state, image_url");
 
-      if (searchSpecies && searchSpecies !== "all") {
-        query = query.eq("species", searchSpecies);
+      // SECURITY: Validate and sanitize all user inputs to prevent SQL injection
+      const validatedSpecies = validateSpecies(searchSpecies);
+      if (validatedSpecies && validatedSpecies !== "all") {
+        query = query.eq("species", validatedSpecies);
       }
 
-      if (searchCity) {
-        query = query.ilike("city", `%${searchCity}%`);
+      const validatedCity = validateCity(searchCity);
+      if (validatedCity) {
+        query = query.ilike("city", `%${validatedCity}%`);
       }
 
-      if (searchState && searchState !== "all") {
-        query = query.ilike("state", `%${searchState}%`);
+      const validatedState = validateState(searchState);
+      if (validatedState) {
+        query = query.eq("state", validatedState);
       }
 
       if (selectedBreeds.length > 0) {

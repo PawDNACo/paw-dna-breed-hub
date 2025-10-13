@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, X, Star, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { validateCity, validateState, validateSpecies } from "@/utils/inputValidation";
 
 interface Pet {
   id: string;
@@ -57,20 +58,23 @@ const SwipeMatch = () => {
         .from("public_pet_listings")
         .select("id, name, species, breed, age_months, price, image_url, city, state");
 
-      // Apply filters from search params
-      const species = searchParams.get("species");
-      if (species && species !== "all") {
-        query = query.eq("species", species);
+      // SECURITY: Validate and sanitize all user inputs to prevent SQL injection
+      const speciesParam = searchParams.get("species");
+      const validatedSpecies = validateSpecies(speciesParam);
+      if (validatedSpecies && validatedSpecies !== "all") {
+        query = query.eq("species", validatedSpecies);
       }
 
-      const city = searchParams.get("city");
-      if (city) {
-        query = query.ilike("city", `%${city}%`);
+      const cityParam = searchParams.get("city");
+      const validatedCity = validateCity(cityParam);
+      if (validatedCity) {
+        query = query.ilike("city", `%${validatedCity}%`);
       }
 
-      const state = searchParams.get("state");
-      if (state && state !== "all") {
-        query = query.ilike("state", `%${state}%`);
+      const stateParam = searchParams.get("state");
+      const validatedState = validateState(stateParam);
+      if (validatedState) {
+        query = query.eq("state", validatedState);
       }
 
       const breeds = searchParams.get("breeds");

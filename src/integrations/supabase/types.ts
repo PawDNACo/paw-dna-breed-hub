@@ -1767,11 +1767,41 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_my_transactions: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          breed: string
+          breeder_earnings: number
+          funds_available_date: string
+          id: string
+          other_party_id: string
+          payout_date: string
+          payout_status: string
+          pet_name: string
+          platform_fee: number
+          sale_date: string
+          sale_price: number
+          species: string
+          transaction_type: string
+        }[]
+      }
       get_partner_location: {
         Args: { _partner_id: string }
         Returns: {
           city: string
           state: string
+        }[]
+      }
+      get_public_profile: {
+        Args: { _profile_id: string }
+        Returns: {
+          city: string
+          created_at: string
+          full_name: string
+          id: string
+          is_verified: boolean
+          state: string
+          verification_status: string
         }[]
       }
       has_role: {

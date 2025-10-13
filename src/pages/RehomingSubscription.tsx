@@ -278,7 +278,7 @@ const RehomingSubscription = () => {
     let totalFee = 0;
     animalDetails.forEach((_, index) => {
       if (needsListingFee(index)) {
-        totalFee += 49.99;
+        totalFee += 19.99;
       }
     });
     return totalFee;
@@ -854,7 +854,7 @@ const RehomingSubscription = () => {
                             <Alert variant="destructive" className="mt-4">
                               <AlertCircle className="h-4 w-4" />
                               <AlertDescription>
-                                Prices under $50 require a one-time listing fee of $49.99
+                                Prices under $50 require a one-time listing fee of $19.99
                               </AlertDescription>
                             </Alert>
                           )}

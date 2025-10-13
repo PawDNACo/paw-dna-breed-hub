@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { InstallPWA } from "@/components/InstallPWA";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
+import Marketplace from "./pages/Marketplace";
 import BreedingServices from "./pages/BreedingServices";
 import RehomingServices from "./pages/RehomingServices";
 import HowItWorksPage from "./pages/HowItWorksPage";
@@ -61,6 +62,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/home" element={<Index />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/breeding-services" element={<BreedingServices />} />
           <Route path="/rehoming-services" element={<RehomingServices />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />

@@ -52,6 +52,36 @@ export default function FAQ() {
                   refunds for breed misrepresentation within 72 hours.
                 </AccordionContent>
               </AccordionItem>
+
+              <AccordionItem value="item-4">
+                <AccordionTrigger>Is PawDNA available as a mobile app?</AccordionTrigger>
+                <AccordionContent>
+                  Yes! PawDNA is available as a Progressive Web App (PWA) that you can install directly 
+                  from your browser to your home screen on both iPhone and Android devices. It works 
+                  offline, loads quickly, and feels just like a native app. Native iOS and Android apps 
+                  are also coming soon to the App Store and Google Play.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-5">
+                <AccordionTrigger>What is DNA-based matchmaking?</AccordionTrigger>
+                <AccordionContent>
+                  PawDNA uses advanced DNA analysis to match pets based on genetic compatibility, health 
+                  traits, and breed quality. This ensures healthier offspring and helps breeders maintain 
+                  breed standards. Our scientific approach minimizes genetic health risks and improves 
+                  breeding outcomes.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-6">
+                <AccordionTrigger>What products and services will be available in the marketplace?</AccordionTrigger>
+                <AccordionContent>
+                  Our upcoming marketplace will feature PawDNA-branded nutrition, accessories, gear, and 
+                  supplies specifically designed for your pets. We'll also host adoption events and provide 
+                  access to an interactive pet community where owners can share experiences, tips, and 
+                  connect with other pet lovers.
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
           </section>
 

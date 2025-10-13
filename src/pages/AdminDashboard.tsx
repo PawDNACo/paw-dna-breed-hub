@@ -77,22 +77,19 @@ export default function AdminDashboard() {
         timestamp: new Date().toISOString() 
       });
 
-      // Load statistics
-      const [usersRes, petsRes, subsRes, breedersRes, buyersRes] = await Promise.all([
-        supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("pets").select("id", { count: "exact", head: true }),
-        supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "active"),
-        supabase.from("pets").select("owner_id", { count: "exact", head: true }),
-        supabase.from("buyer_requests").select("user_id", { count: "exact", head: true }),
-      ]);
+      // Fetch statistics from secure edge function
+      const { data: statsData, error: statsError } = await supabase.functions.invoke('get-admin-stats');
 
-      setStats({
-        totalUsers: usersRes.count || 0,
-        totalPets: petsRes.count || 0,
-        totalSubscriptions: subsRes.count || 0,
-        activeBreeders: breedersRes.count || 0,
-        activeBuyers: buyersRes.count || 0,
-      });
+      if (statsError) {
+        console.error("Error fetching admin stats:", statsError);
+        toast.error("Failed to load admin statistics");
+        navigate("/");
+        return;
+      }
+
+      if (statsData) {
+        setStats(statsData);
+      }
     } catch (error) {
       console.error("Error loading stats:", error);
     } finally {

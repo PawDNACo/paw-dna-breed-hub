@@ -49,21 +49,9 @@ export const ReportUserDialog = ({ reportedUserId, reportedUserName }: ReportUse
 
       if (error) throw error;
 
-      // Automatically freeze the reported account
-      const { error: freezeError } = await supabase.functions.invoke("freeze-reported-account", {
-        body: {
-          reportedUserId,
-          reportReason: reason,
-        },
-      });
-
-      if (freezeError) {
-        console.error("Error freezing account:", freezeError);
-      }
-
       toast({
         title: "Report Submitted",
-        description: "Thank you for your report. The reported account has been frozen and our team will review it immediately.",
+        description: "Thank you for your report. Our team will review it and take appropriate action.",
       });
 
       setOpen(false);

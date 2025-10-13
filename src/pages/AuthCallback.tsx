@@ -92,15 +92,19 @@ export default function AuthCallback() {
         return;
       }
 
-      // Check for pending role from general signup
-      const pendingRole = sessionStorage.getItem('pending_role');
-      if (pendingRole) {
-        const rolesToInsert = pendingRole === "both"
-          ? [
-              { user_id: session.user.id, role: "breeder" as const },
-              { user_id: session.user.id, role: "buyer" as const }
-            ]
-          : [{ user_id: session.user.id, role: pendingRole as "breeder" | "buyer" | "browser" }];
+      // Check for pending role from signup_intents table (secure, server-side)
+      const { data: signupIntents, error: intentsError } = await supabase
+        .from('signup_intents')
+        .select('intended_role')
+        .eq('user_id', session.user.id)
+        .eq('email_verified', false);
+
+      if (!intentsError && signupIntents && signupIntents.length > 0) {
+        // Get unique roles from intents
+        const rolesToInsert = signupIntents.map(intent => ({
+          user_id: session.user.id,
+          role: intent.intended_role
+        }));
 
         // Delete the default 'buyer' role first if needed
         await supabase
@@ -108,7 +112,7 @@ export default function AuthCallback() {
           .delete()
           .eq("user_id", session.user.id);
 
-        // Insert the selected role(s)
+        // Insert the intended role(s) from database
         const { error: roleError } = await supabase
           .from("user_roles")
           .insert(rolesToInsert);
@@ -117,7 +121,11 @@ export default function AuthCallback() {
           console.error("Role assignment error:", roleError);
         }
 
-        sessionStorage.removeItem('pending_role');
+        // Mark intents as verified
+        await supabase
+          .from('signup_intents')
+          .update({ email_verified: true })
+          .eq('user_id', session.user.id);
       }
 
       // Check if user has a profile with username (OAuth flow)

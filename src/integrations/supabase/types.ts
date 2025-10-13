@@ -1214,6 +1214,30 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_intents: {
+        Row: {
+          created_at: string | null
+          email_verified: boolean | null
+          id: string
+          intended_role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email_verified?: boolean | null
+          id?: string
+          intended_role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email_verified?: boolean | null
+          id?: string
+          intended_role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string

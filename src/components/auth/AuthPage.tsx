@@ -162,8 +162,29 @@ export const AuthPage = ({ mode = "signup" }: AuthPageProps) => {
       if (data?.user) {
         console.log('User created successfully:', data.user.id);
         
-        // Store role selection for after email verification
-        sessionStorage.setItem('pending_role', selectedRole);
+        // Store role selection in database (secure, server-side)
+        const { error: intentError } = await supabase
+          .from('signup_intents')
+          .insert({
+            user_id: data.user.id,
+            intended_role: selectedRole === 'both' ? 'breeder' : selectedRole,
+            email_verified: false
+          });
+
+        // If role is 'both', also insert buyer intent
+        if (selectedRole === 'both') {
+          await supabase
+            .from('signup_intents')
+            .insert({
+              user_id: data.user.id,
+              intended_role: 'buyer',
+              email_verified: false
+            });
+        }
+
+        if (intentError) {
+          console.error('Error storing signup intent:', intentError);
+        }
         
         toast.success("Verification email sent! Please check your email to verify your account.");
         navigate("/login");

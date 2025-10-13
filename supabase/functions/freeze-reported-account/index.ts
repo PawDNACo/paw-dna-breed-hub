@@ -13,10 +13,45 @@ serve(async (req) => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: "Authentication required" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
+
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(
+      authHeader.replace("Bearer ", "")
+    );
+
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Invalid authentication" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
+    }
+
+    // Verify admin role using has_role function
+    const { data: isAdmin, error: roleError } = await supabaseClient.rpc('has_role', {
+      _user_id: user.id,
+      _role: 'admin'
+    });
+
+    if (roleError || !isAdmin) {
+      console.log(`Unauthorized freeze attempt by user ${user.id}`);
+      return new Response(
+        JSON.stringify({ error: "Admin privileges required" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }
+      );
+    }
 
     const { reportedUserId, reportReason } = await req.json();
 
@@ -24,10 +59,10 @@ serve(async (req) => {
       throw new Error("Reported user ID is required");
     }
 
-    // Rate limiting: 10 report submissions per hour per IP
+    // Rate limiting: 10 freeze actions per hour per admin
     const clientIp = req.headers.get("x-forwarded-for") || "unknown";
     const rateLimitResponse = rateLimitMiddleware(
-      clientIp,
+      `admin-${user.id}`,
       { maxRequests: 10, windowMs: 60 * 60 * 1000, keyPrefix: "freeze-account" },
       corsHeaders
     );
@@ -36,7 +71,7 @@ serve(async (req) => {
     console.log(`Freezing account for user: ${reportedUserId}`);
     console.log(`Reason: ${reportReason}`);
 
-    // Log security event for account freeze
+    // Log security event for account freeze with admin info
     await supabaseClient
       .from("security_audit_log")
       .insert({
@@ -46,6 +81,8 @@ serve(async (req) => {
         ip_address: clientIp,
         details: {
           reason: reportReason,
+          frozen_by_admin: user.id,
+          admin_email: user.email,
           timestamp: new Date().toISOString()
         }
       });

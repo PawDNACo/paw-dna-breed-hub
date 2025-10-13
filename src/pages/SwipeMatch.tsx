@@ -138,36 +138,17 @@ const SwipeMatch = () => {
 
       if (swipeError) throw swipeError;
 
-      // If right swipe or super like, check for match
+      // If right swipe or super like, check for match via secure server-side function
       if (direction === "right" || direction === "super") {
-        // Check if pet owner has also swiped right on this user
-        const { data: ownerSwipe } = await supabase
-          .from("pets")
-          .select("owner_id")
-          .eq("id", currentPet.id)
-          .single();
-
-        if (ownerSwipe) {
-          const { data: reciprocalSwipe } = await supabase
-            .from("swipes")
-            .select("*")
-            .eq("swiper_id", ownerSwipe.owner_id)
-            .eq("swiped_id", user.id)
-            .eq("swiped_type", "user")
-            .eq("swipe_direction", "right")
-            .maybeSingle();
-
-          if (reciprocalSwipe) {
-            // Create match
-            await supabase.from("matches").insert({
-              user1_id: user.id,
-              user2_id: ownerSwipe.owner_id,
-              pet_id: currentPet.id,
-              match_type: "user_pet"
-            });
-
-            toast.success("🎉 It's a Match! You can now chat with the breeder!");
+        const { data: matchResult, error: matchError } = await supabase.functions.invoke('create-match', {
+          body: { 
+            petId: currentPet.id,
+            swipeDirection: direction
           }
+        });
+
+        if (!matchError && matchResult?.matched && !matchResult?.alreadyMatched) {
+          toast.success("🎉 It's a Match! You can now chat with the breeder!");
         }
 
         if (direction === "super") {

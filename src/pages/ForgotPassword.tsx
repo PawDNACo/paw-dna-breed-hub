@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { PawPrint, ArrowLeft, Mail } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import logo from "@/assets/PawDNALogo.png";
 
 export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
@@ -40,11 +41,8 @@ export default function ForgotPassword() {
     <div className="min-h-screen flex flex-col bg-muted/30">
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          <Link to="/" className="flex items-center justify-center gap-2 mb-8 hover:opacity-80 transition-opacity">
-            <PawPrint className="h-10 w-10 text-primary" />
-            <span className="text-3xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-              PawDNA
-            </span>
+          <Link to="/" className="flex items-center justify-center hover:opacity-80 transition-opacity">
+            <img src={logo} alt="PawDNA Logo" className="h-12" />
           </Link>
 
           <Card>

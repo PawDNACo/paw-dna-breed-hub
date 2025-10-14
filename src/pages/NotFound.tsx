@@ -1,8 +1,8 @@
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
-import { PawPrint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/Footer";
+import logo from "@/assets/PawDNALogo.png";
 
 const NotFound = () => {
   const location = useLocation();
@@ -15,11 +15,8 @@ const NotFound = () => {
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex items-center justify-center bg-muted/30 px-4">
         <div className="text-center space-y-6 max-w-md">
-          <Link to="/" className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <PawPrint className="h-12 w-12 text-primary" />
-            <span className="text-3xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-              PawDNA
-            </span>
+          <Link to="/" className="inline-flex items-center hover:opacity-80 transition-opacity">
+            <img src={logo} alt="PawDNA Logo" className="h-16" />
           </Link>
           <h1 className="text-6xl font-bold text-primary">404</h1>
           <div className="space-y-2">

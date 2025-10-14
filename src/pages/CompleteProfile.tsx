@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { PawPrint } from "lucide-react";
 import { LocationInput } from "@/components/LocationInput";
 import { profileUpdateSchema, validateData } from "@/utils/validation";
+import logo from "@/assets/PawDNALogo.png";
 
 /**
  * Complete Profile Page
@@ -120,11 +120,8 @@ export default function CompleteProfile() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
       <div className="w-full max-w-md">
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <PawPrint className="h-10 w-10 text-primary" />
-          <span className="text-3xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-            PawDNA
-          </span>
+        <div className="flex items-center justify-center mb-8">
+          <img src={logo} alt="PawDNA Logo" className="h-12" />
         </div>
 
         {step === "username" ? (

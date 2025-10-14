@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Search, PawPrint, Calendar, MapPin, Phone, Mail } from "lucide-react";
 import { format } from "date-fns";
 
+// Lost & Found page for public pet listings
 export default function LostAndFound() {
   const [showForm, setShowForm] = useState(false);
   const [listings, setListings] = useState<any[]>([]);

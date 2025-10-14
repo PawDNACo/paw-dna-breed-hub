@@ -56,7 +56,7 @@ export const Navigation = () => {
             className="flex items-center cursor-pointer" 
             onClick={() => navigate("/")}
           >
-            <img src={logo} alt="PawDNA Logo" className="h-20" />
+            <img src={logo} alt="PawDNA Logo" className="h-24" />
           </div>
 
           {/* Desktop Navigation */}
@@ -108,7 +108,7 @@ export const Navigation = () => {
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <SheetHeader>
                 <SheetTitle className="flex items-center justify-center">
-                  <img src={logo} alt="PawDNA Logo" className="h-14" />
+                  <img src={logo} alt="PawDNA Logo" className="h-16" />
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-4 mt-8">

@@ -12,7 +12,7 @@ export default function Marketplace() {
           <div className="text-center min-h-[60vh] flex flex-col items-center justify-center">
             <Package className="w-24 h-24 text-primary mb-6" />
             <div className="flex items-center justify-center gap-4 mb-6">
-              <img src={logo} alt="PawDNA Logo" className="h-16 sm:h-20" />
+              <img src={logo} alt="PawDNA Logo" className="h-24 sm:h-32" />
               <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent">
                 Marketplace
               </h1>

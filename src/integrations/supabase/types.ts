@@ -618,6 +618,66 @@ export type Database = {
         }
         Relationships: []
       }
+      lost_pets: {
+        Row: {
+          breed: string | null
+          city: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at: string
+          description: string
+          id: string
+          last_seen_date: string
+          last_seen_location: string
+          pet_name: string
+          photo_url: string | null
+          species: string
+          state: string | null
+          status: string
+          updated_at: string
+          zip_code: string | null
+        }
+        Insert: {
+          breed?: string | null
+          city?: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at?: string
+          description: string
+          id?: string
+          last_seen_date: string
+          last_seen_location: string
+          pet_name: string
+          photo_url?: string | null
+          species: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+          zip_code?: string | null
+        }
+        Update: {
+          breed?: string | null
+          city?: string | null
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string
+          created_at?: string
+          description?: string
+          id?: string
+          last_seen_date?: string
+          last_seen_location?: string
+          pet_name?: string
+          photo_url?: string | null
+          species?: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
       match_preferences: {
         Row: {
           breed_preferences: string[] | null

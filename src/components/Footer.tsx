@@ -35,6 +35,7 @@ export const Footer = () => {
               <li><a href="/marketplace" className="hover:text-primary transition-colors">Marketplace</a></li>
               <li><a href="/breeding-services" className="hover:text-primary transition-colors">Breeding Services</a></li>
               <li><a href="/rehoming-services" className="hover:text-primary transition-colors">Rehoming Services</a></li>
+              <li><a href="/lost-and-found" className="hover:text-primary transition-colors">Lost & Found</a></li>
               <li><a href="/browse" className="hover:text-primary transition-colors">Buy Puppies</a></li>
               <li><a href="/browse" className="hover:text-primary transition-colors">Buy Kittens</a></li>
             </ul>

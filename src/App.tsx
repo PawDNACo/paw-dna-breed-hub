@@ -8,6 +8,7 @@ import { InstallPWA } from "@/components/InstallPWA";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import Marketplace from "./pages/Marketplace";
+import LostAndFound from "./pages/LostAndFound";
 import BreedingServices from "./pages/BreedingServices";
 import RehomingServices from "./pages/RehomingServices";
 import HowItWorksPage from "./pages/HowItWorksPage";
@@ -63,6 +64,7 @@ const App = () => (
           <Route path="/home" element={<Index />} />
           <Route path="/services" element={<Services />} />
           <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/lost-and-found" element={<LostAndFound />} />
           <Route path="/breeding-services" element={<BreedingServices />} />
           <Route path="/rehoming-services" element={<RehomingServices />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />

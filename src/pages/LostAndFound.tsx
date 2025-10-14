@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Search, PawPrint, Calendar, MapPin, Phone, Mail } from "lucide-react";
+import { Search, PawPrint, Calendar, MapPin, Phone, Mail, AlertTriangle, Eye, EyeOff } from "lucide-react";
 import { format } from "date-fns";
 
 // Lost & Found page for public pet listings
@@ -19,6 +20,8 @@ export default function LostAndFound() {
   const [loading, setLoading] = useState(false);
   const [searchSpecies, setSearchSpecies] = useState("");
   const [searchCity, setSearchCity] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [revealedContacts, setRevealedContacts] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     pet_name: "",
     species: "",
@@ -39,9 +42,30 @@ export default function LostAndFound() {
     setLoading(true);
 
     try {
+      let photoUrl = null;
+
+      // Upload photo if provided
+      if (photoFile) {
+        const fileExt = photoFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('lost-pets')
+          .upload(filePath, photoFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('lost-pets')
+          .getPublicUrl(filePath);
+
+        photoUrl = publicUrl;
+      }
+
       const { error } = await supabase
         .from("lost_pets")
-        .insert([formData]);
+        .insert([{ ...formData, photo_url: photoUrl }]);
 
       if (error) throw error;
 
@@ -60,6 +84,7 @@ export default function LostAndFound() {
         state: "",
         zip_code: "",
       });
+      setPhotoFile(null);
       setShowForm(false);
       handleSearch();
     } catch (error: any) {
@@ -94,6 +119,29 @@ export default function LostAndFound() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleContactReveal = (listingId: string) => {
+    setRevealedContacts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(listingId)) {
+        newSet.delete(listingId);
+      } else {
+        newSet.add(listingId);
+      }
+      return newSet;
+    });
+  };
+
+  const maskPhone = (phone: string) => {
+    if (!phone || phone.length < 4) return "***-***-****";
+    return `***-***-${phone.slice(-4)}`;
+  };
+
+  const maskEmail = (email: string) => {
+    if (!email) return "***@***.com";
+    const [username, domain] = email.split('@');
+    return `${username.slice(0, 2)}***@${domain}`;
   };
 
   return (
@@ -138,6 +186,14 @@ export default function LostAndFound() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                <Alert className="mb-4 border-warning">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Safety Notice:</strong> For your protection, do not include sensitive personal information 
+                    such as your home address, financial details, or other identifiable information beyond basic contact 
+                    details. Meet in public places when arranging to reunite with a found pet.
+                  </AlertDescription>
+                </Alert>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -240,6 +296,19 @@ export default function LostAndFound() {
                     />
                   </div>
 
+                  <div>
+                    <Label htmlFor="photo">Photo (Optional)</Label>
+                    <Input
+                      id="photo"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Upload a clear photo of your pet to help with identification
+                    </p>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="contact_name">Your Name *</Label>
@@ -311,21 +380,32 @@ export default function LostAndFound() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listings.map((listing) => (
-              <Card key={listing.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <PawPrint className="h-5 w-5 text-primary" />
-                    {listing.pet_name}
-                  </CardTitle>
-                  <CardDescription>
-                    {listing.species} {listing.breed && `- ${listing.breed}`}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <p className="text-sm text-muted-foreground">{listing.description}</p>
-                  
-                  <div className="space-y-2 text-sm">
+            {listings.map((listing) => {
+              const isRevealed = revealedContacts.has(listing.id);
+              return (
+                <Card key={listing.id} className="hover:shadow-lg transition-shadow">
+                  {listing.photo_url && (
+                    <div className="w-full h-48 overflow-hidden rounded-t-lg">
+                      <img 
+                        src={listing.photo_url} 
+                        alt={listing.pet_name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <PawPrint className="h-5 w-5 text-primary" />
+                      {listing.pet_name}
+                    </CardTitle>
+                    <CardDescription>
+                      {listing.species} {listing.breed && `- ${listing.breed}`}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <p className="text-sm text-muted-foreground">{listing.description}</p>
+                    
+                    <div className="space-y-2 text-sm">
                     <div className="flex items-start gap-2">
                       <MapPin className="h-4 w-4 text-primary mt-0.5" />
                       <div>
@@ -344,25 +424,55 @@ export default function LostAndFound() {
                       </span>
                     </div>
 
-                    <div className="pt-3 border-t space-y-1">
-                      <p className="font-medium">Contact:</p>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Phone className="h-4 w-4" />
-                        <a href={`tel:${listing.contact_phone}`} className="hover:text-primary">
-                          {listing.contact_phone}
-                        </a>
+                    <div className="pt-3 border-t space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium">Contact Information:</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleContactReveal(listing.id)}
+                        >
+                          {isRevealed ? (
+                            <>
+                              <EyeOff className="h-4 w-4 mr-1" />
+                              Hide
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="h-4 w-4 mr-1" />
+                              Show
+                            </>
+                          )}
+                        </Button>
                       </div>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Mail className="h-4 w-4" />
-                        <a href={`mailto:${listing.contact_email}`} className="hover:text-primary">
-                          {listing.contact_email}
-                        </a>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Phone className="h-4 w-4" />
+                          {isRevealed ? (
+                            <a href={`tel:${listing.contact_phone}`} className="hover:text-primary">
+                              {listing.contact_phone}
+                            </a>
+                          ) : (
+                            <span>{maskPhone(listing.contact_phone)}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Mail className="h-4 w-4" />
+                          {isRevealed ? (
+                            <a href={`mailto:${listing.contact_email}`} className="hover:text-primary">
+                              {listing.contact_email}
+                            </a>
+                          ) : (
+                            <span>{maskEmail(listing.contact_email)}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            );
+            })}
           </div>
 
           {listings.length === 0 && !loading && (

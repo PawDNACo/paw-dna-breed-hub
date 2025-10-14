@@ -16,7 +16,7 @@ const NotFound = () => {
       <div className="flex-1 flex items-center justify-center bg-muted/30 px-4">
         <div className="text-center space-y-6 max-w-md">
           <Link to="/" className="inline-flex items-center hover:opacity-80 transition-opacity">
-            <img src={logo} alt="PawDNA Logo" className="h-20" />
+            <img src={logo} alt="PawDNA Logo" className="h-28" />
           </Link>
           <h1 className="text-6xl font-bold text-primary">404</h1>
           <div className="space-y-2">

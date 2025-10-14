@@ -18,7 +18,7 @@ export const Footer = () => {
               className="flex items-center mb-4 cursor-pointer" 
               onClick={() => window.location.href = "/"}
             >
-              <img src={logo} alt="PawDNA Logo" className="h-10" />
+              <img src={logo} alt="PawDNA Logo" className="h-14" />
             </div>
             <p className="text-sm text-muted-foreground max-w-xs">
               Like Tinder or Bumble, but for pets! The premier marketplace connecting verified breeders with loving pet owners.

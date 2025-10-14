@@ -42,7 +42,7 @@ export default function ForgotPassword() {
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <Link to="/" className="flex items-center justify-center hover:opacity-80 transition-opacity">
-            <img src={logo} alt="PawDNA Logo" className="h-16" />
+            <img src={logo} alt="PawDNA Logo" className="h-24" />
           </Link>
 
           <Card>

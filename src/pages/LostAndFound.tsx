@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Search, PawPrint, Calendar, MapPin, Phone, Mail, AlertTriangle, Eye, EyeOff } from "lucide-react";
 import { format } from "date-fns";
+import { SmartLocationInput } from "@/components/SmartLocationInput";
 
 // Lost & Found page for public pet listings
 export default function LostAndFound() {
@@ -20,6 +21,8 @@ export default function LostAndFound() {
   const [loading, setLoading] = useState(false);
   const [searchSpecies, setSearchSpecies] = useState("");
   const [searchCity, setSearchCity] = useState("");
+  const [searchState, setSearchState] = useState("");
+  const [searchZip, setSearchZip] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [revealedContacts, setRevealedContacts] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
@@ -108,6 +111,12 @@ export default function LostAndFound() {
       }
       if (searchCity) {
         query = query.ilike("city", `%${searchCity}%`);
+      }
+      if (searchState) {
+        query = query.eq("state", searchState);
+      }
+      if (searchZip) {
+        query = query.eq("zip_code", searchZip);
       }
 
       const { data, error } = await query;
@@ -256,34 +265,15 @@ export default function LostAndFound() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="city">City *</Label>
-                      <Input
-                        id="city"
-                        value={formData.city}
-                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="state">State *</Label>
-                      <Input
-                        id="state"
-                        value={formData.state}
-                        onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="zip_code">ZIP Code</Label>
-                      <Input
-                        id="zip_code"
-                        value={formData.zip_code}
-                        onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
-                      />
-                    </div>
-                  </div>
+                  <SmartLocationInput
+                    zipCode={formData.zip_code}
+                    city={formData.city}
+                    state={formData.state}
+                    onZipChange={(zip) => setFormData({ ...formData, zip_code: zip })}
+                    onCityChange={(city) => setFormData({ ...formData, city })}
+                    onStateChange={(state) => setFormData({ ...formData, state })}
+                    required
+                  />
 
                   <div>
                     <Label htmlFor="last_seen_date">Last Seen Date *</Label>
@@ -355,26 +345,23 @@ export default function LostAndFound() {
                 <CardTitle>Search Lost Pets</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="search_species">Species</Label>
-                    <Input
-                      id="search_species"
-                      placeholder="Dog, Cat, Bird..."
-                      value={searchSpecies}
-                      onChange={(e) => setSearchSpecies(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="search_city">City</Label>
-                    <Input
-                      id="search_city"
-                      placeholder="City name"
-                      value={searchCity}
-                      onChange={(e) => setSearchCity(e.target.value)}
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="search_species">Species</Label>
+                  <Input
+                    id="search_species"
+                    placeholder="Dog, Cat, Bird..."
+                    value={searchSpecies}
+                    onChange={(e) => setSearchSpecies(e.target.value)}
+                  />
                 </div>
+                <SmartLocationInput
+                  zipCode={searchZip}
+                  city={searchCity}
+                  state={searchState}
+                  onZipChange={setSearchZip}
+                  onCityChange={setSearchCity}
+                  onStateChange={setSearchState}
+                />
               </CardContent>
             </Card>
           </div>

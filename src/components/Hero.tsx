@@ -28,7 +28,7 @@ export const Hero = () => {
               Because love isn't just for humans—it's in their genes. 🐾
               {" "}<strong className="text-primary">Sign Up Is FREE - No payment required upfront.</strong>
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="xl" onClick={() => window.location.href = "/breeder-subscription"}>
                 Start Breeding
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -42,20 +42,20 @@ export const Hero = () => {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
-            <div className="mt-8 flex flex-wrap gap-8 text-sm justify-center md:justify-start">
-              <div className="text-center md:text-left">
+            <div className="mt-8 flex flex-wrap gap-8 text-sm justify-center">
+              <div className="text-center">
                 <div className="text-2xl font-bold text-primary">Free</div>
                 <div className="text-muted-foreground">Sign Up - No Upfront Cost</div>
               </div>
-              <div className="text-center md:text-left">
+              <div className="text-center">
                 <div className="text-2xl font-bold text-primary">$150+</div>
                 <div className="text-muted-foreground">Average Breeding Value</div>
               </div>
-              <div className="text-center md:text-left">
+              <div className="text-center">
                 <div className="text-2xl font-bold text-primary">85%</div>
                 <div className="text-muted-foreground">Breeder Royalties</div>
               </div>
-              <div className="text-center md:text-left">
+              <div className="text-center">
                 <div className="text-2xl font-bold text-primary">Verified</div>
                 <div className="text-muted-foreground">Secure Platform</div>
               </div>

@@ -17,7 +17,7 @@ import SubscriptionPayment from "@/components/payment/SubscriptionPayment";
 export default function RehomingSubscribe() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { isBreeder, loading } = useUserRole();
+  const { isBreeder, loading, isQA, isDeveloper } = useUserRole();
   const [showPayment, setShowPayment] = useState(false);
   const [subscriptionType, setSubscriptionType] = useState("");
   const [subscriptionAmount, setSubscriptionAmount] = useState(0);
@@ -34,6 +34,9 @@ export default function RehomingSubscribe() {
   }, [isBreeder, loading, navigate]);
 
   const calculateSubscriptionCost = () => {
+    // QA and Developer roles get free subscriptions
+    if (isQA || isDeveloper) return 0;
+    
     const basePrice = formData.subscriptionType === "single-pet" ? 2.99 : 
                       formData.subscriptionType === "multi-pet" ? 5.99 : 0;
     

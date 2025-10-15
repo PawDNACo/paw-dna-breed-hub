@@ -32,6 +32,7 @@ export default function BreederSubscribe() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { isBreeder, loading } = useUserRole();
+  const { isQA, isDeveloper } = useUserRole();
   const [showPayment, setShowPayment] = useState(false);
   const [subscriptionType, setSubscriptionType] = useState("");
   const [subscriptionAmount, setSubscriptionAmount] = useState(0);
@@ -112,6 +113,9 @@ export default function BreederSubscribe() {
   };
 
   const calculateSubscriptionCost = () => {
+    // QA and Developer roles get free subscriptions
+    if (isQA || isDeveloper) return 0;
+    
     const basePrice = formData.subscriptionType === "single-gender" ? 4.99 : 
                       formData.subscriptionType === "both-genders" ? 9.99 :
                       formData.subscriptionType === "multi-single" ? 12.99 :

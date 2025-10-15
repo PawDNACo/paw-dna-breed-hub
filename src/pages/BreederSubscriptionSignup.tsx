@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { SmsOptInDialog } from "@/components/auth/SmsOptInDialog";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const DOG_BREEDS = [
   "Labrador Retriever", "German Shepherd", "Golden Retriever", "French Bulldog",
@@ -57,6 +58,7 @@ const US_STATES = [
 const BreederSubscriptionSignup = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { isQA, isDeveloper } = useUserRole();
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -314,6 +316,9 @@ const BreederSubscriptionSignup = () => {
   };
 
   const calculateSubscriptionCost = () => {
+    // QA and Developer roles get free subscriptions
+    if (isQA || isDeveloper) return 0;
+    
     const basePrice = formData.subscriptionType === "single-gender" ? 4.99 : 
                       formData.subscriptionType === "both-genders" ? 9.99 :
                       formData.subscriptionType === "multi-single" ? 12.99 :
@@ -326,11 +331,17 @@ const BreederSubscriptionSignup = () => {
   };
 
   const needsListingFee = (animalIndex: number) => {
+    // QA and Developer roles don't pay listing fees
+    if (isQA || isDeveloper) return false;
+    
     const price = parseFloat(animalDetails[animalIndex]?.price || "0");
     return price < 50;
   };
 
   const calculateListingFee = () => {
+    // QA and Developer roles don't pay listing fees
+    if (isQA || isDeveloper) return 0;
+    
     let totalFee = 0;
     animalDetails.forEach((_, index) => {
       if (needsListingFee(index)) {

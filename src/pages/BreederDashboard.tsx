@@ -87,6 +87,26 @@ export default function BreederDashboard() {
     if (isBuyer && !rolesLoading) {
       loadBuyerRequests();
     }
+
+    // Set up real-time subscription for pet listings
+    const petsChannel = supabase
+      .channel('pets_realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pets',
+        },
+        () => {
+          checkSubscriptionAndLoadPets();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(petsChannel);
+    };
   }, [isBuyer, rolesLoading]);
 
   const checkSubscriptionAndLoadPets = async () => {

@@ -121,6 +121,45 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadDashboardData();
+
+    // Set up real-time subscription for buyer requests
+    const requestsChannel = supabase
+      .channel('buyer_requests_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'buyer_requests',
+        },
+        () => {
+          // Reload data when requests change
+          loadDashboardData();
+        }
+      )
+      .subscribe();
+
+    // Set up real-time subscription for pet listings
+    const petsChannel = supabase
+      .channel('pets_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pets',
+        },
+        () => {
+          // Reload data when listings change
+          loadDashboardData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(requestsChannel);
+      supabase.removeChannel(petsChannel);
+    };
   }, []);
 
   useEffect(() => {
@@ -210,6 +249,59 @@ export default function Dashboard() {
 
       if (error) throw error;
       toast({ title: "Listing deleted successfully!" });
+      loadDashboardData();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!requestFormData.species || (!requestFormData.breed && requestFormData.species !== "both") || 
+        (requestFormData.species === "both" && requestFormData.breeds.length === 0)) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const requestData = {
+        species: requestFormData.species,
+        breed: requestFormData.species === "both" ? requestFormData.breeds.join(", ") : requestFormData.breed,
+        description: requestFormData.description,
+        max_price: requestFormData.max_price ? parseFloat(requestFormData.max_price) : null,
+        user_id: user.id,
+        status: "active",
+      };
+
+      const { error } = await supabase
+        .from("buyer_requests")
+        .insert([requestData]);
+
+      if (error) throw error;
+
+      toast({ title: "Request posted successfully!" });
+      setRequestDialogOpen(false);
+      setRequestFormData({
+        species: "",
+        breed: "",
+        breeds: [],
+        description: "",
+        max_price: "",
+      });
+      
+      // Reload data to show new request
       loadDashboardData();
     } catch (error: any) {
       toast({
@@ -329,7 +421,7 @@ export default function Dashboard() {
                       <DialogHeader>
                         <DialogTitle>Create Breed Request</DialogTitle>
                       </DialogHeader>
-                      <form className="space-y-4">
+                      <form onSubmit={handleSaveRequest} className="space-y-4">
                         <div>
                           <Label htmlFor="species">Species</Label>
                           <Select

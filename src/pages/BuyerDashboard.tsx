@@ -75,6 +75,26 @@ export default function BuyerDashboard() {
 
   useEffect(() => {
     checkSubscriptionAndLoadRequests();
+
+    // Set up real-time subscription for buyer requests
+    const requestsChannel = supabase
+      .channel('buyer_requests_realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'buyer_requests',
+        },
+        () => {
+          checkSubscriptionAndLoadRequests();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(requestsChannel);
+    };
   }, []);
 
   const checkSubscriptionAndLoadRequests = async () => {

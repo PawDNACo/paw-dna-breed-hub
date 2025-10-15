@@ -16,10 +16,17 @@ const CancelSubscription = () => {
           </div>
           
           <p className="text-lg text-muted-foreground leading-relaxed">
-            We're saddened to hear you canceled your subscription. Your support helped fuel life-changing genetic verification and safe matches for pets in need, and your absence will be felt by the animals and people who rely on PawDNA. If circumstances change, we'd be grateful to welcome you back.
+            Thank you for the support you've given so far. We're saddened by your cancellation and would love to understand if there's anything we can address. If you'd like lower-cost options to stay involved or to discuss next steps, we're here to help.
           </p>
 
-          <div className="pt-4">
+          <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={() => window.location.href = "/subscribe-pricing"}
+            >
+              Resubscribe
+            </Button>
             <Button 
               variant="default" 
               size="lg"

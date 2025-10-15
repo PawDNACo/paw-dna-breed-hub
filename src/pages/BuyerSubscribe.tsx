@@ -16,7 +16,7 @@ import SubscriptionPayment from "@/components/payment/SubscriptionPayment";
 
 const DOG_BREEDS = [
   "Labrador Retriever", "German Shepherd", "Golden Retriever", "French Bulldog",
-  "Bulldog", "Poodle", "Beagle", "Rottweiler", "Yorkshire Terrier", "Dachshund"
+  "Bulldog", "Poodle", "Beagle", "Rottweiler", "Yorkshire Terrier", "Dachshund", "Cane Corso"
 ];
 
 const CAT_BREEDS = [

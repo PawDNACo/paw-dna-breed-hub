@@ -40,7 +40,7 @@ const DOG_BREEDS = [
   "Boxer", "Dachshund", "Pembroke Welsh Corgi", "Siberian Husky", "Australian Shepherd",
   "Great Dane", "Doberman Pinscher", "Cavalier King Charles Spaniel", "Miniature Schnauzer",
   "Shih Tzu", "Boston Terrier", "Pomeranian", "Havanese", "Shetland Sheepdog", "Brittany",
-  "English Springer Spaniel", "Mastiff", "Cocker Spaniel", "Border Collie", "Chihuahua"
+  "English Springer Spaniel", "Mastiff", "Cocker Spaniel", "Border Collie", "Chihuahua", "Cane Corso"
 ];
 
 const CAT_BREEDS = [

@@ -34,7 +34,7 @@ const DOG_BREEDS = [
   "Doberman Pinscher", "Australian Shepherd", "Miniature Schnauzer", "Cavalier King Charles Spaniel",
   "Shih Tzu", "Boston Terrier", "Pomeranian", "Havanese", "Shetland Sheepdog",
   "Brittany", "Pembroke Welsh Corgi", "Australian Cattle Dog", "English Springer Spaniel",
-  "Cocker Spaniel", "Border Collie", "Vizsla"
+  "Cocker Spaniel", "Border Collie", "Vizsla", "Cane Corso"
 ];
 
 const CAT_BREEDS = [

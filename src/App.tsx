@@ -14,9 +14,13 @@ import RehomingServices from "./pages/RehomingServices";
 import HowItWorksPage from "./pages/HowItWorksPage";
 import BreederStandards from "./pages/BreederStandards";
 import PricingPage from "./pages/PricingPage";
+import SubscribePricing from "./pages/SubscribePricing";
 import BreederSubscriptionSignup from "./pages/BreederSubscriptionSignup";
 import BuyerSubscription from "./pages/BuyerSubscription";
 import RehomingSubscription from "./pages/RehomingSubscription";
+import BreederSubscribe from "./pages/BreederSubscribe";
+import BuyerSubscribe from "./pages/BuyerSubscribe";
+import RehomingSubscribe from "./pages/RehomingSubscribe";
 import Browse from "./pages/Browse";
 import SwipeMatch from "./pages/SwipeMatch";
 import Favorites from "./pages/Favorites";
@@ -70,9 +74,41 @@ const App = () => (
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/breeder-standards" element={<BreederStandards />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route 
+            path="/subscribe-pricing" 
+            element={
+              <ProtectedRoute>
+                <SubscribePricing />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/breeder-subscription" element={<BreederSubscriptionSignup />} />
           <Route path="/buyer-subscription" element={<BuyerSubscription />} />
           <Route path="/rehoming-subscription" element={<RehomingSubscription />} />
+          <Route 
+            path="/subscribe-breeder" 
+            element={
+              <ProtectedRoute>
+                <BreederSubscribe />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/subscribe-buyer" 
+            element={
+              <ProtectedRoute>
+                <BuyerSubscribe />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/subscribe-rehoming" 
+            element={
+              <ProtectedRoute>
+                <RehomingSubscribe />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/sign-up" element={<AuthPage mode="signup" />} />
           <Route path="/login" element={<AuthPage mode="login" />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

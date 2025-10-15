@@ -245,6 +245,12 @@ export const Pricing = () => {
   };
 
   const handleSubscribeClick = (planType: string) => {
+    // If user is logged in but has no subscription role, redirect to subscribe-pricing
+    if (user && userRoles.length > 0 && !userRoles.includes("breeder") && !userRoles.includes("buyer") && !userRoles.includes("buy_pup_kit")) {
+      navigate('/subscribe-pricing');
+      return;
+    }
+    
     if (planType === "buyer" || planType === "buy_pup_kit") {
       navigate('/buyer-subscription');
     } else {

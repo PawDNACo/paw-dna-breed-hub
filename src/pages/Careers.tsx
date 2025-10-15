@@ -34,7 +34,7 @@ const jobListings = [
   },
   {
     id: "2",
-    title: "QA Tester",
+    title: "QA Tester - Automation Focus",
     department: "Quality Assurance",
     location: "Remote",
     type: "Full-time",
@@ -158,29 +158,11 @@ export default function Careers() {
   };
 
   const handleGoogleDrivePicker = () => {
-    // Load Google Picker API
-    const script = document.createElement('script');
-    script.src = 'https://apis.google.com/js/api.js';
-    script.onload = () => {
-      window.gapi.load('picker', () => {
-        const picker = new window.google.picker.PickerBuilder()
-          .addView(window.google.picker.ViewId.DOCS)
-          .setOAuthToken('YOUR_OAUTH_TOKEN') // This would need proper OAuth setup
-          .setCallback((data: any) => {
-            if (data.action === window.google.picker.Action.PICKED) {
-              const doc = data.docs[0];
-              toast({
-                title: "File selected from Google Drive",
-                description: `${doc.name} will be attached to your application.`,
-              });
-              // In production, you'd download and attach the file
-            }
-          })
-          .build();
-        picker.setVisible(true);
-      });
-    };
-    document.body.appendChild(script);
+    toast({
+      title: "Coming Soon",
+      description: "Google Drive integration is not yet configured. Please upload your resume directly or use LinkedIn import.",
+      variant: "destructive",
+    });
   };
 
   const handleBoxPicker = () => {

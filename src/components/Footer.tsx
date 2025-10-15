@@ -81,7 +81,6 @@ export const Footer = () => {
               <li><a href="/breeder-standards" className="hover:text-primary transition-colors">Breeder Standards</a></li>
               <li><a href="/careers" className="hover:text-primary transition-colors">Careers</a></li>
               <li><a href="/contact" className="hover:text-primary transition-colors">Contact</a></li>
-              <li><a href="/faq" className="hover:text-primary transition-colors">FAQ</a></li>
               {!isSubscribed && (
                 <li><a href="/waitlist" className="hover:text-primary transition-colors">Join Waitlist</a></li>
               )}
@@ -97,6 +96,7 @@ export const Footer = () => {
               <li><a href="/breeder-agreement" className="hover:text-primary transition-colors">Breeder Agreement</a></li>
               <li><a href="/buyer-agreement" className="hover:text-primary transition-colors">Buyer Agreement</a></li>
               <li><a href="/refund-policy" className="hover:text-primary transition-colors">Refund Policy</a></li>
+              <li><a href="/faq" className="hover:text-primary transition-colors">FAQ</a></li>
             </ul>
           </div>
 

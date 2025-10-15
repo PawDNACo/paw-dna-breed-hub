@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Upload, FileText, MapPin, DollarSign, Clock, Briefcase } from "lucide-react";
@@ -116,6 +117,8 @@ const jobListings = [
 
 export default function Careers() {
   const { toast } = useToast();
+  const formRef = useRef<HTMLDivElement>(null);
+  const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -127,6 +130,12 @@ export default function Careers() {
     startDate: "",
     resume: null as File | null,
   });
+
+  const handleApplyNow = (jobTitle: string) => {
+    setSelectedJob(jobTitle);
+    setFormData({ ...formData, position: jobTitle });
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -181,7 +190,7 @@ export default function Careers() {
             </p>
           </div>
 
-          <Card>
+          <Card ref={formRef}>
             <CardHeader>
               <CardTitle>Application Form</CardTitle>
               <CardDescription>
@@ -229,13 +238,32 @@ export default function Careers() {
 
                   <div>
                     <Label htmlFor="position">Position Applied For *</Label>
-                    <Input
-                      id="position"
-                      required
-                      value={formData.position}
-                      onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                      placeholder="e.g., Software Engineer"
-                    />
+                    {selectedJob ? (
+                      <Input
+                        id="position"
+                        required
+                        value={formData.position}
+                        disabled
+                        className="bg-muted"
+                      />
+                    ) : (
+                      <Select
+                        value={formData.position}
+                        onValueChange={(value) => setFormData({ ...formData, position: value })}
+                        required
+                      >
+                        <SelectTrigger id="position">
+                          <SelectValue placeholder="Select a position" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {jobListings.map((job) => (
+                            <SelectItem key={job.id} value={job.title}>
+                              {job.title} - {job.location}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                 </div>
 
@@ -386,7 +414,7 @@ export default function Careers() {
                           {job.department}
                         </CardDescription>
                       </div>
-                      <Button size="lg">Apply Now</Button>
+                      <Button size="lg" onClick={() => handleApplyNow(job.title)}>Apply Now</Button>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-4">
                       <Badge variant="outline" className="gap-1">

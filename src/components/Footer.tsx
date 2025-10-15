@@ -104,9 +104,7 @@ export const Footer = () => {
           <div className="flex flex-col items-center md:items-start">
             <h3 className="font-semibold mb-4">Developers</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              {isAuthenticated && (
-                <li><a href="/qa-demo" className="hover:text-primary transition-colors">QA/Demo</a></li>
-              )}
+              <li><a href="/qa-demo" className="hover:text-primary transition-colors">QA/Demo</a></li>
               <li><a href="/admin" className="hover:text-primary transition-colors">Admin</a></li>
             </ul>
           </div>

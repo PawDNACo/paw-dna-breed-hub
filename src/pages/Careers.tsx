@@ -388,7 +388,7 @@ export default function Careers() {
                   {/* Integration Options */}
                   <div className="space-y-2">
                     <p className="text-sm text-muted-foreground">Or import from:</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <Button
                         type="button"
                         variant="outline"
@@ -399,17 +399,6 @@ export default function Careers() {
                           <path d="M12.01 1.85l-6.02 10.44 3.78 6.56 6.02-10.44-3.78-6.56zm-7.84 11.86L.39 21.16h7.56l3.78-6.56H4.17zm11.4 0l-3.78 6.56h11.82l-3.78-6.56h-4.26z"/>
                         </svg>
                         Google Drive
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleBoxPicker}
-                        className="gap-2 w-full"
-                      >
-                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M19.9 7L12 2.1 4.1 7 12 11.9 19.9 7zM4.1 17L12 21.9l7.9-4.9-7.9-4.9L4.1 17z"/>
-                        </svg>
-                        Box
                       </Button>
                       <Button
                         type="button"

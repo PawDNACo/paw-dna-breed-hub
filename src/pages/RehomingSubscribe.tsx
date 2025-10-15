@@ -24,7 +24,7 @@ export default function RehomingSubscribe() {
   
   const [formData, setFormData] = useState({
     subscriptionType: "",
-    animalCount: "1"
+    animalCount: "2"
   });
 
   useEffect(() => {
@@ -127,7 +127,7 @@ export default function RehomingSubscribe() {
                     <Input
                       id="animalCount"
                       type="number"
-                      min="1"
+                      min="2"
                       value={formData.animalCount}
                       onChange={(e) => setFormData({...formData, animalCount: e.target.value})}
                     />

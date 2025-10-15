@@ -107,29 +107,29 @@ export default function AboutUs() {
           {/* Why Choose PawDNA */}
           <section className="mb-16">
             <h2 className="text-3xl font-bold mb-6 text-center">Why Choose PawDNA?</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
               <div className="bg-card border border-border rounded-lg p-6">
                 <h3 className="text-xl font-semibold mb-3">For Breeders</h3>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-1">✓</span>
-                    <span>Free sign-up with no upfront costs</span>
+                    <span>Showcase your breeding program professionally</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-1">✓</span>
-                    <span>Earn 85% on all sales—fair royalties</span>
+                    <span>Earn 85% on sales over $750—fair royalties</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-1">✓</span>
-                    <span>Create profiles and reach buyers nationwide</span>
+                    <span>Connect with verified buyers nationwide</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-1">✓</span>
-                    <span>Flexible payment options</span>
+                    <span>Flexible subscription plans for any operation size</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-1">✓</span>
-                    <span>Premium add-ons to increase revenue</span>
+                    <span>Premium add-ons to maximize revenue</span>
                   </li>
                 </ul>
               </div>
@@ -151,11 +151,63 @@ export default function AboutUs() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-1">✓</span>
-                    <span>Access to breeding services</span>
+                    <span>Access to breeding and stud services</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-1">✓</span>
-                    <span>Add-ons for complete pet care</span>
+                    <span>Premium care packages and add-ons</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h3 className="text-xl font-semibold mb-3">For Rehomers</h3>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">✓</span>
+                    <span>No listing fees—just affordable subscriptions</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">✓</span>
+                    <span>Help pets find loving homes responsibly</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">✓</span>
+                    <span>Single or multi-pet plans starting at $2.99/month</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">✓</span>
+                    <span>Connect with verified adopters</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">✓</span>
+                    <span>Safe, transparent rehoming process</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h3 className="text-xl font-semibold mb-3">All In One</h3>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">✓</span>
+                    <span>Full access to breeding and buying features</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">✓</span>
+                    <span>Best value with combined subscription savings</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">✓</span>
+                    <span>Unlimited pet listings and swipes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">✓</span>
+                    <span>Priority support and premium features</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">✓</span>
+                    <span>Perfect for serious breeders and pet enthusiasts</span>
                   </li>
                 </ul>
               </div>

@@ -56,6 +56,7 @@ import GeneratePetListings from "./pages/GeneratePetListings";
 import Waitlist from "./pages/Waitlist";
 import CancellationGoodbye from "./pages/CancellationGoodbye";
 import CancelSubscription from "./pages/CancelSubscription";
+import LinkedInCallback from "./pages/LinkedInCallback";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { QAProtectedRoute } from "./components/auth/QAProtectedRoute";
@@ -279,6 +280,7 @@ const App = () => (
               </ProtectedRoute>
             } 
           />
+          <Route path="/linkedin-callback" element={<LinkedInCallback />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

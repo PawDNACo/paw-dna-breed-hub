@@ -3,6 +3,9 @@ project_id = "mzvotmzztruvllbdbqdy"
 [functions.generate-pet-listings]
 verify_jwt = true
 
+[functions.linkedin-auth]
+verify_jwt = true
+
 [functions.assign-role]
 verify_jwt = true
 

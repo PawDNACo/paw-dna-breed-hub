@@ -211,44 +211,131 @@ export default function Careers() {
     document.body.appendChild(script);
   };
 
-  const handleLinkedInImport = () => {
-    // LinkedIn OAuth flow
-    const clientId = 'YOUR_LINKEDIN_CLIENT_ID';
-    const redirectUri = encodeURIComponent(window.location.origin + '/careers');
-    const scope = encodeURIComponent('r_liteprofile r_emailaddress');
-    const state = Math.random().toString(36).substring(7);
-    
-    const linkedInAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
-    
-    // Open LinkedIn OAuth in popup
-    const width = 600;
-    const height = 700;
-    const left = window.screen.width / 2 - width / 2;
-    const top = window.screen.height / 2 - height / 2;
-    
-    const popup = window.open(
-      linkedInAuthUrl,
-      'LinkedIn Login',
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
-
-    // Listen for OAuth callback
-    window.addEventListener('message', (event) => {
-      if (event.data.type === 'linkedin-auth') {
+  const handleLinkedInImport = async () => {
+    try {
+      const clientId = import.meta.env.VITE_LINKEDIN_CLIENT_ID;
+      
+      if (!clientId) {
         toast({
-          title: "LinkedIn profile imported",
-          description: "Your profile information has been imported successfully.",
+          title: "Configuration Error",
+          description: "LinkedIn integration is not configured. Please contact support.",
+          variant: "destructive",
         });
-        // Auto-fill form with LinkedIn data
-        if (event.data.profile) {
-          setFormData({
-            ...formData,
-            fullName: event.data.profile.name || formData.fullName,
-            email: event.data.profile.email || formData.email,
-          });
-        }
+        return;
       }
-    });
+
+      // OAuth parameters
+      const redirectUri = `${window.location.origin}/linkedin-callback`;
+      const scope = 'openid profile email';
+      const state = Math.random().toString(36).substring(7);
+      
+      // Store state for verification
+      sessionStorage.setItem('linkedin_oauth_state', state);
+      
+      const linkedInAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
+      
+      // Open LinkedIn OAuth in popup
+      const width = 600;
+      const height = 700;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
+      
+      const popup = window.open(
+        linkedInAuthUrl,
+        'LinkedIn Login',
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      // Check if popup was blocked
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        toast({
+          title: "Popup Blocked",
+          description: "Please allow popups for this site to use LinkedIn integration.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Handle OAuth callback
+      const handleCallback = async (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        
+        if (event.data.type === 'linkedin-oauth-callback') {
+          const { code, state: returnedState } = event.data;
+          
+          // Verify state
+          const storedState = sessionStorage.getItem('linkedin_oauth_state');
+          if (returnedState !== storedState) {
+            toast({
+              title: "Security Error",
+              description: "OAuth state mismatch. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          sessionStorage.removeItem('linkedin_oauth_state');
+          
+          // Exchange code for profile via edge function
+          const { supabase } = await import("@/integrations/supabase/client");
+          const { data: { session } } = await supabase.auth.getSession();
+          
+          if (!session) {
+            toast({
+              title: "Authentication Required",
+              description: "Please log in to use LinkedIn import.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          const { data, error } = await supabase.functions.invoke('linkedin-auth', {
+            body: {
+              code,
+              redirectUri,
+            },
+          });
+
+          if (error) {
+            console.error('LinkedIn auth error:', error);
+            toast({
+              title: "Import Failed",
+              description: "Could not import LinkedIn profile. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          if (data?.profile) {
+            setFormData({
+              ...formData,
+              fullName: data.profile.name || formData.fullName,
+              email: data.profile.email || formData.email,
+            });
+            
+            toast({
+              title: "Profile Imported",
+              description: "Your LinkedIn profile has been imported successfully.",
+            });
+          }
+        }
+      };
+
+      window.addEventListener('message', handleCallback);
+      
+      // Cleanup listener after 5 minutes
+      setTimeout(() => {
+        window.removeEventListener('message', handleCallback);
+      }, 5 * 60 * 1000);
+
+    } catch (error) {
+      console.error('LinkedIn import error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {

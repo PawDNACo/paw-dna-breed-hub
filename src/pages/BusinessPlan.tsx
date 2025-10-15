@@ -3,8 +3,28 @@ import { Footer } from "@/components/Footer";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { useRef } from "react";
+import html2pdf from "html2pdf.js";
 
 export default function BusinessPlan() {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadPDF = () => {
+    if (!contentRef.current) return;
+
+    const opt = {
+      margin: 0.5,
+      filename: 'PawDNA-Business-Plan.pdf',
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const }
+    };
+
+    html2pdf().set(opt).from(contentRef.current).save();
+  };
+
   const financialData = [
     { year: "2025", turnover: "$0", profit: "$0" },
     { year: "2026", turnover: "$60,000", profit: "-$60,000" },
@@ -30,7 +50,13 @@ export default function BusinessPlan() {
       <Navigation />
       <main className="flex-1 py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-          <div className="space-y-12">
+          <div className="mb-6 flex justify-end">
+            <Button onClick={handleDownloadPDF} size="lg" className="gap-2">
+              <Download className="w-5 h-5" />
+              Download PDF
+            </Button>
+          </div>
+          <div ref={contentRef} className="space-y-12">
             {/* Header */}
             <div className="text-center space-y-4">
               <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent">

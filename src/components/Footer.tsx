@@ -1,7 +1,42 @@
 import { TrustBadges } from "@/components/TrustBadges";
 import logo from "@/assets/PawDNALogo.png";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Footer = () => {
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user) {
+        setIsAuthenticated(false);
+        return;
+      }
+
+      setIsAuthenticated(true);
+
+      const { data: subscription } = await supabase
+        .from("subscriptions")
+        .select("status")
+        .eq("user_id", session.user.id)
+        .eq("status", "active")
+        .single();
+
+      setIsSubscribed(!!subscription);
+    };
+
+    checkSubscription();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      checkSubscription();
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <footer className="bg-muted/50 border-t border-border py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,6 +81,9 @@ export const Footer = () => {
               <li><a href="/breeder-standards" className="hover:text-primary transition-colors">Breeder Standards</a></li>
               <li><a href="/contact" className="hover:text-primary transition-colors">Contact</a></li>
               <li><a href="/faq" className="hover:text-primary transition-colors">FAQ</a></li>
+              {!isSubscribed && (
+                <li><a href="/waitlist" className="hover:text-primary transition-colors">Join Waitlist</a></li>
+              )}
             </ul>
           </div>
 

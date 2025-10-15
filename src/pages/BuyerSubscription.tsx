@@ -26,6 +26,8 @@ const CAT_BREEDS = [
 export default function BuyerSubscription() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState("");
@@ -48,6 +50,16 @@ export default function BuyerSubscription() {
     maxPrice: "",
     subscriptionPlan: ""
   });
+
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setCurrentUser(user);
+    setLoading(false);
+  };
 
   useEffect(() => {
     if (formData.species === "dog") {
@@ -332,7 +344,8 @@ export default function BuyerSubscription() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Account Creation Section */}
+            {/* Account Creation Section - Only show if not logged in */}
+            {!currentUser && (
             <Card>
               <CardHeader>
                 <CardTitle>Create Your Account</CardTitle>
@@ -445,6 +458,7 @@ export default function BuyerSubscription() {
                 </div>
               </CardContent>
             </Card>
+            )}
 
             {/* Pet Details Section */}
             <Card>

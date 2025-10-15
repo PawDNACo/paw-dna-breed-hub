@@ -542,6 +542,8 @@ const RehomingSubscription = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Account Creation Section - Only show if not logged in */}
+            {!currentUser && (
             <Card>
               <CardHeader>
                 <CardTitle>Create Your Account</CardTitle>
@@ -599,78 +601,9 @@ const RehomingSubscription = () => {
                     onChange={handleProfilePhotoUpload}
                   />
                 </div>
-
-                <div>
-                  <Label>Password</Label>
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        required
-                        disabled={!!currentUser}
-                        value={formData.password}
-                        onChange={(e) => setFormData({...formData, password: e.target.value})}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        disabled={!!currentUser}
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? "Hide" : "Show"}
-                      </Button>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      disabled={!!currentUser}
-                      onClick={() => {
-                        const pwd = generateStrongPassword();
-                        setGeneratedPassword(pwd);
-                        setFormData({...formData, password: pwd, confirmPassword: pwd});
-                      }}
-                    >
-                      Generate Strong Password
-                    </Button>
-                    {generatedPassword && (
-                      <div className="flex gap-2 items-center">
-                        <code className="text-xs bg-muted p-2 rounded flex-1">{generatedPassword}</code>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => copyToClipboard(generatedPassword)}
-                        >
-                          Copy
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Confirm Password</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type={showConfirmPassword ? "text" : "password"}
-                      required
-                      disabled={!!currentUser}
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={!!currentUser}
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? "Hide" : "Show"}
-                    </Button>
-                  </div>
-                </div>
               </CardContent>
             </Card>
+            )}
 
             {animalDetails.map((animal, index) => (
               <Collapsible key={index} open={openSections[index]} onOpenChange={() => toggleSection(index)}>

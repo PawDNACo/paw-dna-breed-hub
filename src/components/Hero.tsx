@@ -1,29 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import heroImage from "@/assets/hero-pets.jpg";
+import bannerImage from "@/assets/banner.png";
 import { TrustBadgesCompact } from "@/components/TrustBadges";
 
 export const Hero = () => {
   return (
     <section className="relative min-h-screen flex items-center pt-16">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src={heroImage} 
-          alt="Happy pets" 
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
-      </div>
-
       {/* Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
           <div className="animate-fade-in">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold mb-6 leading-tight">
-              PawDNA —
-              <span className="bg-gradient-hero bg-clip-text text-transparent"> Where Pets Swipe Right</span>
-            </h1>
+            {/* Banner Image */}
+            <div className="mb-8">
+              <img 
+                src={bannerImage} 
+                alt="PawDNA - Where pets swipe right" 
+                className="w-full max-w-3xl mx-auto rounded-lg"
+              />
+            </div>
             <p className="text-lg sm:text-xl text-muted-foreground mb-8 leading-relaxed">
               Welcome to the future of pet matchmaking.
               Just like Tinder, Bumble, or Plenty of Fish, but for your furry companions.

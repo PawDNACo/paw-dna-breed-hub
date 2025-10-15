@@ -52,7 +52,13 @@ export default function QADemo() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
-      <main className="flex-1 container mx-auto px-4 py-8 pt-24">
+      
+      {/* Demo Only Banner */}
+      <div className="w-full bg-yellow-500 text-black py-3 text-center font-bold text-lg tracking-wider sticky top-16 z-40 shadow-lg">
+        DEMO ONLY - TEST ENVIRONMENT
+      </div>
+      
+      <main className="flex-1 container mx-auto px-4 py-8 pt-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">

@@ -3,8 +3,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import StripePaymentForm from "./StripePaymentForm";
+import PayPalPaymentForm from "./PayPalPaymentForm";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 interface SubscriptionPaymentProps {
   open: boolean;
@@ -23,34 +26,41 @@ export default function SubscriptionPayment({
 }: SubscriptionPaymentProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "paypal">("stripe");
+  const [paymentInitialized, setPaymentInitialized] = useState(false);
 
   const initializePayment = async () => {
-    setLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+    if (paymentMethod === "stripe") {
+      setLoading(true);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: {
-          type: 'subscription',
-          amount,
-          description: `${subscriptionType} Subscription`,
-          metadata: {
-            userId: user.id,
-            subscriptionType,
+        const { data, error } = await supabase.functions.invoke('create-payment', {
+          body: {
+            type: 'subscription',
+            amount,
+            description: `${subscriptionType} Subscription`,
+            metadata: {
+              userId: user.id,
+              subscriptionType,
+            },
+            paymentMethodTypes: ['card', 'us_bank_account'],
           },
-          paymentMethodTypes: ['card', 'us_bank_account'],
-        },
-      });
+        });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      setClientSecret(data.clientSecret);
-    } catch (error) {
-      console.error('Error initializing payment:', error);
-      toast.error("Failed to initialize payment");
-    } finally {
-      setLoading(false);
+        setClientSecret(data.clientSecret);
+      } catch (error) {
+        console.error('Error initializing payment:', error);
+        toast.error("Failed to initialize payment");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // PayPal initialization happens in the component
+      setPaymentInitialized(true);
     }
   };
 
@@ -92,9 +102,35 @@ export default function SubscriptionPayment({
           </DialogDescription>
         </DialogHeader>
 
-        {!clientSecret ? (
-          <div className="py-8 text-center">
-            <Button onClick={initializePayment} disabled={loading} size="lg">
+        {!clientSecret && !paymentInitialized ? (
+          <div className="space-y-6 py-4">
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Select Payment Method</Label>
+              <RadioGroup 
+                value={paymentMethod} 
+                onValueChange={(value) => setPaymentMethod(value as "stripe" | "paypal")}
+                className="space-y-3"
+              >
+                <div className="flex items-center space-x-3 rounded-lg border p-4 cursor-pointer hover:bg-accent">
+                  <RadioGroupItem value="stripe" id="stripe" />
+                  <Label htmlFor="stripe" className="cursor-pointer flex-1 font-normal">
+                    Credit Card (Stripe)
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-3 rounded-lg border p-4 cursor-pointer hover:bg-accent">
+                  <RadioGroupItem value="paypal" id="paypal" />
+                  <Label htmlFor="paypal" className="cursor-pointer flex-1 font-normal">
+                    PayPal
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <Button 
+              onClick={initializePayment} 
+              disabled={loading} 
+              size="lg"
+              className="w-full"
+            >
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -105,14 +141,22 @@ export default function SubscriptionPayment({
               )}
             </Button>
           </div>
-        ) : (
+        ) : paymentMethod === "stripe" && clientSecret ? (
           <StripePaymentForm
             clientSecret={clientSecret}
             amount={amount}
             onSuccess={handleSuccess}
             onCancel={onClose}
           />
-        )}
+        ) : paymentMethod === "paypal" && paymentInitialized ? (
+          <PayPalPaymentForm
+            amount={amount}
+            description={`${subscriptionType} Subscription`}
+            onSuccess={handleSuccess}
+            onCancel={onClose}
+            subscriptionType={subscriptionType}
+          />
+        ) : null}
       </DialogContent>
     </Dialog>
   );

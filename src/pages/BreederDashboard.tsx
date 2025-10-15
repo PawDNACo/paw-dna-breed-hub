@@ -424,7 +424,7 @@ export default function BreederDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => navigate("/#pricing")}>Subscribe Now</Button>
+              <Button onClick={() => navigate("/subscribe-pricing")}>Subscribe Now</Button>
             </CardContent>
           </Card>
         )}

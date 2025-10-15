@@ -337,7 +337,7 @@ export default function BuyerDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => navigate("/")}>View Pricing</Button>
+              <Button onClick={() => navigate("/subscribe-pricing")}>Subscribe Now</Button>
             </CardContent>
           </Card>
         )}

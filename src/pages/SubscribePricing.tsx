@@ -137,7 +137,7 @@ const rehomingPlans = [
 export default function SubscribePricing() {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("breeder");
-  const { isBreeder, isBuyer, loading } = useUserRole();
+  const { isBreeder, isBuyer, isQA, isDeveloper, loading } = useUserRole();
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -146,12 +146,12 @@ export default function SubscribePricing() {
 
   useEffect(() => {
     if (!loading) {
-      // Redirect if user already has a subscription role
-      if (isBreeder || isBuyer) {
+      // Redirect if user already has a subscription role (but not for QA/Developer)
+      if ((isBreeder || isBuyer) && !isQA && !isDeveloper) {
         navigate("/dashboard");
       }
     }
-  }, [isBreeder, isBuyer, loading, navigate]);
+  }, [isBreeder, isBuyer, isQA, isDeveloper, loading, navigate]);
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();

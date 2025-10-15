@@ -150,6 +150,13 @@ export default function BreederSubscribe() {
     }
 
     const cost = calculateSubscriptionCost();
+    
+    // For QA/Developer users with free subscriptions, skip payment
+    if (cost === 0) {
+      await handlePaymentSuccess();
+      return;
+    }
+    
     setSubscriptionType("Breeder Subscription");
     setSubscriptionAmount(cost);
     setShowPayment(true);

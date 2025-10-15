@@ -11,17 +11,25 @@ const CancellationGoodbye = () => {
           <div className="space-y-4">
             <div className="text-8xl mb-6">😢</div>
             <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-              Sorry to see you go
+              We noticed your donation was canceled.
             </h1>
           </div>
           
           <p className="text-lg text-muted-foreground leading-relaxed">
-            We're saddened to hear you canceled your donation. Your support helped fuel life-changing genetic verification and safe matches for pets in need, and your absence will be felt by the animals and people who rely on PawDNA. If circumstances change, we'd be grateful to welcome you back.
+            We're saddened by this...
+            That funding could have directly supported genetic testing and care that makes adoptions safer; losing it reduces our capacity to vet matches and protect animals. If you can reconsider, even a small gift helps keep critical services running.
           </p>
 
-          <div className="pt-4">
+          <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               variant="default" 
+              size="lg"
+              onClick={() => window.open("https://www.paypal.com/donate/?hosted_button_id=QLGMH2XWPJKQ4", "_blank")}
+            >
+              Changed My Mind
+            </Button>
+            <Button 
+              variant="outline" 
               size="lg"
               onClick={() => window.location.href = "/"}
             >

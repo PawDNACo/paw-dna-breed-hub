@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const breederPlans = [
   {
@@ -215,6 +216,12 @@ const bothPlans = [
 
 const PricingPage = () => {
   const [selectedTab, setSelectedTab] = useState("breeder");
+  const { isQA, isDeveloper } = useUserRole();
+  
+  // For QA and Developer roles, display $0.00
+  const getDisplayPrice = (originalPrice: string) => {
+    return (isQA || isDeveloper) ? "$0.00" : originalPrice;
+  };
 
   return (
     <div className="min-h-screen">
@@ -273,7 +280,7 @@ const PricingPage = () => {
                         <p>3 reminders before billing</p>
                       </div>
                       <div className="mt-4">
-                        <span className="text-3xl font-bold text-primary">{plan.price}</span>
+                        <span className="text-3xl font-bold text-primary">{getDisplayPrice(plan.price)}</span>
                         <span className="text-sm text-muted-foreground">{plan.period}</span>
                       </div>
                     </CardHeader>
@@ -314,7 +321,7 @@ const PricingPage = () => {
                         <p className="text-xs">3 reminders before billing</p>
                       </div>
                       <div className="mt-4">
-                        <span className="text-4xl font-bold text-secondary">{plan.price}</span>
+                        <span className="text-4xl font-bold text-secondary">{getDisplayPrice(plan.price)}</span>
                         <span className="text-muted-foreground">{plan.period}</span>
                       </div>
                     </CardHeader>
@@ -366,7 +373,7 @@ const PricingPage = () => {
                         <p>3 reminders before billing</p>
                       </div>
                       <div className="mt-4">
-                        <span className="text-3xl font-bold text-primary">{plan.price}</span>
+                        <span className="text-3xl font-bold text-primary">{getDisplayPrice(plan.price)}</span>
                         <span className="text-sm text-muted-foreground">{plan.period}</span>
                       </div>
                     </CardHeader>
@@ -422,7 +429,7 @@ const PricingPage = () => {
                         <p>3 reminders before billing</p>
                       </div>
                       <div className="mt-4">
-                        <span className="text-3xl font-bold text-primary">{plan.price}</span>
+                        <span className="text-3xl font-bold text-primary">{getDisplayPrice(plan.price)}</span>
                         <span className="text-sm text-muted-foreground">{plan.period}</span>
                       </div>
                     </CardHeader>

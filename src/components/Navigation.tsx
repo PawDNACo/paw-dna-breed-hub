@@ -19,7 +19,7 @@ export const Navigation = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const { isAdmin, isBreeder, isBuyer, hasAnyRole } = useUserRole();
+  const { isAdmin, isBreeder, isBuyer, hasAnyRole, isQA, isDeveloper } = useUserRole();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -84,6 +84,11 @@ export const Navigation = () => {
                   Developer
                 </Button>
               </>
+            )}
+            {(isQA || isDeveloper) && (
+              <Button variant="ghost" size="sm" onClick={() => navigate("/qa-demo")}>
+                QA/Demo
+              </Button>
             )}
             {user ? (
               <Button variant="ghost" size="sm" onClick={handleSignOut}>

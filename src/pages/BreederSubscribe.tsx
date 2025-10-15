@@ -50,6 +50,7 @@ export default function BreederSubscribe() {
     petSize: string;
     price: string;
     description: string;
+    photos: File[];
   }>>([{
     petName: "",
     species: "",
@@ -57,7 +58,8 @@ export default function BreederSubscribe() {
     gender: "",
     petSize: "",
     price: "",
-    description: ""
+    description: "",
+    photos: []
   }]);
 
   const [openSections, setOpenSections] = useState<number[]>([0]);
@@ -80,7 +82,8 @@ export default function BreederSubscribe() {
           gender: "",
           petSize: "",
           price: "",
-          description: ""
+          description: "",
+          photos: []
         });
       }
       while (newDetails.length > count) {
@@ -90,12 +93,19 @@ export default function BreederSubscribe() {
     });
   }, [formData.animalCount]);
 
-  const updateAnimalDetail = (index: number, field: string, value: string) => {
+  const updateAnimalDetail = (index: number, field: string, value: string | File[]) => {
     setAnimalDetails(prev => {
       const newDetails = [...prev];
       newDetails[index] = { ...newDetails[index], [field]: value };
       return newDetails;
     });
+  };
+
+  const handlePhotoUpload = (index: number, files: FileList | null) => {
+    if (files) {
+      const fileArray = Array.from(files);
+      updateAnimalDetail(index, 'photos', fileArray);
+    }
   };
 
   const toggleSection = (index: number) => {
@@ -240,6 +250,162 @@ export default function BreederSubscribe() {
                 )}
               </CardContent>
             </Card>
+
+            {(formData.subscriptionType === "multi-single" || formData.subscriptionType === "multi-both") && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pet Details</CardTitle>
+                  <CardDescription>Provide information for each pet you'll be listing</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {animalDetails.map((animal, index) => (
+                    <Collapsible 
+                      key={index} 
+                      open={openSections.includes(index)}
+                      onOpenChange={() => toggleSection(index)}
+                    >
+                      <div className="border rounded-lg p-4">
+                        <CollapsibleTrigger className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline">Pet {index + 1}</Badge>
+                            {animal.petName && (
+                              <span className="text-sm font-medium">{animal.petName}</span>
+                            )}
+                          </div>
+                          {openSections.includes(index) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </CollapsibleTrigger>
+                        
+                        <CollapsibleContent className="pt-4 space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor={`petName-${index}`}>Pet Name</Label>
+                              <Input
+                                id={`petName-${index}`}
+                                value={animal.petName}
+                                onChange={(e) => updateAnimalDetail(index, 'petName', e.target.value)}
+                                placeholder="Enter pet name"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`species-${index}`}>Species</Label>
+                              <Select 
+                                value={animal.species}
+                                onValueChange={(value) => updateAnimalDetail(index, 'species', value)}
+                              >
+                                <SelectTrigger id={`species-${index}`}>
+                                  <SelectValue placeholder="Select species" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="dog">Dog</SelectItem>
+                                  <SelectItem value="cat">Cat</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          {animal.species && (
+                            <div>
+                              <Label htmlFor={`breed-${index}`}>Breed</Label>
+                              <Select
+                                value={animal.breed}
+                                onValueChange={(value) => updateAnimalDetail(index, 'breed', value)}
+                              >
+                                <SelectTrigger id={`breed-${index}`}>
+                                  <SelectValue placeholder="Select breed" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {getAvailableBreeds(animal.species).map((breed) => (
+                                    <SelectItem key={breed} value={breed}>
+                                      {breed}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor={`gender-${index}`}>Gender</Label>
+                              <Select
+                                value={animal.gender}
+                                onValueChange={(value) => updateAnimalDetail(index, 'gender', value)}
+                              >
+                                <SelectTrigger id={`gender-${index}`}>
+                                  <SelectValue placeholder="Select gender" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="male">Male</SelectItem>
+                                  <SelectItem value="female">Female</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <Label htmlFor={`petSize-${index}`}>Size</Label>
+                              <Select
+                                value={animal.petSize}
+                                onValueChange={(value) => updateAnimalDetail(index, 'petSize', value)}
+                              >
+                                <SelectTrigger id={`petSize-${index}`}>
+                                  <SelectValue placeholder="Select size" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="small">Small</SelectItem>
+                                  <SelectItem value="medium">Medium</SelectItem>
+                                  <SelectItem value="large">Large</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label htmlFor={`price-${index}`}>Price ($)</Label>
+                            <Input
+                              id={`price-${index}`}
+                              type="number"
+                              value={animal.price}
+                              onChange={(e) => updateAnimalDetail(index, 'price', e.target.value)}
+                              placeholder="Enter price"
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor={`description-${index}`}>Description</Label>
+                            <Textarea
+                              id={`description-${index}`}
+                              value={animal.description}
+                              onChange={(e) => updateAnimalDetail(index, 'description', e.target.value)}
+                              placeholder="Describe your pet..."
+                              rows={3}
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor={`photos-${index}`}>Pet Photos</Label>
+                            <div className="flex items-center gap-2">
+                              <Input
+                                id={`photos-${index}`}
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={(e) => handlePhotoUpload(index, e.target.files)}
+                                className="cursor-pointer"
+                              />
+                              <Upload className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            {animal.photos.length > 0 && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {animal.photos.length} photo(s) selected
+                              </p>
+                            )}
+                          </div>
+                        </CollapsibleContent>
+                      </div>
+                    </Collapsible>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
 
             <Button type="submit" className="w-full" size="lg">
               Continue to Payment

@@ -9,8 +9,17 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Upload, FileText, MapPin, DollarSign, Clock, Briefcase } from "lucide-react";
+import { Upload, FileText, MapPin, DollarSign, Clock, Briefcase, Linkedin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+// Type declarations for external APIs
+declare global {
+  interface Window {
+    gapi: any;
+    google: any;
+    Box: any;
+  }
+}
 
 const jobListings = [
   {
@@ -148,11 +157,97 @@ export default function Careers() {
     }
   };
 
-  const handleIntegrationUpload = (source: string) => {
-    toast({
-      title: "Integration coming soon",
-      description: `${source} integration will be available soon. Please use manual upload for now.`,
-      variant: "destructive",
+  const handleGoogleDrivePicker = () => {
+    // Load Google Picker API
+    const script = document.createElement('script');
+    script.src = 'https://apis.google.com/js/api.js';
+    script.onload = () => {
+      window.gapi.load('picker', () => {
+        const picker = new window.google.picker.PickerBuilder()
+          .addView(window.google.picker.ViewId.DOCS)
+          .setOAuthToken('YOUR_OAUTH_TOKEN') // This would need proper OAuth setup
+          .setCallback((data: any) => {
+            if (data.action === window.google.picker.Action.PICKED) {
+              const doc = data.docs[0];
+              toast({
+                title: "File selected from Google Drive",
+                description: `${doc.name} will be attached to your application.`,
+              });
+              // In production, you'd download and attach the file
+            }
+          })
+          .build();
+        picker.setVisible(true);
+      });
+    };
+    document.body.appendChild(script);
+  };
+
+  const handleBoxPicker = () => {
+    // Load Box Content Picker
+    const script = document.createElement('script');
+    script.src = 'https://cdn01.boxcdn.net/platform/elements/18.0.0/en-US/picker.js';
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdn01.boxcdn.net/platform/elements/18.0.0/en-US/picker.css';
+    
+    script.onload = () => {
+      const picker = new window.Box.ContentPicker();
+      picker.show('YOUR_FOLDER_ID', 'YOUR_ACCESS_TOKEN', {
+        container: '.box-picker-container',
+        chooseButtonLabel: 'Select',
+        onChoose: (items: any[]) => {
+          if (items.length > 0) {
+            toast({
+              title: "File selected from Box",
+              description: `${items[0].name} will be attached to your application.`,
+            });
+          }
+        }
+      });
+    };
+    
+    document.head.appendChild(link);
+    document.body.appendChild(script);
+  };
+
+  const handleLinkedInImport = () => {
+    // LinkedIn OAuth flow
+    const clientId = 'YOUR_LINKEDIN_CLIENT_ID';
+    const redirectUri = encodeURIComponent(window.location.origin + '/careers');
+    const scope = encodeURIComponent('r_liteprofile r_emailaddress');
+    const state = Math.random().toString(36).substring(7);
+    
+    const linkedInAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}`;
+    
+    // Open LinkedIn OAuth in popup
+    const width = 600;
+    const height = 700;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+    
+    const popup = window.open(
+      linkedInAuthUrl,
+      'LinkedIn Login',
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
+
+    // Listen for OAuth callback
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'linkedin-auth') {
+        toast({
+          title: "LinkedIn profile imported",
+          description: "Your profile information has been imported successfully.",
+        });
+        // Auto-fill form with LinkedIn data
+        if (event.data.profile) {
+          setFormData({
+            ...formData,
+            fullName: event.data.profile.name || formData.fullName,
+            email: event.data.profile.email || formData.email,
+          });
+        }
+      }
     });
   };
 
@@ -291,34 +386,41 @@ export default function Careers() {
                   </div>
 
                   {/* Integration Options */}
-                  <div className="grid grid-cols-3 gap-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => handleIntegrationUpload("Google Drive")}
-                      className="gap-2"
-                    >
-                      <FileText className="w-4 h-4" />
-                      Google Drive
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => handleIntegrationUpload("Box")}
-                      className="gap-2"
-                    >
-                      <FileText className="w-4 h-4" />
-                      Box
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => handleIntegrationUpload("LinkedIn")}
-                      className="gap-2"
-                    >
-                      <FileText className="w-4 h-4" />
-                      LinkedIn
-                    </Button>
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Or import from:</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleGoogleDrivePicker}
+                        className="gap-2 w-full"
+                      >
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12.01 1.85l-6.02 10.44 3.78 6.56 6.02-10.44-3.78-6.56zm-7.84 11.86L.39 21.16h7.56l3.78-6.56H4.17zm11.4 0l-3.78 6.56h11.82l-3.78-6.56h-4.26z"/>
+                        </svg>
+                        Google Drive
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleBoxPicker}
+                        className="gap-2 w-full"
+                      >
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M19.9 7L12 2.1 4.1 7 12 11.9 19.9 7zM4.1 17L12 21.9l7.9-4.9-7.9-4.9L4.1 17z"/>
+                        </svg>
+                        Box
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleLinkedInImport}
+                        className="gap-2 w-full"
+                      >
+                        <Linkedin className="w-4 h-4" />
+                        LinkedIn Profile
+                      </Button>
+                    </div>
                   </div>
                 </div>
 

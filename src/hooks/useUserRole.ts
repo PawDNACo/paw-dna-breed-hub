@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-type AppRole = "admin" | "breeder" | "buyer" | "browser";
+type AppRole = "admin" | "breeder" | "buyer" | "browser" | "qa" | "developer";
 
 interface UserRoleState {
   roles: AppRole[];
@@ -11,6 +11,8 @@ interface UserRoleState {
   isBreeder: boolean;
   isBuyer: boolean;
   isBrowser: boolean;
+  isQA: boolean;
+  isDeveloper: boolean;
 }
 
 export const useUserRole = () => {
@@ -21,6 +23,8 @@ export const useUserRole = () => {
     isBreeder: false,
     isBuyer: false,
     isBrowser: false,
+    isQA: false,
+    isDeveloper: false,
   });
   const { toast } = useToast();
 
@@ -40,6 +44,8 @@ export const useUserRole = () => {
           isBreeder: false,
           isBuyer: false,
           isBrowser: false,
+          isQA: false,
+          isDeveloper: false,
         });
         return;
       }
@@ -60,6 +66,8 @@ export const useUserRole = () => {
         isBreeder: roles.includes("breeder"),
         isBuyer: roles.includes("buyer"),
         isBrowser: roles.includes("browser"),
+        isQA: roles.includes("qa"),
+        isDeveloper: roles.includes("developer"),
       });
     } catch (error) {
       console.error("Error fetching user roles:", error);
@@ -75,6 +83,8 @@ export const useUserRole = () => {
         isBreeder: false,
         isBuyer: false,
         isBrowser: false,
+        isQA: false,
+        isDeveloper: false,
       });
     }
   };

@@ -1,90 +1,154 @@
-# QA Demo Site Credentials
+# QA Demo Site - Test Credentials
 
-## Demo User Accounts
+## Access Requirements
+The QA/Demo site is restricted to users with either:
+- **QA Role** - Quality assurance testers
+- **Developer Role** - Development team members with full access
 
-To create QA test accounts, please sign up using the following credentials:
+## Test Account Credentials
 
-### Test Admin Account
-- **Email**: `qa-admin@pawdna.test`
-- **Password**: `QATest2025!`
-- **Role**: Admin (will need to be assigned via database)
+### Admin Account
+- **Email:** qa-admin@pawdna.test
+- **Password:** QATest2025!
+- **Roles:** admin, breeder, buyer, developer
+- **Access:** Full system access including admin dashboard and QA/Demo site
 
-### Test Breeder Account
-- **Email**: `qa-breeder@pawdna.test`
-- **Password**: `QATest2025!`
-- **Role**: Breeder
+### QA Tester Account
+- **Email:** qa-tester@pawdna.test
+- **Password:** QATest2025!
+- **Roles:** qa
+- **Access:** QA/Demo site access for testing
 
-### Test Buyer Account
-- **Email**: `qa-buyer@pawdna.test`
-- **Password**: `QATest2025!`
-- **Role**: Buyer
+### Breeder Account
+- **Email:** qa-breeder@pawdna.test
+- **Password:** QATest2025!
+- **Roles:** breeder
+- **Features:** Can list pets, manage care packages, view breeder dashboard
 
-### Test Rehomer Account
-- **Email**: `qa-rehomer@pawdna.test`
-- **Password**: `QATest2025!`
-- **Role**: Rehomer
+### Buyer Account
+- **Email:** qa-buyer@pawdna.test
+- **Password:** QATest2025!
+- **Roles:** buyer
+- **Features:** Can browse pets, create buyer requests, manage favorites
+
+### Rehomer Account
+- **Email:** qa-rehomer@pawdna.test
+- **Password:** QATest2025!
+- **Roles:** buyer (rehomers use buyer role with rehoming subscription)
+- **Features:** Can list pets for rehoming, manage subscriptions
 
 ## Setting Up Demo Accounts
 
 1. **Sign up** using the credentials above at `/login`
 2. **Complete profile** with demo information
-3. **For Admin role assignment**, run this SQL in the database:
+3. **Assign roles** using the SQL commands below
+
+## Assigning Roles
+
+### Assign QA Role
+To assign the QA role to a user, run this SQL in the backend:
 
 ```sql
--- After creating the qa-admin@pawdna.test account, assign admin role
--- Replace 'USER_ID_HERE' with the actual user ID from auth.users
+-- Replace 'qa-tester@pawdna.test' with the actual email
+INSERT INTO public.user_roles (user_id, role)
+SELECT id, 'qa'
+FROM public.profiles
+WHERE email = 'qa-tester@pawdna.test'
+ON CONFLICT (user_id, role) DO NOTHING;
+```
+
+### Assign Developer Role
+To assign the developer role to a user, run this SQL in the backend:
+
+```sql
+-- Replace email with the actual developer email
+INSERT INTO public.user_roles (user_id, role)
+SELECT id, 'developer'
+FROM public.profiles
+WHERE email = 'qa-admin@pawdna.test'
+ON CONFLICT (user_id, role) DO NOTHING;
+```
+
+### Assign Admin Role (includes admin, breeder, buyer)
+```sql
+-- This function assigns admin, breeder, and buyer roles
 SELECT assign_admin_by_email('qa-admin@pawdna.test');
+```
+
+### Assign Breeder Role
+```sql
+INSERT INTO public.user_roles (user_id, role)
+SELECT id, 'breeder'
+FROM public.profiles
+WHERE email = 'qa-breeder@pawdna.test'
+ON CONFLICT (user_id, role) DO NOTHING;
+```
+
+### Assign Buyer Role
+```sql
+INSERT INTO public.user_roles (user_id, role)
+SELECT id, 'buyer'
+FROM public.profiles
+WHERE email = 'qa-buyer@pawdna.test'
+ON CONFLICT (user_id, role) DO NOTHING;
 ```
 
 ## Demo Data Available
 
-### Waitlist Entries
-The system now contains 10 demo waitlist entries with various interests:
-- Sarah Johnson - breeder, buyer
-- Mike Peterson - buyer
-- Emily Chen - breeder
-- David Rodriguez - rehomer
-- Jessica Williams - just browsing
-- Robert Taylor - buyer, rehomer
-- Amanda Martinez - breeder
-- Chris Anderson - just browsing
-- Lisa Thompson - buyer, breeder
-- Kevin Brown - rehomer, just browsing
+### Pet Listings
+- Sample pets available in Browse section
+- Various species: Dogs, Cats
+- Different price ranges and locations
+- Mix of available, pending, and sold status
 
-### Creating Demo Pet Listings
+### Conversations
+- Sample conversations between buyers and breeders
+- Different conversation states (pending, approved, completed)
 
-After signing in as a breeder, you can create demo pet listings with:
-- Various breeds (Golden Retriever, Persian Cat, etc.)
-- Different price points
-- Multiple locations across the US
-- Different availability statuses
+### Transactions
+- Sample sales records
+- Payout tracking examples
+- Transaction history
 
-### Testing Workflows
+## Testing Workflows
 
-1. **Breeder Flow**:
-   - Sign in as qa-breeder@pawdna.test
-   - Create pet listings
-   - Manage care packages
-   - View breeder dashboard
+### QA Testing Workflow
+1. Login with QA credentials (qa-tester@pawdna.test)
+2. Access QA/Demo site from footer (Developer > QA/Demo)
+3. View demo data for all user types
+4. Test workflows without affecting production data
+5. Report issues found during testing
 
-2. **Buyer Flow**:
-   - Sign in as qa-buyer@pawdna.test
-   - Browse available pets
-   - Save favorites
-   - Request conversations with breeders
+### Developer Testing Workflow
+1. Login with developer/admin credentials (qa-admin@pawdna.test)
+2. Full unrestricted access to QA/Demo site
+3. Can view and test all features
+4. Can modify demo data for testing scenarios
+5. Access to developer dashboard for additional tools
 
-3. **Admin Flow**:
-   - Sign in as qa-admin@pawdna.test
-   - View admin dashboard
-   - Check waitlist signups
-   - Monitor platform statistics
+### Breeder Testing Workflow
+1. Sign in as qa-breeder@pawdna.test
+2. Create pet listings
+3. Manage care packages
+4. View breeder dashboard
+
+### Buyer Testing Workflow
+1. Sign in as qa-buyer@pawdna.test
+2. Browse available pets
+3. Save favorites
+4. Request conversations with breeders
+
+### Admin Testing Workflow
+1. Sign in as qa-admin@pawdna.test
+2. View admin dashboard
+3. Access QA/Demo site
+4. Monitor platform statistics
 
 ## Important Notes
-
-- All demo accounts use the same password: `QATest2025!`
+- All test accounts use the password: **QATest2025!**
+- QA and Developer roles have access to the QA/Demo site
 - Demo data is for testing purposes only
 - Do not use these credentials in production
-- Regularly clear demo data to maintain database cleanliness
 - All demo emails use the `.test` TLD to avoid conflicts with real users
 
 ## Additional Demo Data Setup
@@ -101,9 +165,13 @@ If you need to populate more demo data:
 To clear demo data:
 
 ```sql
--- Delete demo waitlist entries
-DELETE FROM public.waitlist WHERE email LIKE '%@example.com';
+-- Delete demo pet listings created by test accounts
+DELETE FROM public.pets WHERE owner_id IN (
+  SELECT id FROM public.profiles WHERE email LIKE '%@pawdna.test'
+);
 
--- Delete demo user accounts (be careful!)
--- This requires admin access to auth.users table
+-- Clear demo conversations
+DELETE FROM public.conversations WHERE buyer_id IN (
+  SELECT id FROM public.profiles WHERE email LIKE '%@pawdna.test'
+);
 ```

@@ -58,6 +58,7 @@ import CancellationGoodbye from "./pages/CancellationGoodbye";
 import CancelSubscription from "./pages/CancelSubscription";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { QAProtectedRoute } from "./components/auth/QAProtectedRoute";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -79,9 +80,9 @@ const App = () => (
           <Route 
             path="/qa-demo" 
             element={
-              <ProtectedRoute>
+              <QAProtectedRoute>
                 <QADemo />
-              </ProtectedRoute>
+              </QAProtectedRoute>
             } 
           />
           <Route path="/lost-and-found" element={<LostAndFound />} />

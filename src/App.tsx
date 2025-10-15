@@ -50,6 +50,7 @@ import Contact from "./pages/Contact";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import GeneratePetListings from "./pages/GeneratePetListings";
+import Waitlist from "./pages/Waitlist";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -211,6 +212,7 @@ const App = () => (
           <Route path="/about" element={<AboutUs />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/waitlist" element={<Waitlist />} />
           <Route
             path="/verification-complete" 
             element={

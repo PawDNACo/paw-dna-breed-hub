@@ -1657,6 +1657,39 @@ export type Database = {
           },
         ]
       }
+      waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          interests: string[]
+          ip_address: unknown | null
+          name: string
+          phone: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          interests: string[]
+          ip_address?: unknown | null
+          name: string
+          phone: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          interests?: string[]
+          ip_address?: unknown | null
+          name?: string
+          phone?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       conversation_partner_profiles: {

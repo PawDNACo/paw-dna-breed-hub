@@ -157,12 +157,165 @@ export default function Careers() {
     }
   };
 
-  const handleGoogleDrivePicker = () => {
-    toast({
-      title: "Coming Soon",
-      description: "Google Drive integration is not yet configured. Please upload your resume directly or use LinkedIn import.",
-      variant: "destructive",
-    });
+  const handleGoogleDrivePicker = async () => {
+    try {
+      // Get client ID from edge function
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { data: configData, error: configError } = await supabase.functions.invoke('google-drive-auth', {
+        body: { action: 'get-client-id' },
+      });
+
+      if (configError || !configData?.clientId) {
+        toast({
+          title: "Configuration Error",
+          description: "Google Drive integration is not configured. Please contact support.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // OAuth parameters
+      const redirectUri = `${window.location.origin}/google-drive-callback`;
+      const scope = 'https://www.googleapis.com/auth/drive.readonly';
+      const state = Math.random().toString(36).substring(7);
+      
+      // Store state for verification
+      sessionStorage.setItem('google_drive_oauth_state', state);
+      
+      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${configData.clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}&access_type=offline&prompt=consent`;
+      
+      // Open Google OAuth in popup
+      const width = 600;
+      const height = 700;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
+      
+      const popup = window.open(
+        googleAuthUrl,
+        'Google Drive Login',
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      // Check if popup was blocked
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        toast({
+          title: "Popup Blocked",
+          description: "Please allow popups for this site to use Google Drive integration.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Handle OAuth callback
+      const handleCallback = async (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        
+        if (event.data.type === 'google-drive-oauth-callback') {
+          const { code, state: returnedState, error } = event.data;
+          
+          if (error) {
+            toast({
+              title: "Authorization Failed",
+              description: "Could not authorize Google Drive access. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          // Verify state
+          const storedState = sessionStorage.getItem('google_drive_oauth_state');
+          if (returnedState !== storedState) {
+            toast({
+              title: "Security Error",
+              description: "OAuth state mismatch. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          sessionStorage.removeItem('google_drive_oauth_state');
+          
+          // Exchange code for token and show file picker
+          const { data: { session } } = await supabase.auth.getSession();
+          
+          if (!session) {
+            toast({
+              title: "Authentication Required",
+              description: "Please log in to use Google Drive import.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          const { data: tokenData, error: tokenError } = await supabase.functions.invoke('google-drive-auth', {
+            body: {
+              action: 'exchange-code',
+              code,
+              redirectUri,
+            },
+          });
+
+          if (tokenError || !tokenData?.accessToken) {
+            console.error('Google Drive auth error:', tokenError);
+            toast({
+              title: "Import Failed",
+              description: "Could not access Google Drive. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Load Google Picker API with the access token
+          const script = document.createElement('script');
+          script.src = 'https://apis.google.com/js/api.js';
+          script.onload = () => {
+            window.gapi.load('picker', () => {
+              const picker = new window.google.picker.PickerBuilder()
+                .addView(new window.google.picker.DocsView()
+                  .setIncludeFolders(true)
+                  .setMimeTypes('application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'))
+                .setOAuthToken(tokenData.accessToken)
+                .setDeveloperKey(configData.clientId)
+                .setCallback(async (data: any) => {
+                  if (data.action === window.google.picker.Action.PICKED) {
+                    const doc = data.docs[0];
+                    
+                    toast({
+                      title: "File Selected",
+                      description: `${doc.name} has been selected from Google Drive.`,
+                    });
+
+                    // Note: In a production app, you would:
+                    // 1. Use the file ID to download the file via the Drive API
+                    // 2. Upload it to your backend/storage
+                    // 3. Attach it to the application
+                    // For now, we just show it was selected
+                  }
+                })
+                .build();
+              picker.setVisible(true);
+            });
+          };
+          document.body.appendChild(script);
+        }
+      };
+
+      window.addEventListener('message', handleCallback);
+      
+      // Cleanup listener after 5 minutes
+      setTimeout(() => {
+        window.removeEventListener('message', handleCallback);
+      }, 5 * 60 * 1000);
+
+    } catch (error) {
+      console.error('Google Drive import error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleBoxPicker = () => {

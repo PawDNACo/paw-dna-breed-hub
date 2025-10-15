@@ -57,6 +57,7 @@ import Waitlist from "./pages/Waitlist";
 import CancellationGoodbye from "./pages/CancellationGoodbye";
 import CancelSubscription from "./pages/CancelSubscription";
 import LinkedInCallback from "./pages/LinkedInCallback";
+import GoogleDriveCallback from "./pages/GoogleDriveCallback";
 import { AuthPage } from "./components/auth/AuthPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { QAProtectedRoute } from "./components/auth/QAProtectedRoute";
@@ -281,6 +282,7 @@ const App = () => (
             } 
           />
           <Route path="/linkedin-callback" element={<LinkedInCallback />} />
+          <Route path="/google-drive-callback" element={<GoogleDriveCallback />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

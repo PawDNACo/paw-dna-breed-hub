@@ -92,7 +92,7 @@ export default function GeneratePetListings() {
     <div className="min-h-screen flex flex-col">
       <Navigation />
       
-      <main className="flex-grow container mx-auto px-4 py-8 mt-20">
+      <main className="flex-grow container mx-auto px-4 py-8 pt-24">
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>

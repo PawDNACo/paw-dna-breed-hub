@@ -361,7 +361,7 @@ export default function BreederDashboard() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-8 pt-24">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>

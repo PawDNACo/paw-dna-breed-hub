@@ -561,7 +561,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
-      <div className="flex-1 flex">
+      <div className="flex-1 flex pt-16">
         {/* Sidebar */}
         <aside className="w-64 border-r bg-card p-6 hidden lg:block">
           <div className="mb-8">

@@ -213,17 +213,9 @@ export default function Careers() {
 
   const handleLinkedInImport = async () => {
     try {
-      const clientId = import.meta.env.VITE_LINKEDIN_CLIENT_ID;
+      // Get client ID from edge function (it will fetch from secrets)
+      const { supabase } = await import("@/integrations/supabase/client");
       
-      if (!clientId) {
-        toast({
-          title: "Configuration Error",
-          description: "LinkedIn integration is not configured. Please contact support.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       // OAuth parameters
       const redirectUri = `${window.location.origin}/linkedin-callback`;
       const scope = 'openid profile email';
@@ -232,7 +224,21 @@ export default function Careers() {
       // Store state for verification
       sessionStorage.setItem('linkedin_oauth_state', state);
       
-      const linkedInAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
+      // Get the client ID from the backend to ensure it's configured
+      const { data: configData, error: configError } = await supabase.functions.invoke('linkedin-auth', {
+        body: { action: 'get-client-id' },
+      });
+
+      if (configError || !configData?.clientId) {
+        toast({
+          title: "Configuration Error",
+          description: "LinkedIn integration is not configured. Please contact support.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const linkedInAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${configData.clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
       
       // Open LinkedIn OAuth in popup
       const width = 600;
@@ -277,7 +283,6 @@ export default function Careers() {
           sessionStorage.removeItem('linkedin_oauth_state');
           
           // Exchange code for profile via edge function
-          const { supabase } = await import("@/integrations/supabase/client");
           const { data: { session } } = await supabase.auth.getSession();
           
           if (!session) {
@@ -291,6 +296,7 @@ export default function Careers() {
 
           const { data, error } = await supabase.functions.invoke('linkedin-auth', {
             body: {
+              action: 'exchange-code',
               code,
               redirectUri,
             },

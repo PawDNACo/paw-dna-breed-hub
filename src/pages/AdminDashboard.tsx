@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Users, Package, ShoppingBag, DollarSign, Settings, Database } from "lucide-react";
+import { Users, Package, ShoppingBag, DollarSign, Settings, Database, ListChecks } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
@@ -18,6 +19,15 @@ interface Stats {
   activeBuyers: number;
 }
 
+interface WaitlistEntry {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  interests: string[];
+  created_at: string;
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { isAdmin, loading: roleLoading } = useUserRole();
@@ -28,6 +38,7 @@ export default function AdminDashboard() {
     activeBreeders: 0,
     activeBuyers: 0,
   });
+  const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -89,6 +100,18 @@ export default function AdminDashboard() {
 
       if (statsData) {
         setStats(statsData);
+      }
+
+      // Fetch waitlist data
+      const { data: waitlistData, error: waitlistError } = await supabase
+        .from("waitlist")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (waitlistError) {
+        console.error("Error fetching waitlist:", waitlistError);
+      } else if (waitlistData) {
+        setWaitlist(waitlistData);
       }
     } catch (error) {
       console.error("Error loading stats:", error);
@@ -189,9 +212,10 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="waitlist">Waitlist</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
@@ -244,6 +268,63 @@ export default function AdminDashboard() {
                     <ShoppingBag className="mr-2 h-4 w-4" />
                     View All Buyers
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="waitlist" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Waitlist Signups</CardTitle>
+                <CardDescription>
+                  Users who signed up for early access ({waitlist.length} total)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>Interests</TableHead>
+                        <TableHead>Joined</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {waitlist.map((entry) => (
+                        <TableRow key={entry.id}>
+                          <TableCell className="font-medium">{entry.name}</TableCell>
+                          <TableCell>{entry.email}</TableCell>
+                          <TableCell>{entry.phone}</TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {entry.interests.map((interest, idx) => (
+                                <span
+                                  key={idx}
+                                  className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary"
+                                >
+                                  {interest}
+                                </span>
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {new Date(entry.created_at).toLocaleDateString()}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {waitlist.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center text-muted-foreground">
+                            No waitlist signups yet
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
                 </div>
               </CardContent>
             </Card>
